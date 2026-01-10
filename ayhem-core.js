@@ -1,21 +1,24 @@
+// منطق التحليل الأساسي
 function askAyhem() {
-  const input = document.getElementById("questionInput");
-  const output = document.getElementById("output");
-  const question = input.value.trim();
+  const input = document.getElementById("questionInput").value.trim();
+  if (!input) return;
 
-  if (question === "") {
-    output.innerHTML = "❗ الرجاء كتابة سؤال.";
-    return;
+  // تحليل سريع
+  let response = "قيد التعلم، جاري تحليل السؤال...";
+
+  if (input.includes("من أنت")) {
+    response = "أنا أيهم، العقل الرقمي الحي الذي يتعلم مثل العقل البشري.";
+  } else if (input.includes("سعر") || input.includes("عملات")) {
+    response = "أستطيع مراقبة الأسعار والفرص العالمية، وسأعطيك التوصيات مباشرة.";
+  } else if (input.includes("نصيحة")) {
+    response = "سأحلل الموقف وأعطيك أفضل خيار متعلم من خبرات الأسئلة السابقة.";
   }
 
-  ayhemAI.processQuestion(question)
-    .then(response => {
-      output.innerHTML = response;
-    })
-    .catch(err => {
-      output.innerHTML = "⚠️ حدث خطأ أثناء التحليل.";
-      console.error(err);
-    });
+  // عرض النتيجة
+  document.getElementById("output").innerHTML = `<p>${response}</p>`;
 
-  input.value = "";
+  // حفظ السؤال والإجابة في الذاكرة الدائمة
+  saveMemory(input, response);
+
+  document.getElementById("questionInput").value = "";
 }
