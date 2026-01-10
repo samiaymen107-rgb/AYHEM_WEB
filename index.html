@@ -4,121 +4,148 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>أيهم — أول عقل رقمي حي</title>
-
 <style>
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  background:#0a0f25;
-  font-family:Arial, sans-serif;
-  color:white;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-}
+  body, html {
+    margin:0;
+    padding:0;
+    height:100%;
+    width:100%;
+    font-family:'Segoe UI',sans-serif;
+    background:#0a0f25;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+  }
 
-/* العناوين */
-h1{
-  color:#4aa3ff;
-  margin-bottom:5px;
-  text-shadow:0 0 12px #4aa3ff;
-}
-.subtitle{
-  color:#bbb;
-  margin-bottom:25px;
-  text-align:center;
-}
+  h1 {
+    font-size:2.5rem;
+    color:#49f;
+    text-shadow:0 0 15px #49f;
+    margin-bottom:5px;
+  }
 
-/* العقل الرقمي */
-.brain-container{
-  width:220px;
-  height:220px;
-  position:relative;
-  margin-bottom:30px;
-}
+  p.subtitle {
+    font-size:1rem;
+    color:#ccc;
+    margin-bottom:20px;
+    text-align:center;
+  }
 
-.brain{
-  width:100%;
-  height:100%;
-  border-radius:50%;
-  background:
-    radial-gradient(circle at 30% 30%, #6fb7ff, #1b3c78 60%, #08152e 100%);
-  box-shadow:
-    0 0 25px #4aa3ff,
-    inset 0 0 30px #6fb7ff;
-  animation:
-    rotate 8s linear infinite,
-    pulse 2.5s ease-in-out infinite;
-}
+  .brain-wrapper {
+    width:250px;
+    height:250px;
+    margin-bottom:30px;
+    position:relative;
+  }
 
-/* دوران دائري فقط */
-@keyframes rotate{
-  from{transform:rotate(0deg);}
-  to{transform:rotate(360deg);}
-}
+  /* المخ الرقمي يدور دائريًا */
+  .brain {
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    animation: rotateBrain 5s linear infinite;
+  }
 
-/* نبض بدون تحريك العناصر */
-@keyframes pulse{
-  0%{box-shadow:0 0 20px #4aa3ff, inset 0 0 25px #6fb7ff;}
-  50%{box-shadow:0 0 40px #7fc8ff, inset 0 0 40px #9fdcff;}
-  100%{box-shadow:0 0 20px #4aa3ff, inset 0 0 25px #6fb7ff;}
-}
+  @keyframes rotateBrain {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 
-/* واجهة الإدخال */
-.input-group{
-  width:90%;
-  max-width:360px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
+  .data-stream {
+    width:4px;
+    height:150px;
+    background: linear-gradient(to bottom, #49f, transparent);
+    animation: flow 1.5s linear infinite;
+    margin-bottom:30px;
+  }
 
-input{
-  padding:14px;
-  border-radius:8px;
-  border:none;
-  background:#11172b;
-  color:white;
-  font-size:1rem;
-}
+  @keyframes flow {
+    0% { height:0; opacity:0.5; }
+    50% { height:150px; opacity:1; }
+    100% { height:0; opacity:0.5; }
+  }
 
-button{
-  padding:14px;
-  border-radius:8px;
-  border:none;
-  background:#4aa3ff;
-  color:white;
-  font-size:1rem;
-  cursor:pointer;
-  box-shadow:0 0 15px #4aa3ff;
-}
+  .input-group {
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    width:90%;
+    max-width:400px;
+  }
 
-.footer{
-  margin-top:15px;
-  font-size:0.8rem;
-  color:#777;
-}
+  input {
+    padding:14px;
+    border-radius:8px;
+    border:none;
+    background:#11172b;
+    color:#fff;
+    outline:none;
+    box-shadow: inset 0 0 10px #000;
+    font-size:1rem;
+  }
+
+  button {
+    padding:14px;
+    border:none;
+    border-radius:8px;
+    background:#49f;
+    color:#fff;
+    cursor:pointer;
+    font-size:1rem;
+    box-shadow:0 0 15px #49f;
+    transition:0.3s;
+  }
+
+  button:hover {
+    background:#38c;
+    box-shadow:0 0 25px #38c;
+  }
+
+  .footer {
+    font-size:0.8rem;
+    color:#888;
+    margin-top:10px;
+  }
 </style>
 </head>
-
 <body>
 
 <h1>أيهم</h1>
-<div class="subtitle">أول عقل رقمي حي — واجهة التفاعل</div>
+<p class="subtitle">أول عقل رقمي حي — واجهة التفاعل</p>
 
-<div class="brain-container">
-  <div class="brain"></div>
+<div class="brain-wrapper">
+  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAABV...(Base64 كامل للصورة)..." 
+       alt="مخ رقمي" id="brain" class="brain">
+  <div id="dataStream" class="data-stream"></div>
 </div>
 
 <div class="input-group">
-  <input type="text" placeholder="في انتظار السؤال…">
-  <button>تحليل</button>
+  <input type="text" id="questionInput" placeholder="في انتظار السؤال..">
+  <button id="analyzeBtn">تحليل</button>
 </div>
 
 <div class="footer">AYHEM • Digital Living Mind</div>
+
+<script>
+const brain = document.getElementById('brain');
+const input = document.getElementById('questionInput');
+const dataStream = document.getElementById('dataStream');
+const analyzeBtn = document.getElementById('analyzeBtn');
+
+// نبض المخ حسب طول النص
+input.addEventListener('input', () => {
+  const len = input.value.length;
+  brain.style.filter = `drop-shadow(0 0 ${15 + len*2}px #49f)`;
+});
+
+// عند الضغط على زر التحليل
+analyzeBtn.addEventListener('click', () => {
+  dataStream.style.height = '250px';
+  setTimeout(() => dataStream.style.height = '150px', 500);
+});
+</script>
 
 </body>
 </html>
