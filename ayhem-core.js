@@ -2,15 +2,23 @@ function askAyhem() {
   const input = document.getElementById("questionInput");
   const output = document.getElementById("output");
 
-  const question = input.value;
+  const question = input.value.trim();
 
-  // إخفاء مربع السؤال (احترافي)
+  if (!question) {
+    output.innerHTML = "❗ اكتب سؤالًا أولًا.";
+    return;
+  }
+
+  // إخفاء السؤال بعد التحليل (احترافية)
+  input.value = "";
   input.style.display = "none";
 
-  output.innerHTML = "🔍 جاري التحليل...";
+  // حالة التفكير
+  output.innerHTML = `<span class="thinking">أيهم يفكّر…</span>`;
 
+  // محاكاة تفكير عقل رقمي
   setTimeout(() => {
     const response = generateAyhemResponse(question);
     output.innerHTML = response;
-  }, 800);
+  }, 900);
 }
