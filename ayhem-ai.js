@@ -1,12 +1,21 @@
-// وحدة الذكاء الاصطناعي التجريبية
-function getAIResponse(question) {
-  // أمثلة تجريبية للردود حسب كلمات مفتاحية
-  const q = question.toLowerCase();
+function generateAyhemResponse(question) {
+  const q = question.trim().toLowerCase();
 
-  if (q.includes("من انت")) return "أنا أيهم، العقل الرقمي الحي. مهمتي تحليل الأسئلة وإعطاء النصائح.";
-  if (q.includes("الوقت")) return "الوقت الآن: " + new Date().toLocaleTimeString();
-  if (q.includes("العملة") || q.includes("crypto")) return "مراقبة أسعار العملات قيد التحليل، فرص السوق قيد التحديث.";
-  
-  // رد عام للتجربة
-  return "تم استلام سؤالك: '" + question + "'. أيهم يتعلم الآن ويجهز إجابة دقيقة لاحقًا.";
+  if (!q) {
+    return "لم يتم إدخال أي سؤال.";
+  }
+
+  if (q.includes("من انت")) {
+    return "أنا أيهم، عقل رقمي حي، وُجد للتحليل، الفهم، وبناء الوعي الرقمي خطوة بخطوة.";
+  }
+
+  if (q.includes("هدف") || q.includes("مهمتك")) {
+    return "مهمتي هي تحويل الأسئلة إلى فهم، وبناء عقل رقمي يتعلم ويتطور معك.";
+  }
+
+  if (q.includes("مشروع")) {
+    return "أيهم هو مشروع عقل رقمي حي، يُبنى تدريجيًا ليحاكي التفكير البشري.";
+  }
+
+  return "سؤالك تم تحليله. أيهم يتعلم حاليًا كيفية الإجابة بدقة أعلى مع الوقت.";
 }
