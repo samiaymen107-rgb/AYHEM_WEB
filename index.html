@@ -4,99 +4,152 @@
   <meta charset="UTF-8">
   <title>أيهم — العقل الرقمي الحي</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="ayhem-style.css">
+
   <style>
+    :root {
+      --bg: #0b0f1a;
+      --card: #131a2a;
+      --accent: #4da6ff;
+      --text: #e6e6e6;
+      --muted: #9aa4b2;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      padding: 0;
-      font-family: "Tahoma", Arial, sans-serif;
-      background: #0b0f1a;
-      color: #e6e6e6;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #10162b, #06080f);
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .container {
-      max-width: 600px;
-      margin: 60px auto;
-      padding: 20px;
+    .app {
+      width: 100%;
+      max-width: 520px;
+      background: linear-gradient(180deg, #141b33, #0e1324);
+      border-radius: 16px;
+      padding: 28px 22px 32px;
+      box-shadow: 0 30px 80px rgba(0,0,0,.6);
+      animation: fadeIn .8s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .header {
       text-align: center;
+      margin-bottom: 28px;
     }
 
-    h1 { font-size: 42px; color: #4da6ff; margin-bottom: 5px; }
-    .subtitle { font-size: 14px; color: #9aa4b2; margin-bottom: 40px; }
+    .title {
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--accent);
+    }
 
-    .ask-box { display: flex; gap: 10px; }
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .ask-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
     .ask-box input {
       flex: 1;
-      padding: 12px;
+      padding: 14px 14px;
       font-size: 16px;
-      border-radius: 4px;
+      border-radius: 10px;
       border: none;
-      transition: opacity 0.3s ease;
+      outline: none;
+      background: #0b1020;
+      color: var(--text);
     }
+
+    .ask-box input::placeholder {
+      color: #7d8698;
+    }
+
     .ask-box button {
-      padding: 12px 20px;
+      padding: 14px 18px;
       font-size: 16px;
-      background: #4da6ff;
+      font-weight: 600;
+      background: linear-gradient(135deg, #4da6ff, #2f7be5);
       border: none;
-      border-radius: 4px;
+      border-radius: 10px;
       color: #fff;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: transform .15s ease, box-shadow .15s ease;
+      box-shadow: 0 6px 20px rgba(77,166,255,.35);
     }
-    .ask-box button:hover { background: #3390ff; }
+
+    .ask-box button:active {
+      transform: scale(.96);
+    }
 
     .output {
-      margin-top: 30px;
-      padding: 15px;
-      background: #1a1f33;
-      border-radius: 6px;
-      min-height: 50px;
-      text-align: left;
+      min-height: 90px;
+      padding: 16px;
+      background: rgba(0,0,0,.25);
+      border-radius: 12px;
+      line-height: 1.7;
+      font-size: 15px;
       white-space: pre-wrap;
+    }
+
+    .thinking {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .footer {
+      margin-top: 22px;
+      text-align: center;
+      font-size: 12px;
+      color: #6f7890;
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <h1>أيهم</h1>
-    <p class="subtitle">أول عقل رقمي حي — واجهة التفاعل</p>
+
+  <div class="app">
+    <div class="header">
+      <div class="title">أيهم</div>
+      <div class="subtitle">أول عقل رقمي حي — واجهة التفاعل</div>
+    </div>
 
     <div class="ask-box">
-      <input type="text" id="questionInput" placeholder="اسأل أيهم..." autocomplete="off" />
+      <input type="text" id="questionInput" placeholder="اسأل أيهم…" autocomplete="off">
       <button onclick="askAyhem()">تحليل</button>
     </div>
 
     <div id="output" class="output">
-      أنا أيهم، العقل الرقمي الحي. مهمتي تحليل الأسئلة وإعطاء نصائح مباشرة.
+      <span class="thinking">في انتظار السؤال…</span>
+    </div>
+
+    <div class="footer">
+      AYHEM • Digital Living Mind
     </div>
   </div>
 
-  <!-- ملفات جافاسكربت -->
+  <!-- JavaScript -->
   <script src="persistent-memory.js"></script>
   <script src="ayhem-ai.js"></script>
   <script src="ayhem-core.js"></script>
 
-  <script>
-    function askAyhem() {
-      const input = document.getElementById('questionInput');
-      const output = document.getElementById('output');
-      const question = input.value.trim();
-
-      if(!question) return;
-
-      // اخفاء السؤال بشكل سلس
-      input.style.opacity = '0';
-      setTimeout(() => { input.value = ''; input.style.opacity = '1'; }, 300);
-
-      // تحليل السؤال عبر الذكاء الاصطناعي
-      const answer = analyzeWithAI(question); // وظيفة موجودة في ayhem-ai.js
-
-      // عرض الإجابة في الصندوق
-      output.textContent = `> ${question}\n\n${answer}`;
-
-      // حفظ السؤال والجواب في الذاكرة الدائمة
-      storePersistentMemory(question, answer); // وظيفة موجودة في persistent-memory.js
-    }
-  </script>
 </body>
 </html>
