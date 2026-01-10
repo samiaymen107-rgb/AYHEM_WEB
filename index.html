@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>أيهم — العقل الرقمي الحي</title>
+<title>أيهم — أول عقل رقمي حي</title>
 
 <style>
 html,body{
@@ -12,8 +12,8 @@ html,body{
   width:100%;
   height:100%;
   background:#0a0f25;
-  font-family:Tahoma, Arial, sans-serif;
-  color:#fff;
+  font-family:Arial, sans-serif;
+  color:white;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -23,18 +23,17 @@ html,body{
 /* العناوين */
 h1{
   color:#4aa3ff;
-  margin-bottom:6px;
-  text-shadow:0 0 14px #4aa3ff;
+  margin-bottom:5px;
+  text-shadow:0 0 12px #4aa3ff;
 }
 .subtitle{
-  color:#b5c7e6;
-  margin-bottom:28px;
+  color:#bbb;
+  margin-bottom:25px;
   text-align:center;
-  font-size:0.95rem;
 }
 
-/* ===== العقل الرقمي ===== */
-.brain-box{
+/* العقل الرقمي */
+.brain-container{
   width:220px;
   height:220px;
   position:relative;
@@ -46,30 +45,29 @@ h1{
   height:100%;
   border-radius:50%;
   background:
-    radial-gradient(circle at 30% 30%, #9fd6ff, #2b5cb3 55%, #050d22 100%);
+    radial-gradient(circle at 30% 30%, #6fb7ff, #1b3c78 60%, #08152e 100%);
   box-shadow:
     0 0 25px #4aa3ff,
-    inset 0 0 35px #7fc8ff;
-  animation: rotate 7s linear infinite;
+    inset 0 0 30px #6fb7ff;
+  animation:
+    rotate 8s linear infinite,
+    pulse 2.5s ease-in-out infinite;
 }
 
-/* الدوران فقط */
+/* دوران دائري فقط */
 @keyframes rotate{
-  from{ transform:rotate(0deg); }
-  to{ transform:rotate(360deg); }
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
 }
 
-/* خطوط رقمية داخلية */
-.brain::before{
-  content:"";
-  position:absolute;
-  inset:18px;
-  border-radius:50%;
-  border:2px dashed rgba(120,190,255,0.35);
-  animation: rotate 12s linear infinite reverse;
+/* نبض بدون تحريك العناصر */
+@keyframes pulse{
+  0%{box-shadow:0 0 20px #4aa3ff, inset 0 0 25px #6fb7ff;}
+  50%{box-shadow:0 0 40px #7fc8ff, inset 0 0 40px #9fdcff;}
+  100%{box-shadow:0 0 20px #4aa3ff, inset 0 0 25px #6fb7ff;}
 }
 
-/* ===== الإدخال ===== */
+/* واجهة الإدخال */
 .input-group{
   width:90%;
   max-width:360px;
@@ -83,9 +81,8 @@ input{
   border-radius:8px;
   border:none;
   background:#11172b;
-  color:#fff;
+  color:white;
   font-size:1rem;
-  outline:none;
 }
 
 button{
@@ -93,24 +90,15 @@ button{
   border-radius:8px;
   border:none;
   background:#4aa3ff;
-  color:#fff;
+  color:white;
   font-size:1rem;
   cursor:pointer;
   box-shadow:0 0 15px #4aa3ff;
 }
 
-/* مخرجات الذكاء */
-.output{
-  margin-top:15px;
-  font-size:0.9rem;
-  color:#9fd6ff;
-  min-height:20px;
-  text-align:center;
-}
-
 .footer{
-  margin-top:18px;
-  font-size:0.75rem;
+  margin-top:15px;
+  font-size:0.8rem;
   color:#777;
 }
 </style>
@@ -119,39 +107,18 @@ button{
 <body>
 
 <h1>أيهم</h1>
-<div class="subtitle">عقل رقمي دائري مدعوم بالذكاء الاصطناعي</div>
+<div class="subtitle">أول عقل رقمي حي — واجهة التفاعل</div>
 
-<div class="brain-box">
+<div class="brain-container">
   <div class="brain"></div>
 </div>
 
 <div class="input-group">
-  <input id="question" type="text" placeholder="اكتب سؤالك...">
-  <button onclick="analyze()">تحليل</button>
+  <input type="text" placeholder="في انتظار السؤال…">
+  <button>تحليل</button>
 </div>
 
-<div class="output" id="output"></div>
-
 <div class="footer">AYHEM • Digital Living Mind</div>
-
-<script>
-function analyze(){
-  const q = document.getElementById("question").value.trim();
-  const out = document.getElementById("output");
-
-  if(!q){
-    out.textContent = "⚠️ الرجاء إدخال سؤال";
-    return;
-  }
-
-  // محاكاة ذكاء اصطناعي (قابل للربط الحقيقي لاحقًا)
-  out.textContent = "🧠 العقل الرقمي يحلل السؤال...";
-  
-  setTimeout(()=>{
-    out.textContent = "✅ تم التحليل. النظام جاهز للربط بالذكاء الاصطناعي الحقيقي.";
-  },1200);
-}
-</script>
 
 </body>
 </html>
