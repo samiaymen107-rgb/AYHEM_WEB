@@ -1,155 +1,141 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>أيهم — العقل الرقمي الحي</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    :root {
-      --bg: #0b0f1a;
-      --card: #131a2a;
-      --accent: #4da6ff;
-      --text: #e6e6e6;
-      --muted: #9aa4b2;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>أيهم — أول عقل رقمي حي</title>
+<style>
+    /* ===== عام ===== */
     body {
-      margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #10162b, #06080f);
-      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+        margin: 0;
+        padding: 0;
+        font-family: 'Cairo', sans-serif;
+        background: linear-gradient(180deg, #0a0f2c, #000);
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
     }
-
-    .app {
-      width: 100%;
-      max-width: 520px;
-      background: linear-gradient(180deg, #141b33, #0e1324);
-      border-radius: 16px;
-      padding: 28px 22px 32px;
-      box-shadow: 0 30px 80px rgba(0,0,0,.6);
-      animation: fadeIn .8s ease;
+    /* ===== البطاقة المركزية ===== */
+    .card {
+        background: rgba(10, 15, 44, 0.95);
+        border-radius: 20px;
+        padding: 30px 25px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 0 20px rgba(0, 128, 255, 0.4);
+        text-align: center;
+        position: relative;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .card h1 {
+        font-size: 2em;
+        color: #00bfff;
+        margin-bottom: 10px;
+        text-shadow: 0 0 10px #00bfff;
     }
-
-    .header {
-      text-align: center;
-      margin-bottom: 28px;
+    .card p.subtitle {
+        font-size: 1em;
+        color: #aaa;
+        margin-bottom: 20px;
     }
-
-    .title {
-      font-size: 38px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      color: var(--accent);
+    /* ===== حقل الإدخال ===== */
+    input[type="text"] {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 12px;
+        border: none;
+        font-size: 1em;
+        outline: none;
+        margin-bottom: 15px;
+        background: #111633;
+        color: #fff;
+        box-shadow: inset 0 0 8px rgba(0, 191, 255, 0.3);
     }
-
-    .subtitle {
-      font-size: 14px;
-      color: var(--muted);
-      margin-top: 6px;
+    input[type="text"]::placeholder {
+        color: #888;
     }
-
-    .ask-box {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 24px;
+    /* ===== زر التحليل ===== */
+    button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 12px;
+        background: #00bfff;
+        color: #000;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 1em;
+        transition: 0.3s;
     }
-
-    .ask-box input {
-      flex: 1;
-      padding: 14px 14px;
-      font-size: 16px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      background: #0b1020;
-      color: var(--text);
+    button:disabled {
+        background: #555;
+        cursor: not-allowed;
     }
-
-    .ask-box input::placeholder {
-      color: #7d8698;
+    button:hover:not(:disabled) {
+        background: #0094d6;
+        color: #fff;
     }
-
-    .ask-box button {
-      padding: 14px 18px;
-      font-size: 16px;
-      font-weight: 600;
-      background: linear-gradient(135deg, #4da6ff, #2f7be5);
-      border: none;
-      border-radius: 10px;
-      color: #fff;
-      cursor: pointer;
-      transition: transform .15s ease, box-shadow .15s ease;
-      box-shadow: 0 6px 20px rgba(77,166,255,.35);
+    /* ===== الرسائل ===== */
+    .message {
+        margin-top: 12px;
+        font-size: 0.9em;
+        color: #aaa;
+        min-height: 20px;
     }
-
-    .ask-box button:active {
-      transform: scale(.96);
-    }
-
-    .output {
-      min-height: 90px;
-      padding: 16px;
-      background: rgba(0,0,0,.25);
-      border-radius: 12px;
-      line-height: 1.7;
-      font-size: 15px;
-      white-space: pre-wrap;
-    }
-
-    .thinking {
-      color: var(--muted);
-      font-style: italic;
-    }
-
+    /* ===== التذييل ===== */
     .footer {
-      margin-top: 22px;
-      text-align: center;
-      font-size: 12px;
-      color: #6f7890;
+        margin-top: 20px;
+        font-size: 0.8em;
+        color: #555;
     }
-  </style>
+    /* ===== جسيمات خفيفة ===== */
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: #00bfff;
+        border-radius: 50%;
+        animation: float 6s linear infinite;
+        opacity: 0.6;
+    }
+    @keyframes float {
+        0% { transform: translateY(0) translateX(0); opacity:0.6; }
+        50% { transform: translateY(-100px) translateX(50px); opacity:1; }
+        100% { transform: translateY(-200px) translateX(-30px); opacity:0.6; }
+    }
+</style>
 </head>
-
 <body>
+    <!-- جسيمات بسيطة -->
+    <div class="particle" style="top:80%; left:10%; animation-delay:0s;"></div>
+    <div class="particle" style="top:90%; left:50%; animation-delay:2s;"></div>
+    <div class="particle" style="top:85%; left:80%; animation-delay:4s;"></div>
 
-  <div class="app">
-    <div class="header">
-      <div class="title">أيهم</div>
-      <div class="subtitle">أول عقل رقمي حي — واجهة التفاعل</div>
+    <div class="card">
+        <h1>أيهم</h1>
+        <p class="subtitle">أول عقل رقمي حي — واجهة التفاعل</p>
+        <input type="text" id="userQuestion" placeholder="مثال: حلّل وضعي المهني الحالي">
+        <button id="analyzeButton" disabled>تحليل</button>
+        <div class="message" id="message">مرحبًا، اكتب سؤالك لنبدأ.</div>
+        <div class="footer">AYHEM • Digital Living Mind</div>
     </div>
 
-    <div class="ask-box">
-      <input type="text" id="questionInput" placeholder="اسأل أيهم…" autocomplete="off">
-      <button onclick="askAyhem()">تحليل</button>
-    </div>
+<script>
+    const input = document.getElementById('userQuestion');
+    const button = document.getElementById('analyzeButton');
+    const message = document.getElementById('message');
 
-    <div id="output" class="output">
-      <span class="thinking">في انتظار السؤال…</span>
-    </div>
+    input.addEventListener('input', () => {
+        button.disabled = !input.value.trim();
+        message.textContent = input.value.trim() ? '' : 'مرحبًا، اكتب سؤالك لنبدأ.';
+    });
 
-    <div class="footer">
-      AYHEM • Digital Living Mind
-    </div>
-  </div>
-
-  <!-- JavaScript -->
-  <script src="persistent-memory.js"></script>
-  <script src="ayhem-ai.js"></script>
-  <script src="ayhem-core.js"></script>
-
+    button.addEventListener('click', () => {
+        message.textContent = `⚡ جاري تحليل: "${input.value}" ...`;
+        // يمكن إضافة منطق التحليل بالذكاء الرقمي لاحقًا
+    });
+</script>
 </body>
 </html>
