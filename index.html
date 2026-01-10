@@ -13,32 +13,25 @@
       background: #0b0f1a;
       color: #e6e6e6;
     }
+
     .container {
       max-width: 600px;
       margin: 60px auto;
       padding: 20px;
       text-align: center;
     }
-    h1 {
-      font-size: 42px;
-      margin-bottom: 5px;
-      color: #4da6ff;
-    }
-    .subtitle {
-      font-size: 14px;
-      color: #9aa4b2;
-      margin-bottom: 40px;
-    }
-    .ask-box {
-      display: flex;
-      gap: 10px;
-    }
+
+    h1 { font-size: 42px; color: #4da6ff; margin-bottom: 5px; }
+    .subtitle { font-size: 14px; color: #9aa4b2; margin-bottom: 40px; }
+
+    .ask-box { display: flex; gap: 10px; }
     .ask-box input {
       flex: 1;
       padding: 12px;
       font-size: 16px;
       border-radius: 4px;
       border: none;
+      transition: opacity 0.3s ease;
     }
     .ask-box button {
       padding: 12px 20px;
@@ -48,10 +41,10 @@
       border-radius: 4px;
       color: #fff;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
-    .ask-box button:hover {
-      background: #3390ff;
-    }
+    .ask-box button:hover { background: #3390ff; }
+
     .output {
       margin-top: 30px;
       padding: 15px;
@@ -59,6 +52,7 @@
       border-radius: 6px;
       min-height: 50px;
       text-align: left;
+      white-space: pre-wrap;
     }
   </style>
 </head>
@@ -73,13 +67,36 @@
     </div>
 
     <div id="output" class="output">
-      AI قيد التعلم، جاري تحليل السؤال...
+      أنا أيهم، العقل الرقمي الحي. مهمتي تحليل الأسئلة وإعطاء نصائح مباشرة.
     </div>
   </div>
 
-  <!-- ملفات JS -->
+  <!-- ملفات جافاسكربت -->
   <script src="persistent-memory.js"></script>
   <script src="ayhem-ai.js"></script>
   <script src="ayhem-core.js"></script>
+
+  <script>
+    function askAyhem() {
+      const input = document.getElementById('questionInput');
+      const output = document.getElementById('output');
+      const question = input.value.trim();
+
+      if(!question) return;
+
+      // اخفاء السؤال بشكل سلس
+      input.style.opacity = '0';
+      setTimeout(() => { input.value = ''; input.style.opacity = '1'; }, 300);
+
+      // تحليل السؤال عبر الذكاء الاصطناعي
+      const answer = analyzeWithAI(question); // وظيفة موجودة في ayhem-ai.js
+
+      // عرض الإجابة في الصندوق
+      output.textContent = `> ${question}\n\n${answer}`;
+
+      // حفظ السؤال والجواب في الذاكرة الدائمة
+      storePersistentMemory(question, answer); // وظيفة موجودة في persistent-memory.js
+    }
+  </script>
 </body>
 </html>
