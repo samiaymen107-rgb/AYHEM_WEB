@@ -1,25 +1,14 @@
-const persistentMemory = {
-  storageKey: "ayhemPersistentMemory",
-  data: [],
+// تخزين دائم للذاكرة
+if (!localStorage.getItem("ayhemMemory")) {
+  localStorage.setItem("ayhemMemory", JSON.stringify([]));
+}
 
-  load: function() {
-    const saved = localStorage.getItem(this.storageKey);
-    this.data = saved ? JSON.parse(saved) : [];
-  },
+function saveMemory(question, answer) {
+  const data = JSON.parse(localStorage.getItem("ayhemMemory"));
+  data.push({ question, answer, timestamp: new Date().toISOString() });
+  localStorage.setItem("ayhemMemory", JSON.stringify(data));
+}
 
-  saveEntry: function(question, answer) {
-    const entry = {
-      question,
-      answer,
-      timestamp: new Date().toISOString()
-    };
-    this.data.push(entry);
-    localStorage.setItem(this.storageKey, JSON.stringify(this.data));
-  },
-
-  searchSimilar: function(query) {
-    return this.data.filter(item => item.question.includes(query));
-  }
-};
-
-persistentMemory.load();
+function loadMemory() {
+  return JSON.parse(localStorage.getItem("ayhemMemory"));
+}
