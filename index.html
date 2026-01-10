@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!DOCTYPE html><html lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>أيهم — أول عقل رقمي حي</title>
 <style>
-    /* ===== عام ===== */
     body {
         margin: 0;
         padding: 0;
@@ -18,7 +16,6 @@
         height: 100vh;
         overflow: hidden;
     }
-    /* ===== البطاقة المركزية ===== */
     .card {
         background: rgba(10, 15, 44, 0.95);
         border-radius: 20px;
@@ -40,7 +37,6 @@
         color: #aaa;
         margin-bottom: 20px;
     }
-    /* ===== حقل الإدخال ===== */
     input[type="text"] {
         width: 100%;
         padding: 12px 15px;
@@ -56,7 +52,6 @@
     input[type="text"]::placeholder {
         color: #888;
     }
-    /* ===== زر التحليل ===== */
     button {
         width: 100%;
         padding: 12px;
@@ -77,65 +72,11 @@
         background: #0094d6;
         color: #fff;
     }
-    /* ===== الرسائل ===== */
     .message {
         margin-top: 12px;
         font-size: 0.9em;
         color: #aaa;
         min-height: 20px;
     }
-    /* ===== التذييل ===== */
     .footer {
         margin-top: 20px;
-        font-size: 0.8em;
-        color: #555;
-    }
-    /* ===== جسيمات خفيفة ===== */
-    .particle {
-        position: absolute;
-        width: 4px;
-        height: 4px;
-        background: #00bfff;
-        border-radius: 50%;
-        animation: float 6s linear infinite;
-        opacity: 0.6;
-    }
-    @keyframes float {
-        0% { transform: translateY(0) translateX(0); opacity:0.6; }
-        50% { transform: translateY(-100px) translateX(50px); opacity:1; }
-        100% { transform: translateY(-200px) translateX(-30px); opacity:0.6; }
-    }
-</style>
-</head>
-<body>
-    <!-- جسيمات بسيطة -->
-    <div class="particle" style="top:80%; left:10%; animation-delay:0s;"></div>
-    <div class="particle" style="top:90%; left:50%; animation-delay:2s;"></div>
-    <div class="particle" style="top:85%; left:80%; animation-delay:4s;"></div>
-
-    <div class="card">
-        <h1>أيهم</h1>
-        <p class="subtitle">أول عقل رقمي حي — واجهة التفاعل</p>
-        <input type="text" id="userQuestion" placeholder="مثال: حلّل وضعي المهني الحالي">
-        <button id="analyzeButton" disabled>تحليل</button>
-        <div class="message" id="message">مرحبًا، اكتب سؤالك لنبدأ.</div>
-        <div class="footer">AYHEM • Digital Living Mind</div>
-    </div>
-
-<script>
-    const input = document.getElementById('userQuestion');
-    const button = document.getElementById('analyzeButton');
-    const message = document.getElementById('message');
-
-    input.addEventListener('input', () => {
-        button.disabled = !input.value.trim();
-        message.textContent = input.value.trim() ? '' : 'مرحبًا، اكتب سؤالك لنبدأ.';
-    });
-
-    button.addEventListener('click', () => {
-        message.textContent = `⚡ جاري تحليل: "${input.value}" ...`;
-        // يمكن إضافة منطق التحليل بالذكاء الرقمي لاحقًا
-    });
-</script>
-</body>
-</html>
