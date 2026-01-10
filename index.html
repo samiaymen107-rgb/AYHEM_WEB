@@ -5,119 +5,115 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>أيهم — أول عقل رقمي حي</title>
 <style>
-  body, html { margin:0; padding:0; height:100%; width:100%; overflow:hidden; font-family:'Segoe UI',sans-serif; background:#0a0f25; }
-  #container { position:absolute; top:0; left:0; width:100%; height:100%; }
-  .ui {
-    position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
-    width:90%; max-width:400px; display:flex; flex-direction:column; gap:10px;
+  body, html {
+    margin:0;
+    padding:0;
+    height:100%;
+    width:100%;
+    font-family:'Segoe UI',sans-serif;
+    background:#0a0f25;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
   }
-  .ui input {
-    padding:14px; border-radius:8px; border:none; background:#11172b; color:#fff;
-    font-size:1rem; outline:none; box-shadow:inset 0 0 10px #000;
+
+  h1 {
+    font-size:2.5rem;
+    color:#49f;
+    text-shadow:0 0 15px #49f;
+    margin-bottom:5px;
   }
-  .ui button {
-    padding:14px; border:none; border-radius:8px; background:#49f; color:#fff;
-    font-size:1rem; cursor:pointer; box-shadow:0 0 15px #49f; transition:0.3s;
+
+  p.subtitle {
+    font-size:1rem;
+    color:#ccc;
+    margin-bottom:20px;
+    text-align:center;
   }
-  .ui button:hover { background:#38c; box-shadow:0 0 25px #38c; }
+
+  .brain {
+    width:220px;
+    height:220px;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Brain_icon.svg/1024px-Brain_icon.svg.png') no-repeat center/contain;
+    border-radius:50%;
+    box-shadow:0 0 30px #49f;
+    margin-bottom:30px;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .data-stream {
+    width:4px;
+    height:150px;
+    background: linear-gradient(to bottom, #49f, transparent);
+    margin-bottom:30px;
+    animation: flow 1.5s linear infinite;
+  }
+
+  @keyframes flow {
+    0% {height:0; opacity:0.5;}
+    50% {height:150px; opacity:1;}
+    100% {height:0; opacity:0.5;}
+  }
+
+  input, button {
+    width:90%;
+    max-width:400px;
+    padding:14px;
+    margin:5px auto;
+    border-radius:8px;
+    border:none;
+    display:block;
+    font-size:1rem;
+    outline:none;
+  }
+
+  input {
+    background:#11172b;
+    color:#fff;
+    box-shadow: inset 0 0 10px #000;
+  }
+
+  button {
+    background:#49f;
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 0 15px #49f;
+    transition:0.3s;
+  }
+
+  button:hover {
+    background:#38c;
+    box-shadow:0 0 25px #38c;
+  }
+
   .footer {
-    position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
-    color:#888; font-size:0.8rem;
+    font-size:0.8rem;
+    color:#888;
+    margin-top:10px;
   }
 </style>
 </head>
 <body>
-<div id="container"></div>
 
-<div class="ui">
-  <input type="text" id="questionInput" placeholder="في انتظار السؤال..">
-  <button id="analyzeBtn">تحليل</button>
-</div>
+<h1>أيهم</h1>
+<p class="subtitle">أول عقل رقمي حي — واجهة التفاعل</p>
+
+<div class="brain" id="brain"></div>
+<div class="data-stream" id="dataStream"></div>
+
+<input type="text" id="questionInput" placeholder="في انتظار السؤال..">
+<button id="analyzeBtn">تحليل</button>
 <div class="footer">AYHEM • Digital Living Mind</div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/controls/OrbitControls.js"></script>
-
 <script>
-  let scene = new THREE.Scene();
-  let camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 1000);
-  camera.position.z = 4;
+const brain = document.getElementById('brain');
+const input = document.getElementById('questionInput');
+const dataStream = document.getElementById('dataStream');
+const analyzeBtn = document.getElementById('analyzeBtn');
 
-  let renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.getElementById('container').appendChild(renderer.domElement);
-
-  // ضوء المحيط
-  let ambientLight = new THREE.AmbientLight(0x49f, 0.5);
-  scene.add(ambientLight);
-
-  // ضوء نقطة ديناميكي
-  let pointLight = new THREE.PointLight(0x49f, 1.2, 10);
-  pointLight.position.set(0, 0, 5);
-  scene.add(pointLight);
-
-  // المخ الرقمي (Sphere + wireframe)
-  let brainGeometry = new THREE.SphereGeometry(1, 32, 32);
-  let brainMaterial = new THREE.MeshStandardMaterial({color:0x49f, metalness:0.7, roughness:0.2, wireframe:false});
-  let brain = new THREE.Mesh(brainGeometry, brainMaterial);
-  scene.add(brain);
-
-  // خطوط التدفق حول المخ
-  let flowGeometry = new THREE.TorusGeometry(1.3, 0.02, 16, 100);
-  let flowMaterial = new THREE.MeshBasicMaterial({color:0x49f});
-  let flow = new THREE.Mesh(flowGeometry, flowMaterial);
-  flow.rotation.x = Math.PI/2;
-  scene.add(flow);
-
-  // نجوم خلفية
-  let starsGeometry = new THREE.BufferGeometry();
-  let starsCount = 1000;
-  let positions = [];
-  for(let i=0;i<starsCount;i++){
-    positions.push((Math.random()-0.5)*50);
-    positions.push((Math.random()-0.5)*50);
-    positions.push((Math.random()-0.5)*50);
-  }
-  starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  let starsMaterial = new THREE.PointsMaterial({color:0xffffff, size:0.05});
-  let stars = new THREE.Points(starsGeometry, starsMaterial);
-  scene.add(stars);
-
-  // التحكم باللمس للهواتف
-  let controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableZoom = false;
-  controls.enablePan = false;
-
-  // Animation loop
-  function animate(){
-    requestAnimationFrame(animate);
-    brain.rotation.y += 0.005;
-    flow.rotation.z += 0.02;
-    renderer.render(scene, camera);
-  }
-  animate();
-
-  // التفاعل مع الكتابة
-  const input = document.getElementById('questionInput');
-  input.addEventListener('input', () => {
-    let len = input.value.length;
-    brainMaterial.emissive = new THREE.Color(0x49f);
-    brainMaterial.emissiveIntensity = Math.min(0.2 + len*0.05, 1.2);
-  });
-
-  // عند النقر على التحليل
-  const analyzeBtn = document.getElementById('analyzeBtn');
-  analyzeBtn.addEventListener('click', ()=>{
-    flow.scale.set(1.5,1.5,1.5);
-    setTimeout(()=>flow.scale.set(1,1,1),500);
-  });
-
-  // Adjust canvas on resize
-  window.addEventListener('resize', ()=>{
-    camera.aspect = window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-</script>
-</body>
-</html>
+// نبض المخ حسب طول النص
+input.addEventListener('input', () => {
+  const len = input.value.length;
+  brain.style.box
