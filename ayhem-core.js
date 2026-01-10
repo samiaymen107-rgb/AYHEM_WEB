@@ -1,23 +1,22 @@
-// منطق التحليل الأساسي
 function askAyhem() {
   const input = document.getElementById("questionInput").value.trim();
   if (!input) return;
 
-  // تحليل سريع
+  const memory = loadMemory();
   let response = "قيد التعلم، جاري تحليل السؤال...";
 
-  if (input.includes("من أنت")) {
+  if (/من أنت/i.test(input)) {
     response = "أنا أيهم، العقل الرقمي الحي الذي يتعلم مثل العقل البشري.";
-  } else if (input.includes("سعر") || input.includes("عملات")) {
+  } else if (/سعر|عملات|فرص/i.test(input)) {
     response = "أستطيع مراقبة الأسعار والفرص العالمية، وسأعطيك التوصيات مباشرة.";
-  } else if (input.includes("نصيحة")) {
+  } else if (/نصيحة|مساعدة/i.test(input)) {
     response = "سأحلل الموقف وأعطيك أفضل خيار متعلم من خبرات الأسئلة السابقة.";
+  } else {
+    const match = memory.find(m => input.includes(m.question));
+    if (match) response = match.answer;
   }
 
-  // عرض النتيجة
   document.getElementById("output").innerHTML = `<p>${response}</p>`;
-
-  // حفظ السؤال والإجابة في الذاكرة الدائمة
   saveMemory(input, response);
 
   document.getElementById("questionInput").value = "";
