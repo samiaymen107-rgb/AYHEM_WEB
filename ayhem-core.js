@@ -1,23 +1,19 @@
-function askAyhem() {
+async function askAyhem() {
   const input = document.getElementById("questionInput").value.trim();
   if (!input) return;
 
-  const memory = loadMemory();
-  let response = "قيد التعلم، جاري تحليل السؤال...";
+  const outputDiv = document.getElementById("output");
+  outputDiv.innerHTML = "<p>قيد التحليل...</p>";
 
-  if (/من أنت/i.test(input)) {
-    response = "أنا أيهم، العقل الرقمي الحي الذي يتعلم مثل العقل البشري.";
-  } else if (/سعر|عملات|فرص/i.test(input)) {
-    response = "أستطيع مراقبة الأسعار والفرص العالمية، وسأعطيك التوصيات مباشرة.";
-  } else if (/نصيحة|مساعدة/i.test(input)) {
-    response = "سأحلل الموقف وأعطيك أفضل خيار متعلم من خبرات الأسئلة السابقة.";
-  } else {
-    const match = memory.find(m => input.includes(m.question));
-    if (match) response = match.answer;
-  }
+  // استدعاء AI للحصول على الجواب
+  const aiResponse = await askAI(input);
 
-  document.getElementById("output").innerHTML = `<p>${response}</p>`;
-  saveMemory(input, response);
+  // عرض الإجابة في الصفحة
+  outputDiv.innerHTML = `<p>${aiResponse}</p>`;
 
+  // حفظ السؤال والإجابة في الذاكرة المحلية
+  saveMemory(input, aiResponse);
+
+  // تفريغ حقل الإدخال
   document.getElementById("questionInput").value = "";
 }
