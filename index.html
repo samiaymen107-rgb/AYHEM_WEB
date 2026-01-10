@@ -3,114 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AYHEM – العقل الرقمي الحي</title>
+<title>أيهم — العقل الرقمي الحي</title>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  background:#f4f8ff;
+  font-family:Arial, sans-serif;
+  color:#2c3e50;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
 }
 
-body {
-  background: radial-gradient(circle at top, #0b1d33, #040912);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
+/* العناوين */
+h1{
+  color:#4a90e2;
+  margin-bottom:4px;
 }
-
-.app {
-  width: 100%;
-  max-width: 420px;
-  text-align: center;
-  padding: 20px;
+.subtitle{
+  color:#6b7c93;
+  margin-bottom:24px;
+  font-size:0.95rem;
+  text-align:center;
 }
 
 /* ===== العقل ===== */
-.brain-rotate {
-  width: 260px;
-  height: 260px;
-  margin: 30px auto;
-  animation: spin 28s linear infinite;
+.brain-wrapper{
+  width:240px;
+  height:240px;
+  margin-bottom:26px;
+  animation: spin 12s linear infinite;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* دوران هادئ */
+@keyframes spin{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
 }
 
-/* ===== النص ===== */
-h1 {
-  font-size: 22px;
-  margin-bottom: 10px;
+/* الإدخال */
+.input-group{
+  width:90%;
+  max-width:360px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
-p {
-  font-size: 14px;
-  opacity: 0.85;
-  margin-bottom: 25px;
+input{
+  padding:14px;
+  border-radius:10px;
+  border:1px solid #dbe6f5;
+  background:#fff;
+  font-size:1rem;
 }
 
-/* ===== زر ===== */
-button {
-  background: linear-gradient(135deg, #00b4ff, #6f7bff);
-  border: none;
-  border-radius: 30px;
-  padding: 14px 30px;
-  color: white;
-  font-size: 16px;
-  box-shadow: 0 0 18px rgba(0,180,255,0.6);
+button{
+  padding:14px;
+  border-radius:10px;
+  border:none;
+  background:#4a90e2;
+  color:#fff;
+  font-size:1rem;
+  cursor:pointer;
+}
+
+.output{
+  margin-top:12px;
+  font-size:0.9rem;
+  color:#4a90e2;
+  min-height:20px;
+  text-align:center;
+}
+
+.footer{
+  margin-top:16px;
+  font-size:0.75rem;
+  color:#999;
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<h1>أيهم</h1>
+<div class="subtitle">عقل رقمي بشري — ذكي، مطمئن، ومحبّب للأطفال</div>
 
-  <!-- عقل رقمي SVG (داخلي - مضمون الظهور) -->
-  <div class="brain-rotate">
-    <svg viewBox="0 0 200 200" width="100%" height="100%">
-      <defs>
-        <radialGradient id="g1">
-          <stop offset="0%" stop-color="#9be7ff"/>
-          <stop offset="100%" stop-color="#1a6cff"/>
-        </radialGradient>
-      </defs>
+<!-- ===== عقل بشري مرسوم SVG ===== -->
+<div class="brain-wrapper">
+<svg viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="brainGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffd6e8"/>
+      <stop offset="50%" stop-color="#c1e8ff"/>
+      <stop offset="100%" stop-color="#b5f2d8"/>
+    </linearGradient>
+  </defs>
 
-      <!-- شكل الدماغ -->
-      <path d="
-        M100 20
-        C40 20, 20 60, 35 90
-        C20 120, 40 160, 80 160
-        C90 180, 130 180, 140 160
-        C180 160, 180 120, 165 95
-        C180 60, 160 20, 100 20 Z"
-        fill="url(#g1)"
-        opacity="0.95"/>
+  <!-- نصف أيسر -->
+  <path d="M100 30
+           C50 20, 30 70, 45 95
+           C20 120, 40 165, 80 160
+           C90 175, 110 175, 100 150 Z"
+        fill="url(#brainGrad)" stroke="#8bbce8" stroke-width="3"/>
 
-      <!-- إشارات ضوئية داخلية -->
-      <circle cx="70" cy="80" r="4" fill="#ffffff"/>
-      <circle cx="110" cy="60" r="3" fill="#ffffff"/>
-      <circle cx="130" cy="100" r="5" fill="#ffffff"/>
-      <circle cx="90" cy="120" r="3" fill="#ffffff"/>
+  <!-- نصف أيمن -->
+  <path d="M100 30
+           C150 20, 170 70, 155 95
+           C180 120, 160 165, 120 160
+           C110 175, 90 175, 100 150 Z"
+        fill="url(#brainGrad)" stroke="#8bbce8" stroke-width="3"/>
 
-      <!-- خطوط عصبية -->
-      <line x1="70" y1="80" x2="110" y2="60" stroke="#cceeff" stroke-width="1"/>
-      <line x1="110" y1="60" x2="130" y2="100" stroke="#cceeff" stroke-width="1"/>
-      <line x1="130" y1="100" x2="90" y2="120" stroke="#cceeff" stroke-width="1"/>
-    </svg>
-  </div>
-
-  <!-- محتوى ثابت -->
-  <h1>أيهم — العقل الرقمي الحي</h1>
-  <p>عقل بشري رقمي، ذكي، مطمئن، وموجّه للمستقبل</p>
-  <button>ابدأ</button>
-
+  <!-- تعرجات -->
+  <path d="M75 70 Q90 85 70 100" stroke="#ffffff" stroke-width="3" fill="none"/>
+  <path d="M125 70 Q110 85 130 100" stroke="#ffffff" stroke-width="3" fill="none"/>
+  <path d="M80 110 Q100 125 80 140" stroke="#ffffff" stroke-width="3" fill="none"/>
+  <path d="M120 110 Q100 125 120 140" stroke="#ffffff" stroke-width="3" fill="none"/>
+</svg>
 </div>
+
+<div class="input-group">
+  <input id="q" type="text" placeholder="اكتب سؤالك هنا…">
+  <button onclick="analyze()">تحليل</button>
+</div>
+
+<div class="output" id="out"></div>
+
+<div class="footer">AYHEM • Digital Living Mind</div>
+
+<script>
+function analyze(){
+  const q = document.getElementById("q").value.trim();
+  const out = document.getElementById("out");
+
+  if(!q){
+    out.textContent = "😊 اكتب سؤالًا ليبدأ العقل بالتفكير";
+    return;
+  }
+
+  out.textContent = "🧠 العقل يفكّر بهدوء...";
+  setTimeout(()=>{
+    out.textContent = "✨ تم التحليل — الذكاء الاصطناعي جاهز للتفاعل";
+  },1200);
+}
+</script>
 
 </body>
 </html>
