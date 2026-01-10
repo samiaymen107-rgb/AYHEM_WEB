@@ -4,10 +4,75 @@
   <meta charset="UTF-8">
   <title>أيهم — العقل الرقمي الحي</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- ربط CSS -->
   <link rel="stylesheet" href="ayhem-style.css">
+  <style>
+    /* أسلوب سريع للتأكد من الواجهة */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Tahoma", Arial, sans-serif;
+      background: #0b0f1a;
+      color: #e6e6e6;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 60px auto;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin-bottom: 5px;
+      color: #4da6ff;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #9aa4b2;
+      margin-bottom: 40px;
+    }
+
+    .ask-box {
+      display: flex;
+      gap: 10px;
+    }
+
+    .ask-box input {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: none;
+    }
+
+    .ask-box button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background: #4da6ff;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .ask-box button:hover {
+      background: #3390ff;
+    }
+
+    .output {
+      margin-top: 30px;
+      padding: 15px;
+      background: #1a1f33;
+      border-radius: 6px;
+      min-height: 50px;
+      text-align: left;
+    }
+  </style>
 </head>
 <body>
-
   <div class="container">
     <h1>أيهم</h1>
     <p class="subtitle">أول عقل رقمي حي — واجهة التفاعل</p>
@@ -22,9 +87,9 @@
     </div>
   </div>
 
-  <!-- ملفات جافاسكربت -->
-  <script src="ayhem-core.js"></script>
+  <!-- ترتيب ملفات JS مهم جداً -->
   <script src="persistent-memory.js"></script>
   <script src="ayhem-ai.js"></script>
+  <script src="ayhem-core.js"></script>
 </body>
 </html>
