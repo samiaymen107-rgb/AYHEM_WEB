@@ -1,14 +1,12 @@
-// تخزين دائم للذاكرة
-if (!localStorage.getItem("ayhemMemory")) {
-  localStorage.setItem("ayhemMemory", JSON.stringify([]));
+const MEMORY_KEY = "ayhem_memory";
+
+function loadMemory() {
+  const data = localStorage.getItem(MEMORY_KEY);
+  return data ? JSON.parse(data) : [];
 }
 
 function saveMemory(question, answer) {
-  const data = JSON.parse(localStorage.getItem("ayhemMemory"));
-  data.push({ question, answer, timestamp: new Date().toISOString() });
-  localStorage.setItem("ayhemMemory", JSON.stringify(data));
-}
-
-function loadMemory() {
-  return JSON.parse(localStorage.getItem("ayhemMemory"));
+  const memory = loadMemory();
+  memory.push({ question, answer });
+  localStorage.setItem(MEMORY_KEY, JSON.stringify(memory));
 }
