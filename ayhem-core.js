@@ -1,18 +1,16 @@
-// أيهم - وحدة الربط مع الواجهة
 function askAyhem() {
-  const question = document.getElementById('questionInput').value;
-  const output = document.getElementById('output');
+  const input = document.getElementById("questionInput");
+  const output = document.getElementById("output");
 
-  if (!question) {
-    output.innerHTML = "يرجى كتابة سؤال!";
-    return;
-  }
+  const question = input.value;
 
-  // نرسل السؤال إلى وحدة الذكاء الاصطناعي
-  const answer = getAIResponse(question);
+  // إخفاء مربع السؤال (احترافي)
+  input.style.display = "none";
 
-  // حفظ السؤال والإجابة في الذاكرة الدائمة
-  saveToMemory(question, answer);
+  output.innerHTML = "🔍 جاري التحليل...";
 
-  output.innerHTML = answer;
+  setTimeout(() => {
+    const response = generateAyhemResponse(question);
+    output.innerHTML = response;
+  }, 800);
 }
