@@ -1,13 +1,7 @@
-// أيهم - التعلم الذكي (تطوير مستقبلي)
-const aiMemory = loadMemory();
-
-// مثال: تحديث ذكي للتعلم
-function trainAyhem() {
-  aiMemory.forEach(item => {
-    // هنا يمكن إضافة خوارزميات تعلم أعمق مستقبليًا
-    console.log("تعلّم سابق:", item.question, "->", item.answer);
-  });
+// Placeholder للربط بالذكاء الاصطناعي الخارجي
+function aiAnalyze(question, callback) {
+  // هنا يمكن ربط GPT API أو أي محرك ذكي
+  setTimeout(() => {
+    callback("تم تحليل السؤال بواسطة AI، والجواب قيد التعلم.");
+  }, 500);
 }
-
-// يمكن توسيع هذه الوظيفة لربط أيهم بواجهات API حية أو محرك AI خارجي
-trainAyhem();
