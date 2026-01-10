@@ -4,172 +4,198 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>أيهم — العقل الرقمي الحي</title>
+
 <style>
-body {
+body{
   margin:0;
   height:100vh;
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
-  background: radial-gradient(circle at top, #0b1d33, #040912);
+  background:radial-gradient(circle at top,#0b1d33,#040912);
   color:white;
-  font-family: Arial, sans-serif;
+  font-family:Arial,sans-serif;
   text-align:center;
+  overflow:hidden;
 }
 
-h1 {
-  margin-bottom:5px;
-  font-size:24px;
-  color:#4ac8ff;
-}
-.subtitle {
-  font-size:14px;
-  margin-bottom:20px;
-  opacity:0.85;
+h1{color:#4ac8ff;margin-bottom:5px}
+.subtitle{font-size:14px;opacity:.85;margin-bottom:16px}
+
+.brain-wrapper{
+  width:340px;
+  height:340px;
+  perspective:1600px;
+  cursor:grab;
 }
 
-.brain-wrapper {
-  width:280px;
-  height:280px;
-  margin-bottom:20px;
-  position:relative;
-  perspective: 1000px;
-}
-
-.brain {
+.brain{
   width:100%;
   height:100%;
-  transform-style: preserve-3d;
-  animation: rotateBrain 20s linear infinite;
+  border-radius:50%;
+  position:relative;
+  transform-style:preserve-3d;
+  background:
+    radial-gradient(circle at 30% 30%,rgba(180,240,255,.35),rgba(20,80,160,.15),rgba(5,10,30,.9)),
+    repeating-linear-gradient(90deg,rgba(120,200,255,.08) 0 1px,transparent 1px 14px),
+    repeating-linear-gradient(0deg,rgba(120,200,255,.08) 0 1px,transparent 1px 14px);
+  box-shadow:
+    inset 0 0 60px rgba(100,180,255,.35),
+    0 0 60px rgba(0,140,255,.45);
 }
 
-@keyframes rotateBrain {
-  0% { transform: rotateY(0deg) rotateX(15deg); }
-  100% { transform: rotateY(360deg) rotateX(15deg); }
+.light{
+  position:absolute;
+  width:6px;
+  height:6px;
+  background:#9be7ff;
+  border-radius:50%;
+  box-shadow:0 0 12px #9be7ff;
+  opacity:.3;
 }
 
-.light {
-  fill:#ffffff;
-  opacity:0.2;
-  transition: opacity 0.3s ease;
-}
-.light.layer2 { fill:#7fd1ff; opacity:0.15; }
-.light.layer3 { fill:#4ac8ff; opacity:0.12; }
-
-input, button {
-  width:90%; max-width:300px; padding:12px; border-radius:12px; border:none; margin:6px 0; font-size:14px;
+input,button{
+  width:90%;
+  max-width:300px;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  margin:6px 0;
 }
 
-input {
-  border:1px solid #4ac8ff;
+input{
   background:#0a1b33;
   color:white;
+  border:1px solid #4ac8ff;
 }
 
-button {
-  background: linear-gradient(135deg,#00b4ff,#6f7bff);
+button{
+  background:linear-gradient(135deg,#00b4ff,#6f7bff);
   color:white;
   cursor:pointer;
-  box-shadow:0 0 12px rgba(0,180,255,0.6);
+  box-shadow:0 0 12px rgba(0,180,255,.6);
 }
 
-.output {
+.output{
   margin-top:12px;
   font-size:13px;
   color:#7fd1ff;
   min-height:20px;
 }
 
-.footer {
-  margin-top:16px;
+.footer{
+  margin-top:14px;
   font-size:10px;
   color:#999;
 }
 </style>
 </head>
+
 <body>
 
 <h1>أيهم</h1>
-<div class="subtitle">عقل رقمي حي مدعوم بالذكاء الاصطناعي</div>
+<div class="subtitle">عقل رقمي حي — كرة أرضية ذكية</div>
 
 <div class="brain-wrapper">
-  <svg class="brain" viewBox="0 0 200 200" width="100%" height="100%">
-    <defs>
-      <radialGradient id="g1">
-        <stop offset="0%" stop-color="#9be7ff"/>
-        <stop offset="50%" stop-color="#4ac8ff"/>
-        <stop offset="100%" stop-color="#1a6cff"/>
-      </radialGradient>
-    </defs>
-
-    <!-- كرة عقل مسطحة رقمية -->
-    <ellipse cx="100" cy="100" rx="90" ry="60" fill="url(#g1)" opacity="0.95"/>
-
-    <!-- خطوط عصبية -->
-    <line id="line1" x1="70" y1="80" x2="110" y2="60" stroke="#cceeff" stroke-width="1"/>
-    <line id="line2" x1="110" y1="60" x2="130" y2="100" stroke="#cceeff" stroke-width="1"/>
-    <line id="line3" x1="130" y1="100" x2="90" y2="120" stroke="#cceeff" stroke-width="1"/>
-    <line id="line4" x1="100" y1="90" x2="120" y2="80" stroke="#cceeff" stroke-width="1"/>
-
-    <!-- إشارات ضوئية نابضة متحركة -->
-    <circle id="pulse1" class="light layer2" cx="70" cy="80" r="4"/>
-    <circle id="pulse2" class="light layer3" cx="110" cy="60" r="3"/>
-    <circle id="pulse3" class="light layer2" cx="130" cy="100" r="5"/>
-    <circle id="pulse4" class="light layer3" cx="90" cy="120" r="3"/>
-  </svg>
+  <div id="brain" class="brain"></div>
 </div>
 
-<input id="query" type="text" placeholder="اكتب سؤالك هنا…">
+<input id="query" placeholder="اكتب سؤالك هنا…">
 <button onclick="analyze()">تحليل</button>
-
-<div class="output" id="out">✅ تم التحليل. النظام جاهز للربط بالذكاء الاصطناعي الحقيقي.</div>
+<div id="out" class="output">✅ النظام جاهز.</div>
 
 <div class="footer">AYHEM</div>
 
 <script>
-function analyze() {
-  const q = document.getElementById("query").value.trim();
-  const out = document.getElementById("out");
-  if(!q){
-    out.textContent = "😊 اكتب سؤالًا ليبدأ العقل بالتفكير";
-    return;
-  }
-  out.textContent = "🧠 العقل يفكر...";
-  setTimeout(()=>{
-    out.textContent = "✅ تم التحليل. النظام جاهز للربط بالذكاء الاصطناعي الحقيقي.";
-  },1200);
+/* ========= AYHEM – DIGITAL LIVING MIND ========= */
+
+const brain = document.getElementById("brain");
+const out   = document.getElementById("out");
+const input = document.getElementById("query");
+
+/* إنشاء النقاط العصبية */
+const R = 150;
+const nodes = [];
+
+for(let i=0;i<50;i++){
+  const n=document.createElement("div");
+  n.className="light";
+  brain.appendChild(n);
+
+  const t=Math.random()*Math.PI*2;
+  const p=Math.acos(Math.random()*2-1);
+  const x=R*Math.sin(p)*Math.cos(t);
+  const y=R*Math.sin(p)*Math.sin(t);
+  const z=R*Math.cos(p);
+
+  n.dataset.x=x; n.dataset.y=y; n.dataset.z=z;
+  n.style.transform=`translate3d(${x}px,${y}px,${z}px)`;
+  nodes.push(n);
 }
 
-// ⚡ تحريك الإشارات على طول الخطوط العصبية
-const pulses = [
-  {el: document.getElementById("pulse1"), path: document.getElementById("line1")},
-  {el: document.getElementById("pulse2"), path: document.getElementById("line2")},
-  {el: document.getElementById("pulse3"), path: document.getElementById("line3")},
-  {el: document.getElementById("pulse4"), path: document.getElementById("line4")},
-];
+/* تحليل ذكي وهمي */
+let pulseTimer;
 
-pulses.forEach(p => {
-  let t = Math.random(); // لكل إشارة نقطة بداية عشوائية
-  setInterval(() => {
-    const x = parseFloat(p.path.getAttribute("x1"))*(1-t) + parseFloat(p.path.getAttribute("x2"))*t;
-    const y = parseFloat(p.path.getAttribute("y1"))*(1-t) + parseFloat(p.path.getAttribute("y2"))*t;
-    p.el.setAttribute("cx", x);
-    p.el.setAttribute("cy", y);
-    // توهج عشوائي
-    p.el.style.opacity = 0.2 + Math.random()*0.8;
-    t += 0.02;
-    if(t>1) t=0;
-  }, 50);
-});
+function analyze(){
+  const q=input.value.trim();
+  if(!q){ out.textContent="🙂 اكتب فكرة ليبدأ العقل"; return; }
 
-// ⚡ توهج خطوط المخ
-const lines = ["line1","line2","line3","line4"].map(id => document.getElementById(id));
-setInterval(() => {
-  lines.forEach(line => {
-    line.style.stroke = `rgba(204,238,255,${0.3 + Math.random()*0.7})`;
-  });
-}, 200);
+  out.textContent="🧠 العقل الرقمي يعالج البيانات…";
+  startPulse();
+
+  setTimeout(()=>out.textContent="🔍 تحليل الأنماط…",1200);
+  setTimeout(()=>out.textContent="🧬 ربط الذاكرة…",2400);
+
+  setTimeout(()=>{
+    out.textContent="✅ التحليل اكتمل.";
+    stopPulse();
+  },3600);
+}
+
+/* نبض أثناء التفكير */
+function startPulse(){
+  pulseTimer=setInterval(()=>{
+    brain.style.boxShadow=
+      `inset 0 0 ${40+Math.random()*40}px rgba(120,220,255,.7),
+       0 0 ${70+Math.random()*40}px rgba(0,140,255,.9)`;
+    nodes.forEach(n=>{
+      n.style.opacity=.3+Math.random()*.7;
+    });
+  },120);
+}
+
+function stopPulse(){
+  clearInterval(pulseTimer);
+  brain.style.boxShadow=
+    "inset 0 0 60px rgba(100,180,255,.35), 0 0 60px rgba(0,140,255,.45)";
+}
+
+/* دوران + سحب */
+let rx=15, ry=0, drag=false, lx, ly;
+const wrap=document.querySelector(".brain-wrapper");
+
+wrap.onmousedown=e=>{drag=true;lx=e.clientX;ly=e.clientY;wrap.style.cursor="grabbing"};
+document.onmouseup=()=>{drag=false;wrap.style.cursor="grab"};
+document.onmousemove=e=>{
+  if(!drag)return;
+  ry+=(e.clientX-lx)*0.4;
+  rx-=(e.clientY-ly)*0.4;
+  brain.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;
+  lx=e.clientX; ly=e.clientY;
+};
+
+setInterval(()=>{
+  if(!drag){
+    ry+=0.15;
+    brain.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;
+  }
+},40);
+
+/* تثبيت أولي */
+window.onload=()=>{
+  brain.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;
+};
 </script>
 
 </body>
