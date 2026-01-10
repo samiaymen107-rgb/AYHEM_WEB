@@ -1,58 +1,13 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Tahoma", Arial, sans-serif;
-  background: #0b0f1a;
-  color: #e6e6e6;
-}
-
-.container {
-  max-width: 600px;
-  margin: 60px auto;
-  padding: 20px;
-  text-align: center;
-}
-
-h1 {
-  font-size: 42px;
-  margin-bottom: 5px;
-  color: #4da6ff;
-}
-
-.subtitle {
-  font-size: 14px;
-  color: #9aa4b2;
-  margin-bottom: 40px;
-}
-
-.ask-box {
-  display: flex;
-  gap: 10px;
-}
-
-.ask-box input {
-  flex: 1;
-  padding: 12px;
-  font-size: 16px;
-}
-
-.ask-box button {
-  padding: 12px 20px;
-  font-size: 16px;
-  background-color: #4da6ff;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-.ask-box button:hover {
-  background-color: #3399ff;
-}
-
-.output {
-  margin-top: 20px;
-  background: #1c1f32;
-  padding: 15px;
-  border-radius: 6px;
-  min-height: 50px;
-}
+body, html { margin:0; padding:0; height:100%; width:100%; font-family:'Segoe UI',sans-serif; background:#0a0f25; color:#fff; display:flex; justify-content:center; align-items:center; }
+.container { display:flex; flex-direction:column; align-items:center; width:100%; padding:20px; gap:15px; }
+h1 { font-size:2.5rem; color:#49f; text-shadow:0 0 15px #49f; }
+p.subtitle { color:#ccc; font-size:1rem; text-align:center; margin-bottom:10px; }
+.brain-wrapper { display:flex; flex-direction:column; align-items:center; }
+.brain { width:220px; height:220px; transition: filter 0.2s ease; margin-bottom:20px; }
+.data-stream { width:4px; height:150px; background: linear-gradient(to bottom, #49f, transparent); animation: flow 1.5s linear infinite; margin-bottom:30px; }
+@keyframes flow { 0% { height:0; opacity:0.5; } 50% { height:150px; opacity:1; } 100% { height:0; opacity:0.5; } }
+.input-group { display:flex; flex-direction:column; gap:10px; width:90%; max-width:400px; }
+input { padding:14px; border-radius:8px; border:none; background:#11172b; color:#fff; outline:none; box-shadow: inset 0 0 10px #000; font-size:1rem; }
+button { padding:14px; border:none; border-radius:8px; background:#49f; color:#fff; cursor:pointer; font-size:1rem; box-shadow:0 0 15px #49f; transition:0.3s; }
+button:hover { background:#38c; box-shadow:0 0 25px #38c; }
+.footer { font-size:0.8rem; color:#888; margin-top:10px; }
