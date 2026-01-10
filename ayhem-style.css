@@ -34,32 +34,30 @@ h1 {
   flex: 1;
   padding: 12px;
   font-size: 16px;
-  border-radius: 6px;
   border: none;
-  outline: none;
+  border-radius: 5px;
 }
 
 .ask-box button {
-  padding: 12px 18px;
+  padding: 12px 20px;
   font-size: 16px;
+  background-color: #4da6ff;
+  color: #fff;
   border: none;
-  border-radius: 6px;
-  background: #4da6ff;
-  color: #000;
+  border-radius: 5px;
   cursor: pointer;
 }
 
 .ask-box button:hover {
-  background: #3399ff;
+  background-color: #3b8ed9;
 }
 
 .output {
   margin-top: 30px;
-  padding: 15px;
-  background: #11162a;
-  border-radius: 6px;
-  text-align: right;
+  text-align: left;
+  background: #1a1f33;
+  padding: 20px;
+  border-radius: 8px;
   min-height: 80px;
-  font-size: 15px;
-  line-height: 1.6;
+  overflow-y: auto;
 }
