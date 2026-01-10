@@ -11,8 +11,8 @@ html,body{
   padding:0;
   width:100%;
   height:100%;
-  background:#0a0f25;
-  font-family:Tahoma, Arial, sans-serif;
+  background:#070b1c;
+  font-family:Arial, sans-serif;
   color:#fff;
   display:flex;
   flex-direction:column;
@@ -20,53 +20,68 @@ html,body{
   justify-content:center;
 }
 
-/* العناوين */
+/* ===== العناوين ===== */
 h1{
-  color:#4aa3ff;
+  color:#6fb7ff;
   margin-bottom:6px;
-  text-shadow:0 0 14px #4aa3ff;
+  text-shadow:0 0 16px #6fb7ff;
 }
 .subtitle{
-  color:#b5c7e6;
+  color:#b8c9e8;
   margin-bottom:28px;
   text-align:center;
   font-size:0.95rem;
 }
 
-/* ===== العقل الرقمي ===== */
-.brain-box{
-  width:220px;
-  height:220px;
+/* ===== العقل ===== */
+.brain-shell{
+  width:240px;
+  height:240px;
   position:relative;
-  margin-bottom:30px;
+  margin-bottom:32px;
 }
 
-.brain{
+.brain-core{
   width:100%;
   height:100%;
   border-radius:50%;
   background:
-    radial-gradient(circle at 30% 30%, #9fd6ff, #2b5cb3 55%, #050d22 100%);
+    radial-gradient(circle at 35% 30%, #cfeaff 0%, #5fa9ff 25%, #1e3f7f 55%, #050c20 75%);
   box-shadow:
-    0 0 25px #4aa3ff,
-    inset 0 0 35px #7fc8ff;
-  animation: rotate 7s linear infinite;
+    0 0 35px rgba(120,190,255,0.9),
+    inset 0 0 45px rgba(160,220,255,0.9);
+  animation: spin 10s linear infinite;
+  position:relative;
+  overflow:hidden;
 }
 
-/* الدوران فقط */
-@keyframes rotate{
-  from{ transform:rotate(0deg); }
-  to{ transform:rotate(360deg); }
-}
-
-/* خطوط رقمية داخلية */
-.brain::before{
+/* تعرّجات تشبه فصوص الدماغ */
+.brain-core::before,
+.brain-core::after{
   content:"";
   position:absolute;
   inset:18px;
   border-radius:50%;
-  border:2px dashed rgba(120,190,255,0.35);
-  animation: rotate 12s linear infinite reverse;
+  background:
+    repeating-radial-gradient(
+      circle,
+      rgba(180,230,255,0.35) 0px,
+      rgba(180,230,255,0.35) 2px,
+      transparent 4px,
+      transparent 8px
+    );
+  mix-blend-mode:overlay;
+}
+
+.brain-core::after{
+  inset:32px;
+  opacity:0.6;
+}
+
+/* دوران العقل فقط */
+@keyframes spin{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
 }
 
 /* ===== الإدخال ===== */
@@ -82,7 +97,7 @@ input{
   padding:14px;
   border-radius:8px;
   border:none;
-  background:#11172b;
+  background:#0f162d;
   color:#fff;
   font-size:1rem;
   outline:none;
@@ -92,18 +107,17 @@ button{
   padding:14px;
   border-radius:8px;
   border:none;
-  background:#4aa3ff;
-  color:#fff;
+  background:#6fb7ff;
+  color:#000;
   font-size:1rem;
   cursor:pointer;
-  box-shadow:0 0 15px #4aa3ff;
+  box-shadow:0 0 18px #6fb7ff;
 }
 
-/* مخرجات الذكاء */
 .output{
-  margin-top:15px;
+  margin-top:14px;
   font-size:0.9rem;
-  color:#9fd6ff;
+  color:#cfeaff;
   min-height:20px;
   text-align:center;
 }
@@ -119,36 +133,34 @@ button{
 <body>
 
 <h1>أيهم</h1>
-<div class="subtitle">عقل رقمي دائري مدعوم بالذكاء الاصطناعي</div>
+<div class="subtitle">عقل رقمي حي — تمثيل بصري متقدّم</div>
 
-<div class="brain-box">
-  <div class="brain"></div>
+<div class="brain-shell">
+  <div class="brain-core"></div>
 </div>
 
 <div class="input-group">
-  <input id="question" type="text" placeholder="اكتب سؤالك...">
+  <input id="q" type="text" placeholder="اكتب سؤالك…">
   <button onclick="analyze()">تحليل</button>
 </div>
 
-<div class="output" id="output"></div>
+<div class="output" id="out"></div>
 
 <div class="footer">AYHEM • Digital Living Mind</div>
 
 <script>
 function analyze(){
-  const q = document.getElementById("question").value.trim();
-  const out = document.getElementById("output");
+  const q = document.getElementById("q").value.trim();
+  const out = document.getElementById("out");
 
   if(!q){
-    out.textContent = "⚠️ الرجاء إدخال سؤال";
+    out.textContent = "⚠️ أدخل سؤالًا ليبدأ العقل بالتحليل";
     return;
   }
 
-  // محاكاة ذكاء اصطناعي (قابل للربط الحقيقي لاحقًا)
-  out.textContent = "🧠 العقل الرقمي يحلل السؤال...";
-  
+  out.textContent = "🧠 العقل الرقمي يعالج البيانات...";
   setTimeout(()=>{
-    out.textContent = "✅ تم التحليل. النظام جاهز للربط بالذكاء الاصطناعي الحقيقي.";
+    out.textContent = "✅ التحليل الأولي مكتمل — جاهز للذكاء الاصطناعي الحقيقي";
   },1200);
 }
 </script>
