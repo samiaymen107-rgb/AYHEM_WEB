@@ -1,19 +1,18 @@
-async function askAyhem() {
-  const input = document.getElementById("questionInput").value.trim();
-  if (!input) return;
+// أيهم - وحدة الربط مع الواجهة
+function askAyhem() {
+  const question = document.getElementById('questionInput').value;
+  const output = document.getElementById('output');
 
-  const outputDiv = document.getElementById("output");
-  outputDiv.innerHTML = "<p>قيد التحليل...</p>";
+  if (!question) {
+    output.innerHTML = "يرجى كتابة سؤال!";
+    return;
+  }
 
-  // استدعاء AI للحصول على الجواب
-  const aiResponse = await askAI(input);
+  // نرسل السؤال إلى وحدة الذكاء الاصطناعي
+  const answer = getAIResponse(question);
 
-  // عرض الإجابة في الصفحة
-  outputDiv.innerHTML = `<p>${aiResponse}</p>`;
+  // حفظ السؤال والإجابة في الذاكرة الدائمة
+  saveToMemory(question, answer);
 
-  // حفظ السؤال والإجابة في الذاكرة المحلية
-  saveMemory(input, aiResponse);
-
-  // تفريغ حقل الإدخال
-  document.getElementById("questionInput").value = "";
+  output.innerHTML = answer;
 }
