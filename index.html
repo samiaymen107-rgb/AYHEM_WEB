@@ -1,82 +1,122 @@
-<!DOCTYPE html><html lang="ar">
+<!DOCTYPE html>
+<html lang="ar">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>أيهم — أول عقل رقمي حي</title>
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>أيهم - أول عقل رقمي حي</title>
+  <style>
+    /* الخلفية */
     body {
-        margin: 0;
-        padding: 0;
-        font-family: 'Cairo', sans-serif;
-        background: linear-gradient(180deg, #0a0f2c, #000);
-        color: #fff;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        overflow: hidden;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0a0f25;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
     }
-    .card {
-        background: rgba(10, 15, 44, 0.95);
-        border-radius: 20px;
-        padding: 30px 25px;
-        width: 90%;
-        max-width: 400px;
-        box-shadow: 0 0 20px rgba(0, 128, 255, 0.4);
-        text-align: center;
-        position: relative;
+
+    /* تأثير النجوم */
+    body::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: url('https://i.ibb.co/QMZ0WJc/stars-bg.jpg') repeat;
+      background-size: cover;
+      animation: moveStars 200s linear infinite;
+      z-index: 0;
     }
-    .card h1 {
-        font-size: 2em;
-        color: #00bfff;
-        margin-bottom: 10px;
-        text-shadow: 0 0 10px #00bfff;
+
+    @keyframes moveStars {
+      from { transform: translate(0, 0); }
+      to { transform: translate(-1000px, -1000px); }
     }
-    .card p.subtitle {
-        font-size: 1em;
-        color: #aaa;
-        margin-bottom: 20px;
+
+    /* الحاوية الرئيسية */
+    .container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 600px;
+      padding: 20px;
     }
-    input[type="text"] {
-        width: 100%;
-        padding: 12px 15px;
-        border-radius: 12px;
-        border: none;
-        font-size: 1em;
-        outline: none;
-        margin-bottom: 15px;
-        background: #111633;
-        color: #fff;
-        box-shadow: inset 0 0 8px rgba(0, 191, 255, 0.3);
+
+    /* عنوان المشروع */
+    h1 {
+      font-size: 3rem;
+      color: #49f;
+      margin-bottom: 10px;
+      text-shadow: 0 0 20px #49f, 0 0 40px #49f80;
     }
-    input[type="text"]::placeholder {
-        color: #888;
+
+    /* الوصف */
+    p.subtitle {
+      font-size: 1.2rem;
+      color: #bbb;
+      margin-bottom: 40px;
     }
-    button {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 12px;
-        background: #00bfff;
-        color: #000;
-        font-weight: bold;
-        cursor: pointer;
-        font-size: 1em;
-        transition: 0.3s;
+
+    /* المخ الرقمي */
+    .brain {
+      width: 250px;
+      height: 250px;
+      margin: 0 auto 40px;
+      background: url('https://i.ibb.co/2Mbs1YH/brain-digital.png') no-repeat center/contain;
+      filter: drop-shadow(0 0 20px #49f);
+      animation: glow 2s infinite alternate;
     }
-    button:disabled {
-        background: #555;
-        cursor: not-allowed;
+
+    @keyframes glow {
+      0% { filter: drop-shadow(0 0 10px #49f); }
+      100% { filter: drop-shadow(0 0 25px #49f); }
     }
-    button:hover:not(:disabled) {
-        background: #0094d6;
-        color: #fff;
+
+    /* مربع السؤال */
+    .question-box {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
     }
-    .message {
-        margin-top: 12px;
-        font-size: 0.9em;
-        color: #aaa;
-        min-height: 20px;
+
+    .question-box input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+      box-shadow: 0 0 10px #222 inset;
+      background: #11172b;
+      color: #fff;
     }
+
+    .question-box button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #49f;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 10px #49f;
+    }
+
+    .question-box button:hover {
+      background-color: #38c;
+      box-shadow: 0 0 20px #38c;
+    }
+
+    /* أسفل مربع السؤال */
     .footer {
-        margin-top: 20px;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="
