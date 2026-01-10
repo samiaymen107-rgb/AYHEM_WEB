@@ -6,80 +6,63 @@
 <title>AYHEM – العقل الرقمي الحي</title>
 
 <style>
-/* ====== RESET ====== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Arial", sans-serif;
+  font-family: Arial, sans-serif;
 }
 
-/* ====== BODY ====== */
 body {
-  background: radial-gradient(circle at top, #0a1a2f, #050b16);
-  color: #ffffff;
+  background: radial-gradient(circle at top, #0b1d33, #040912);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  color: white;
 }
 
-/* ====== CONTAINER ====== */
 .app {
   width: 100%;
   max-width: 420px;
-  padding: 20px;
   text-align: center;
+  padding: 20px;
 }
 
-/* ====== BRAIN ====== */
-.brain-wrapper {
+/* ===== العقل ===== */
+.brain-rotate {
   width: 260px;
   height: 260px;
   margin: 30px auto;
-  border-radius: 50%;
-  animation: rotateBrain 30s linear infinite;
+  animation: spin 28s linear infinite;
 }
 
-.brain-wrapper img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 0 25px rgba(0,180,255,0.7));
-}
-
-/* دوران فقط */
-@keyframes rotateBrain {
+@keyframes spin {
   from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 
-/* ====== TEXT ====== */
+/* ===== النص ===== */
 h1 {
   font-size: 22px;
-  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 p {
   font-size: 14px;
   opacity: 0.85;
-  margin: 10px 0 20px;
+  margin-bottom: 25px;
 }
 
-/* ====== BUTTON ====== */
+/* ===== زر ===== */
 button {
-  background: linear-gradient(135deg, #00b4ff, #7a7cff);
+  background: linear-gradient(135deg, #00b4ff, #6f7bff);
   border: none;
   border-radius: 30px;
   padding: 14px 30px;
   color: white;
   font-size: 16px;
-  cursor: pointer;
-  box-shadow: 0 0 15px rgba(0,180,255,0.6);
-}
-
-button:active {
-  transform: scale(0.96);
+  box-shadow: 0 0 18px rgba(0,180,255,0.6);
 }
 </style>
 </head>
@@ -88,17 +71,44 @@ button:active {
 
 <div class="app">
 
-  <!-- العقل الرقمي -->
-  <div class="brain-wrapper">
-    <img src="https://i.imgur.com/7QpVZkG.png" alt="Digital Brain">
+  <!-- عقل رقمي SVG (داخلي - مضمون الظهور) -->
+  <div class="brain-rotate">
+    <svg viewBox="0 0 200 200" width="100%" height="100%">
+      <defs>
+        <radialGradient id="g1">
+          <stop offset="0%" stop-color="#9be7ff"/>
+          <stop offset="100%" stop-color="#1a6cff"/>
+        </radialGradient>
+      </defs>
+
+      <!-- شكل الدماغ -->
+      <path d="
+        M100 20
+        C40 20, 20 60, 35 90
+        C20 120, 40 160, 80 160
+        C90 180, 130 180, 140 160
+        C180 160, 180 120, 165 95
+        C180 60, 160 20, 100 20 Z"
+        fill="url(#g1)"
+        opacity="0.95"/>
+
+      <!-- إشارات ضوئية داخلية -->
+      <circle cx="70" cy="80" r="4" fill="#ffffff"/>
+      <circle cx="110" cy="60" r="3" fill="#ffffff"/>
+      <circle cx="130" cy="100" r="5" fill="#ffffff"/>
+      <circle cx="90" cy="120" r="3" fill="#ffffff"/>
+
+      <!-- خطوط عصبية -->
+      <line x1="70" y1="80" x2="110" y2="60" stroke="#cceeff" stroke-width="1"/>
+      <line x1="110" y1="60" x2="130" y2="100" stroke="#cceeff" stroke-width="1"/>
+      <line x1="130" y1="100" x2="90" y2="120" stroke="#cceeff" stroke-width="1"/>
+    </svg>
   </div>
 
-  <!-- نص ثابت -->
+  <!-- محتوى ثابت -->
   <h1>أيهم — العقل الرقمي الحي</h1>
-  <p>عقل بشري رقمي، ذكي، آمن، ويبعث على الطمأنينة</p>
-
-  <!-- زر ثابت -->
-  <button>ابدأ التجربة</button>
+  <p>عقل بشري رقمي، ذكي، مطمئن، وموجّه للمستقبل</p>
+  <button>ابدأ</button>
 
 </div>
 
