@@ -1,12 +1,10 @@
-const MEMORY_KEY = "ayhem_memory";
+// تخزين مؤقت للتجربة الأولية
+const memory = [];
 
-function loadMemory() {
-  const data = localStorage.getItem(MEMORY_KEY);
-  return data ? JSON.parse(data) : [];
+function saveToMemory(question, answer) {
+  memory.push({ question, answer, timestamp: new Date() });
 }
 
-function saveMemory(question, answer) {
-  const memory = loadMemory();
-  memory.push({ question, answer });
-  localStorage.setItem(MEMORY_KEY, JSON.stringify(memory));
+function getMemory() {
+  return memory;
 }
