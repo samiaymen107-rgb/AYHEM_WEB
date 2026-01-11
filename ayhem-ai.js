@@ -1,15 +1,24 @@
-async function askAI(question) {
-  const res = await fetch("/api/ai", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt: question })
-  });
-  const data = await res.json();
-  return data.output_text || data; 
-}
+const AYHEM_API = "https://autumn-brook-5828.samiaymen720.workers.dev";
 
-document.getElementById("btnAsk").addEventListener("click", async () => {
-  const q = document.getElementById("txtAsk").value;
-  const reply = await askAI(q);
-  document.getElementById("divAnswer").innerText = reply;
-});
+export async function talkToAyhem(prompt) {
+  try {
+    const response = await fetch(AYHEM_API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ prompt })
+    });
+
+    if (!response.ok) {
+      throw new Error("AYHEM is not responding");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return {
+      reply: "أيهم صامت الآن... حاول لاحقًا"
+    };
+  }
+}
