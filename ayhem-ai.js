@@ -1,6 +1,6 @@
 const AYHEM_API = "https://autumn-brook-5828.samiaymen720.workers.dev";
 
-export async function talkToAyhem(prompt) {
+async function talkToAyhem(prompt) {
   try {
     const response = await fetch(AYHEM_API, {
       method: "POST",
@@ -9,10 +9,6 @@ export async function talkToAyhem(prompt) {
       },
       body: JSON.stringify({ prompt })
     });
-
-    if (!response.ok) {
-      throw new Error("AYHEM is not responding");
-    }
 
     const data = await response.json();
     return data;
