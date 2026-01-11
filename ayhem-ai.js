@@ -10,11 +10,8 @@ async function talkToAyhem(prompt) {
       body: JSON.stringify({ prompt })
     });
 
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    return {
-      reply: "أيهم صامت الآن... حاول لاحقًا"
-    };
+    return await response.json();
+  } catch (e) {
+    return { reply: "أيهم صامت الآن... حاول لاحقًا" };
   }
 }
