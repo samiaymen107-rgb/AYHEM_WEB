@@ -1,56 +1,180 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>AYHEM</title>
-  <style>
-    body {
-      background: #0f172a;
-      color: #e5e7eb;
-      font-family: Arial;
-      text-align: center;
-      padding: 20px;
-    }
-    input, button {
-      width: 90%;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 16px;
-    }
-    #reply {
-      margin-top: 20px;
-      padding: 15px;
-      background: #020617;
-      border: 1px solid #334155;
-      white-space: pre-wrap;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AYHEM</title>
+
+<style>
+/* ===== الخلفية ===== */
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background: radial-gradient(circle at top, #0b1d3a, #020617);
+  color: #e5e7eb;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===== إطار التطبيق ===== */
+.app {
+  width: 100%;
+  max-width: 420px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(2, 6, 23, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+/* ===== الهيدر ===== */
+.header {
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid #1e293b;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #7dd3fc;
+}
+
+.header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* ===== منطقة الشات ===== */
+.chat {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+/* رسائل */
+.msg {
+  max-width: 80%;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+/* المستخدم */
+.user {
+  background: #2563eb;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+/* أيهم */
+.ai {
+  background: #020617;
+  border: 1px solid #1e293b;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+/* ===== الإدخال ===== */
+.input-box {
+  display: flex;
+  padding: 12px;
+  border-top: 1px solid #1e293b;
+  background: rgba(2, 6, 23, 0.9);
+}
+
+.input-box input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 15px;
+}
+
+.input-box button {
+  margin-left: 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+</style>
 </head>
 
 <body>
 
-  <h2>🧠 AYHEM</h2>
+<div class="app">
 
-  <input id="userInput" placeholder="اكتب سؤالك لأيهم..." />
+  <div class="header">
+    <h1>🧠 AYHEM</h1>
+    <p>أول عقل رقمي حي — واجهة التفاعل</p>
+  </div>
 
-  <button id="askBtn">إرسال</button>
+  <div id="chat" class="chat">
+    <div class="msg ai">
+      مرحبًا، أنا أيهم. كيف أستطيع مساعدتك؟
+    </div>
+  </div>
 
-  <div id="reply">بانتظار التفاعل...</div>
+  <div class="input-box">
+    <input id="input" placeholder="اكتب سؤالك هنا..." />
+    <button onclick="send()">➤</button>
+  </div>
 
-  <!-- ربط العقل -->
-  <script src="ayhem-ai.js"></script>
+</div>
 
-  <!-- التحكم -->
-  <script>
-    document.getElementById("askBtn").onclick = async () => {
-      const input = document.getElementById("userInput").value;
-      document.getElementById("reply").innerText = "⏳ أيهم يفكّر...";
+<script>
+const API = "https://autumn-brook-5828.samiaymen720.workers.dev";
 
-      const result = await talkToAyhem(input);
-      document.getElementById("reply").innerText =
-        result.reply || JSON.stringify(result, null, 2);
-    };
-  </script>
+async function send() {
+  const input = document.getElementById("input");
+  const text = input.value.trim();
+  if (!text) return;
+
+  const chat = document.getElementById("chat");
+
+  // رسالة المستخدم
+  const userMsg = document.createElement("div");
+  userMsg.className = "msg user";
+  userMsg.textContent = text;
+  chat.appendChild(userMsg);
+
+  input.value = "";
+  chat.scrollTop = chat.scrollHeight;
+
+  // رسالة انتظار
+  const aiMsg = document.createElement("div");
+  aiMsg.className = "msg ai";
+  aiMsg.textContent = "⏳ أيهم يفكّر...";
+  chat.appendChild(aiMsg);
+  chat.scrollTop = chat.scrollHeight;
+
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: text })
+    });
+    const data = await res.json();
+    aiMsg.textContent = data.reply || "…";
+  } catch {
+    aiMsg.textContent = "حدث خطأ في الاتصال.";
+  }
+
+  chat.scrollTop = chat.scrollHeight;
+}
+</script>
 
 </body>
 </html>
