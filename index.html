@@ -1,75 +1,65 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-<meta charset="UTF-8">
-<title>أيهم — عقل رقمي حي</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body{
-  margin:0;
-  font-family:Tahoma, Arial, sans-serif;
-  background:radial-gradient(circle at center,#081b33,#000);
-  color:#eaf4ff;
-  text-align:center;
-}
-h1{margin-top:25px;font-size:28px;}
-.globe{
-  width:280px;height:280px;margin:40px auto;border-radius:50%;
-  background:url("https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg");
-  background-size:cover;
-  box-shadow:0 0 45px #2fa4ff88,inset 0 0 35px #00ccff66;
-  animation:spin 50s linear infinite;
-}
-@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.box{
-  max-width:520px;margin:30px auto;padding:20px;
-  background:#0b1c35;border-radius:14px;
-}
-input{
-  width:85%;padding:12px;border-radius:10px;border:none;outline:none;
-}
-button{
-  margin-top:12px;padding:10px 24px;background:#2fa4ff;color:#fff;
-  border:none;border-radius:10px;cursor:pointer;font-size:15px;
-}
-button:hover{background:#4db2ff;}
-.response{margin-top:15px;color:#a8d8ff;white-space:pre-wrap;}
-</style>
+  <meta charset="UTF-8" />
+  <title>AYHEM – العقل الرقمي الحي</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      text-align: center;
+      padding: 40px;
+    }
+    input {
+      width: 80%;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 12px 25px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #reply {
+      margin-top: 25px;
+      padding: 15px;
+      background: #020617;
+      border: 1px solid #334155;
+    }
+  </style>
 </head>
 
 <body>
 
-<h1>أيهم — عقل رقمي حي</h1>
-<p>نواة معرفية حية • محاكاة AI جاهزة للربط لاحقًا</p>
+  <h1>🧠 AYHEM</h1>
+  <p>العقل الرقمي الحي</p>
 
-<div class="globe"></div>
+  <input
+    id="userInput"
+    type="text"
+    placeholder="اكتب سؤالك لأيهم..."
+  />
 
-<div class="box">
-  <input id="q" placeholder="اكتب سؤال أو فكرة" />
-  <br>
-  <button onclick="askAYHEM()">تحليل</button>
-  <div id="r" class="response"></div>
-</div>
+  <br />
 
-<script>
-function askAYHEM(){
-  const q=document.getElementById("q").value.trim();
-  const r=document.getElementById("r");
+  <button onclick="sendToAyhem()">تفاعل مع أيهم</button>
 
-  if(!q){r.textContent="✦ الرجاء إدخال سؤال أو فكرة.";return;}
+  <div id="reply">بانتظار تفاعل...</div>
 
-  r.textContent="⏳ أيهم يفكر...";
+  <!-- ربط ملف الذكاء -->
+  <script src="ayhem-ai.js"></script>
 
-  // محاكاة ذكاء اصطناعي (جاهز للربط الحقيقي لاحقًا)
-  setTimeout(()=>{
-    r.textContent=
-      "✔️ تم التحليل.\n\n" +
-      "أيهم يربط المعطيات داخليًا في هيكله الرقمي، " +
-      "جاهز للربط بالذكاء الاصطناعي الحقيقي عند الإعداد التالي.";
-  },1200);
-}
-</script>
+  <script>
+    async function sendToAyhem() {
+      const input = document.getElementById("userInput").value;
+      const result = await talkToAyhem(input);
+      document.getElementById("reply").innerText =
+        result.reply || JSON.stringify(result);
+    }
+  </script>
 
 </body>
 </html>
