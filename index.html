@@ -2,63 +2,56 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8" />
-  <title>AYHEM – العقل الرقمي الحي</title>
+  <title>AYHEM</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
       background: #0f172a;
       color: #e5e7eb;
+      font-family: Arial;
       text-align: center;
-      padding: 40px;
+      padding: 20px;
     }
-    input {
-      width: 80%;
+    input, button {
+      width: 90%;
       padding: 12px;
+      margin-top: 10px;
       font-size: 16px;
-      margin-top: 20px;
-    }
-    button {
-      margin-top: 15px;
-      padding: 12px 25px;
-      font-size: 16px;
-      cursor: pointer;
     }
     #reply {
-      margin-top: 25px;
+      margin-top: 20px;
       padding: 15px;
       background: #020617;
       border: 1px solid #334155;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>🧠 AYHEM</h1>
-  <p>العقل الرقمي الحي</p>
+  <h2>🧠 AYHEM</h2>
 
-  <input
-    id="userInput"
-    type="text"
-    placeholder="اكتب سؤالك لأيهم..."
-  />
+  <input id="userInput" placeholder="اكتب سؤالك لأيهم..." />
 
-  <br />
+  <button id="askBtn">إرسال</button>
 
-  <button onclick="sendToAyhem()">تفاعل مع أيهم</button>
+  <div id="reply">بانتظار التفاعل...</div>
 
-  <div id="reply">بانتظار تفاعل...</div>
-
-  <!-- ربط ملف الذكاء -->
   <script src="ayhem-ai.js"></script>
 
   <script>
-    async function sendToAyhem() {
+    document.getElementById("askBtn").onclick = async () => {
       const input = document.getElementById("userInput").value;
-      const result = await talkToAyhem(input);
-      document.getElementById("reply").innerText =
-        result.reply || JSON.stringify(result);
-    }
+      document.getElementById("reply").innerText = "⏳ أيهم يفكّر...";
+
+      try {
+        const result = await talkToAyhem(input);
+        document.getElementById("reply").innerText =
+          result.reply || JSON.stringify(result, null, 2);
+      } catch (e) {
+        document.getElementById("reply").innerText = "❌ خطأ في الاتصال";
+      }
+    };
   </script>
 
 </body>
