@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>AYHEM</title>
   <style>
     body {
@@ -37,20 +37,18 @@
 
   <div id="reply">بانتظار التفاعل...</div>
 
+  <!-- ربط العقل -->
   <script src="ayhem-ai.js"></script>
 
+  <!-- التحكم -->
   <script>
     document.getElementById("askBtn").onclick = async () => {
       const input = document.getElementById("userInput").value;
       document.getElementById("reply").innerText = "⏳ أيهم يفكّر...";
 
-      try {
-        const result = await talkToAyhem(input);
-        document.getElementById("reply").innerText =
-          result.reply || JSON.stringify(result, null, 2);
-      } catch (e) {
-        document.getElementById("reply").innerText = "❌ خطأ في الاتصال";
-      }
+      const result = await talkToAyhem(input);
+      document.getElementById("reply").innerText =
+        result.reply || JSON.stringify(result, null, 2);
     };
   </script>
 
