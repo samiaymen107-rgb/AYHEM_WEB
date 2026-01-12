@@ -2,98 +2,114 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>AYHEM</title>
 
 <style>
+:root {
+  --bg: #f7f7f8;
+  --ai: #ffffff;
+  --user: #e6f0ff;
+  --text: #111827;
+  --sub: #6b7280;
+  --border: #e5e7eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  background: #0f172a;
-  color: #e5e7eb;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+  background: var(--bg);
+  color: var(--text);
   height: 100vh;
-  display: flex;
-  justify-content: center;
 }
 
+/* ===== الحاوية ===== */
 .app {
-  width: 100%;
   max-width: 720px;
+  margin: auto;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 100vh;
 }
 
+/* ===== الهيدر ===== */
 .header {
-  padding: 14px;
-  border-bottom: 1px solid #1e293b;
-  text-align: center;
-  background: #020617;
-}
-
-.header h1 {
-  margin: 0;
-  font-size: 18px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
   font-weight: 600;
 }
 
+/* ===== الشات ===== */
 .chat {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 16px;
 }
 
+/* ===== الرسائل ===== */
 .msg {
-  max-width: 85%;
-  padding: 12px 14px;
+  max-width: 92%;
+  padding: 14px 16px;
+  border-radius: 14px;
   margin-bottom: 14px;
-  border-radius: 12px;
+  line-height: 1.7;
   font-size: 15px;
-  line-height: 1.6;
   white-space: pre-wrap;
 }
 
-.user {
-  background: #2563eb;
-  color: #fff;
-  margin-left: auto;
-  border-bottom-right-radius: 4px;
-}
-
+/* AI */
 .ai {
-  background: #020617;
-  border: 1px solid #1e293b;
+  background: var(--ai);
+  border: 1px solid var(--border);
+  margin-left: auto;
   margin-right: auto;
-  border-bottom-left-radius: 4px;
 }
 
+/* USER */
+.user {
+  background: var(--user);
+  margin-right: auto;
+}
+
+/* ===== الإدخال ===== */
 .input-box {
+  border-top: 1px solid var(--border);
+  background: #fff;
+  padding: 10px;
+}
+
+.input-wrap {
   display: flex;
-  padding: 12px;
-  border-top: 1px solid #1e293b;
-  background: #020617;
+  gap: 8px;
+  align-items: center;
 }
 
-.input-box input {
+.input-wrap input {
   flex: 1;
-  padding: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
   font-size: 15px;
-  border-radius: 10px;
-  border: none;
   outline: none;
-  background: #020617;
-  color: #e5e7eb;
 }
 
-.input-box button {
-  margin-right: 8px;
-  padding: 12px 16px;
-  font-size: 16px;
-  border-radius: 10px;
+.input-wrap button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   border: none;
+  background: #111827;
+  color: #fff;
+  font-size: 18px;
   cursor: pointer;
-  background: linear-gradient(135deg, #38bdf8, #2563eb);
-  color: white;
 }
 </style>
 </head>
@@ -101,8 +117,9 @@ body {
 <body>
 
 <div class="app">
+
   <div class="header">
-    <h1>AYHEM</h1>
+    AYHEM
   </div>
 
   <div id="chat" class="chat">
@@ -112,23 +129,29 @@ body {
   </div>
 
   <div class="input-box">
-    <input id="input" placeholder="اكتب سؤالك…" />
-    <button onclick="send()">➤</button>
+    <div class="input-wrap">
+      <input id="input" placeholder="اسأل عن أي شيء…" autocomplete="off">
+      <button onclick="send()">➤</button>
+    </div>
   </div>
+
 </div>
 
 <script>
-const API = "PUT_YOUR_WORKER_URL_HERE";
+/* ===== الإعدادات ===== */
+const API = "https://autumn-brook-5828.samiaymen720.workers.dev";
+
 let history = [];
 
+/* ===== إرسال ===== */
 async function send() {
   const input = document.getElementById("input");
   const text = input.value.trim();
   if (!text) return;
 
   input.value = "";
-  addMsg(text, "user");
 
+  addMsg(text, "user");
   const wait = addMsg("…", "ai");
 
   try {
@@ -139,25 +162,27 @@ async function send() {
     });
 
     const data = await res.json();
-    wait.textContent = data.reply || "";
+    wait.textContent = data.reply || "…";
 
     history.push({ role: "user", content: text });
     history.push({ role: "assistant", content: data.reply });
+    history = history.slice(-6);
 
-    if (history.length > 8) history = history.slice(-8);
   } catch {
-    wait.textContent = "خطأ في الاتصال";
+    wait.textContent = "⚠️ خطأ في الاتصال";
   }
 
   scrollDown();
 }
 
-function addMsg(text, cls) {
+/* ===== إضافة رسالة ===== */
+function addMsg(text, type) {
   const chat = document.getElementById("chat");
   const div = document.createElement("div");
-  div.className = "msg " + cls;
+  div.className = "msg " + type;
   div.textContent = text;
   chat.appendChild(div);
+  scrollDown();
   return div;
 }
 
