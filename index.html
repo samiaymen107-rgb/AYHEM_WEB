@@ -1,80 +1,163 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>AYHEM Core Interface</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AYHEM</title>
+
 <style>
 body {
-  font-family: Arial, sans-serif;
-  direction: rtl;
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   background: #0f172a;
   color: #e5e7eb;
-  margin: 0;
-  padding: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
 }
-header {
-  background: #020617;
-  padding: 20px;
-  text-align: center;
-}
-section {
-  padding: 20px;
-  max-width: 800px;
-  margin: auto;
-}
-textarea {
+
+.app {
   width: 100%;
-  height: 120px;
+  max-width: 720px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 14px;
+  border-bottom: 1px solid #1e293b;
+  text-align: center;
+  background: #020617;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.msg {
+  max-width: 85%;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.user {
+  background: #2563eb;
+  color: #fff;
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
+
+.ai {
+  background: #020617;
+  border: 1px solid #1e293b;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+}
+
+.input-box {
+  display: flex;
+  padding: 12px;
+  border-top: 1px solid #1e293b;
+  background: #020617;
+}
+
+.input-box input {
+  flex: 1;
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
   background: #020617;
   color: #e5e7eb;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  padding: 10px;
 }
-button {
-  margin-top: 10px;
-  padding: 10px 20px;
-  background: #2563eb;
+
+.input-box button {
+  margin-right: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 10px;
   border: none;
-  color: white;
-  border-radius: 6px;
   cursor: pointer;
-}
-pre {
-  background: #020617;
-  padding: 15px;
-  border-radius: 8px;
-  white-space: pre-wrap;
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+  color: white;
 }
 </style>
 </head>
+
 <body>
 
-<header>
-  <h1>AYHEM — Core Interface</h1>
-  <p>نواة تحليل • ذاكرة • تعلّم</p>
-</header>
+<div class="app">
+  <div class="header">🧠 AYHEM</div>
 
-<section>
-  <textarea id="prompt" placeholder="اكتب هنا..."></textarea>
-  <button onclick="send()">إرسال</button>
-</section>
+  <div id="chat" class="chat">
+    <div class="msg ai">مرحبًا، كيف أستطيع مساعدتك؟</div>
+  </div>
 
-<section>
-  <h3>النتيجة:</h3>
-  <pre id="output"></pre>
-</section>
+  <div class="input-box">
+    <input id="input" placeholder="اكتب سؤالك…" />
+    <button onclick="send()">➤</button>
+  </div>
+</div>
 
 <script>
+const API = "https://autumn-brook-5828.samiaymen720.workers.dev";
+let history = [];
+
 async function send() {
-  const prompt = document.getElementById("prompt").value;
-  const res = await fetch("YOUR_WORKER_URL", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt })
-  });
-  const data = await res.json();
-  document.getElementById("output").textContent = data.reply;
+  const input = document.getElementById("input");
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = "";
+  addMsg(text, "user");
+
+  const wait = addMsg("…", "ai");
+
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: text, history })
+    });
+
+    const data = await res.json();
+    wait.textContent = data.reply || "…";
+
+    history.push({ role: "user", content: text });
+    history.push({ role: "assistant", content: data.reply });
+
+    if (history.length > 12) history = history.slice(-12);
+
+  } catch {
+    wait.textContent = "⚠️ خطأ في الاتصال";
+  }
+
+  scrollDown();
+}
+
+function addMsg(text, cls) {
+  const chat = document.getElementById("chat");
+  const div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.textContent = text;
+  chat.appendChild(div);
+  scrollDown();
+  return div;
+}
+
+function scrollDown() {
+  const chat = document.getElementById("chat");
+  chat.scrollTop = chat.scrollHeight;
 }
 </script>
 
