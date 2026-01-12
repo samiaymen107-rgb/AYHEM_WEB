@@ -1,13 +1,104 @@
-body, html { margin:0; padding:0; height:100%; width:100%; font-family:'Segoe UI',sans-serif; background:#0a0f25; color:#fff; display:flex; justify-content:center; align-items:center; }
-.container { display:flex; flex-direction:column; align-items:center; width:100%; padding:20px; gap:15px; }
-h1 { font-size:2.5rem; color:#49f; text-shadow:0 0 15px #49f; }
-p.subtitle { color:#ccc; font-size:1rem; text-align:center; margin-bottom:10px; }
-.brain-wrapper { display:flex; flex-direction:column; align-items:center; }
-.brain { width:220px; height:220px; transition: filter 0.2s ease; margin-bottom:20px; }
-.data-stream { width:4px; height:150px; background: linear-gradient(to bottom, #49f, transparent); animation: flow 1.5s linear infinite; margin-bottom:30px; }
-@keyframes flow { 0% { height:0; opacity:0.5; } 50% { height:150px; opacity:1; } 100% { height:0; opacity:0.5; } }
-.input-group { display:flex; flex-direction:column; gap:10px; width:90%; max-width:400px; }
-input { padding:14px; border-radius:8px; border:none; background:#11172b; color:#fff; outline:none; box-shadow: inset 0 0 10px #000; font-size:1rem; }
-button { padding:14px; border:none; border-radius:8px; background:#49f; color:#fff; cursor:pointer; font-size:1rem; box-shadow:0 0 15px #49f; transition:0.3s; }
-button:hover { background:#38c; box-shadow:0 0 25px #38c; }
-.footer { font-size:0.8rem; color:#888; margin-top:10px; }
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #f7f9fc, #eef3ff);
+  color: #0f172a;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-top: 12px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #2563eb;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* Brain */
+.brain-container {
+  display: flex;
+  justify-content: center;
+  margin: 28px 0;
+}
+
+.brain {
+  width: 180px;
+  animation: float 4s ease-in-out infinite;
+  filter: drop-shadow(0 10px 25px rgba(37,99,235,0.25));
+}
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+
+/* Chat */
+.chat-box {
+  background: rgba(255,255,255,0.8);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  margin-bottom: auto;
+}
+
+.status {
+  font-size: 15px;
+  color: #334155;
+}
+
+/* Input */
+.input-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.input-bar input {
+  flex: 1;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid #dbeafe;
+  background: #ffffff;
+  font-size: 15px;
+}
+
+.input-bar input:focus {
+  outline: none;
+  border-color: #93c5fd;
+}
+
+.input-bar button {
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: none;
+  background: #e0ecff;
+  color: #1e40af;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.input-bar button:hover {
+  background: #dbeafe;
+}
