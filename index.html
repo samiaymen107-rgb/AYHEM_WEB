@@ -192,5 +192,58 @@ function scrollDown() {
 }
 </script>
 <script src="ayhem-enhance.js"></script>
+  <script>
+/* ===== ربط الهاتف مع الذكاء (AYHEM) ===== */
+
+// رابط الذكاء (Cloudflare Worker)
+const WORKER_URL = "https://autumn-brook-5828.samiaymen720.workers.dev/";
+
+// العناصر
+const input  = document.getElementById("input");
+const send   = document.getElementById("send");
+const chat   = document.getElementById("chat");
+
+// إضافة رسالة
+function addMessage(text, type){
+  const div = document.createElement("div");
+  div.className = "message " + type;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// إرسال السؤال من الهاتف إلى الذكاء
+send.onclick = async () => {
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage(text, "user");
+  input.value = "";
+
+  // حالة أيهم
+  if (window.showTyping) showTyping("يفكر");
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+
+    const reply = await res.text();
+    if (window.hideTyping) hideTyping();
+    addMessage(reply, "assistant");
+
+  } catch (e) {
+    if (window.hideTyping) hideTyping();
+    addMessage("حدث خطأ في الاتصال.", "assistant");
+  }
+};
+
+// إرسال بالضغط على Enter
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") send.click();
+});
+</script>
 </body>
 </html>
