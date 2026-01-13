@@ -2,43 +2,62 @@
    AYHEM – Enhancement Layer (SAFE MODE)
    لا يعدّل أي كود موجود
    يضيف فقط تحسينات بصرية وسلوكية
+   Mobile + Identity + Typing Status
 ========================================================= */
 
-/* الهوية الموحدة */
+/* ========= الهوية الموحدة ========= */
 window.AYHEM_IDENTITY = {
   name: "أيهم",
   title: "عقل رقمي حي",
   nickname: "سامي"
 };
 
-/* =====================================
-   شريط حالة الكتابة (أيهم يكتب…)
-===================================== */
+/* ========= تحسين العنوان ========= */
+document.addEventListener("DOMContentLoaded", () => {
+  const title =
+    document.getElementById("title") ||
+    document.querySelector("header");
+
+  if (title) {
+    title.textContent = "أيهم";
+    title.style.fontFamily = "Cairo, Tajawal, Segoe UI, Arial, sans-serif";
+    title.style.fontSize = "20px";
+    title.style.fontWeight = "700";
+    title.style.color = "#2563eb"; // لون رقمي
+  }
+});
+
+/* ========= حالة الكتابة ========= */
 (function () {
   function ensureTypingElement() {
     let t = document.getElementById("ayhem-typing");
     if (!t) {
       t = document.createElement("div");
       t.id = "ayhem-typing";
-      t.style.fontSize = "13px";
-      t.style.color = "#64748b";
-      t.style.margin = "6px 16px";
-      t.style.fontFamily = '"Segoe UI", Tahoma, Arial, sans-serif';
-      t.style.display = "none";
-
+      t.style.cssText = `
+        font-size:13px;
+        color:#64748b;
+        margin:6px 14px;
+        font-family:Segoe UI, Tahoma, Arial, sans-serif;
+        display:none;
+      `;
       const chat =
         document.getElementById("chat") ||
         document.querySelector("main") ||
         document.body;
-
       chat.appendChild(t);
     }
     return t;
   }
 
-  window.showTyping = function (text = "أيهم يكتب…") {
+  window.showTyping = function (state = "يكتب") {
     const t = ensureTypingElement();
-    t.textContent = text;
+    const map = {
+      "يكتب": "أيهم يكتب…",
+      "يفكر": "أيهم يفكر…",
+      "ينظر": "أيهم يلقي نظرة…"
+    };
+    t.textContent = map[state] || map["يكتب"];
     t.style.display = "block";
   };
 
@@ -48,16 +67,14 @@ window.AYHEM_IDENTITY = {
   };
 })();
 
-/* =====================================
-   حماية الهوية ومنع التضارب
-===================================== */
+/* ========= حماية الهوية ========= */
 (function () {
   const sanitize = (str) => {
     if (typeof str !== "string") return str;
     return str
-      .replace(/عقل رقمي حي|عقل رقمي|عقل حي/gi, "عقل رقمي حي")
       .replace(/اسمي\s+\S+/gi, "اسمي أيهم")
-      .replace(/لقبي\s+\S+/gi, "لقبي سامي");
+      .replace(/لقبي\s+\S+/gi, "لقبي سامي")
+      .replace(/عقل\s+(رقمي|حي)/gi, "عقل رقمي حي");
   };
 
   const _log = console.log;
@@ -66,44 +83,62 @@ window.AYHEM_IDENTITY = {
   };
 })();
 
-/* =====================================
-   تحسين الشكل العام (خفيف وآمن)
-===================================== */
+/* ========= تحسين المظهر + الموبايل ========= */
 (function () {
   const style = document.createElement("style");
   style.textContent = `
-    body {
-      background: linear-gradient(180deg, #f8fafc, #eef2f7);
+    body{
+      background: linear-gradient(180deg,#f8fafc,#eef2f7);
     }
 
-    header, #title {
-      font-weight: 600 !important;
-      color: #0f172a !important;
+    .assistant{
+      font-size:15px;
+      line-height:1.7;
     }
 
-    .assistant {
-      font-size: 15px;
-      line-height: 1.7;
-      font-weight: 400;
+    .user{
+      font-size:15px;
+      font-weight:500;
     }
 
-    .user {
-      font-size: 15px;
-      font-weight: 500;
+    /* ===== Mobile Input Fix (Redmi / Android) ===== */
+    .input-bar{
+      position:fixed !important;
+      bottom:env(safe-area-inset-bottom,0);
+      left:0;
+      right:0;
+      padding:6px 8px !important;
+      gap:6px;
+      z-index:9999;
+      background:#fff;
+    }
+
+    .input-bar input{
+      font-size:14px !important;
+      padding:10px !important;
+      border-radius:14px;
+    }
+
+    .input-bar button{
+      font-size:14px !important;
+      padding:10px 14px !important;
+      border-radius:14px;
+    }
+
+    main,#chat{
+      padding-bottom:120px !important;
     }
   `;
   document.head.appendChild(style);
 })();
 
-/* =====================================
-   ربط تلقائي مع fetch (إن وُجد)
-===================================== */
+/* ========= ربط تلقائي مع fetch ========= */
 (function () {
+  if (!window.fetch) return;
   const _fetch = window.fetch;
-  if (!_fetch) return;
 
   window.fetch = async function (...args) {
-    showTyping();
+    showTyping("يفكر");
     try {
       const res = await _fetch.apply(this, args);
       hideTyping();
