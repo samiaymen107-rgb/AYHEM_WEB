@@ -1,5 +1,5 @@
-// ===== MEMORY CORE =====
-const MEM_KEY = "AYHEM_MEMORY";
+// ===== AYHEM MEMORY (LONG + IDENTITY) =====
+const MEM_KEY = "AYHEM_LONG_MEMORY";
 const NAME_KEY = "AYHEM_OWNER_NAME";
 
 export function getMemory(){
@@ -12,7 +12,7 @@ export function saveMemory(role, content){
   localStorage.setItem(MEM_KEY, JSON.stringify(m));
 }
 
-// ===== NAME MEMORY (SAFE) =====
+// ===== NAME MEMORY =====
 export function rememberNameFromText(text){
   const m = text.match(/اسمي\s+(.+)/);
   if(m){
