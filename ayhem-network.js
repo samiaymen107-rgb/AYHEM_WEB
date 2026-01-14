@@ -6,16 +6,26 @@ const API="https://autumn-brook-5828.samiaymen720.workers.dev";
 export async function askAYHEM(prompt,persona){
   analyzeInteraction(prompt);
 
-  const memory=getMemory();
-  if(memory.length%15===0) compressMemory(memory);
+  const memory = getMemory();
+  if(memory.length % 15 === 0) compressMemory(memory);
 
-  const learning=getLearningContext();
+  const learning = getLearningContext();
 
-  const r=await fetch(API,{
+  /* ===== حقن الاسم إجباريًا ===== */
+  let systemContext = "";
+  if (learning.rememberedName) {
+    systemContext = `معلومة ثابتة: اسم المستخدم هو ${learning.rememberedName}. يجب أن تتذكره دائمًا.`;
+  }
+
+  const finalPrompt = systemContext
+    ? systemContext + "\n\n" + prompt
+    : prompt;
+
+  const r = await fetch(API,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      prompt,
+      prompt: finalPrompt,
       memory,
       learning,
       persona,
@@ -23,8 +33,8 @@ export async function askAYHEM(prompt,persona){
     })
   });
 
-  const d=await r.json();
-  saveMemory("user",prompt);
-  saveMemory("assistant",d.reply);
+  const d = await r.json();
+  saveMemory("user", prompt);
+  saveMemory("assistant", d.reply);
   return d.reply;
 }
