@@ -1,11 +1,2 @@
-self.addEventListener("install",e=>{
-  e.waitUntil(
-    caches.open("ayhem").then(c=>c.addAll(["./"]))
-  );
-});
-
-self.addEventListener("fetch",e=>{
-  e.respondWith(
-    fetch(e.request).catch(()=>caches.match(e.request))
-  );
-});
+self.addEventListener("install",e=>self.skipWaiting());
+self.addEventListener("fetch",e=>{});
