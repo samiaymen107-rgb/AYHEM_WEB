@@ -4,111 +4,192 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-<title>AYHEM</title>
+<title>أيهم</title>
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2563eb">
+<meta name="theme-color" content="#111827">
 
 <style>
 :root{
-  --bg:#f7f7f8;--ai:#fff;--user:#e6f0ff;
-  --text:#111827;--sub:#6b7280;--border:#e5e7eb
+  --bg:#f7f7f8;
+  --ai:#ffffff;
+  --user:#e6f0ff;
+  --text:#111827;
+  --sub:#6b7280;
+  --border:#e5e7eb;
 }
+
 *{box-sizing:border-box}
+
 body{
-  margin:0;height:100vh;background:var(--bg);
-  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial
+  margin:0;
+  height:100vh;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  background:var(--bg);
+  color:var(--text);
 }
-.app{max-width:720px;margin:auto;height:100vh;display:flex;flex-direction:column}
+
+/* APP */
+.app{
+  max-width:720px;
+  margin:auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* HEADER */
 .header{
-  height:56px;display:flex;align-items:center;justify-content:center;
-  background:#fff;border-bottom:1px solid var(--border);font-weight:600
+  height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+  border-bottom:1px solid var(--border);
+  font-weight:600;
 }
-.chat{flex:1;overflow-y:auto;padding:16px}
+
+/* CHAT */
+.chat{
+  flex:1;
+  overflow-y:auto;
+  padding:16px;
+}
+
+/* MESSAGES */
 .msg{
-  max-width:92%;padding:14px 16px;border-radius:14px;
-  margin-bottom:14px;line-height:1.7;font-size:15px;white-space:pre-wrap
+  max-width:92%;
+  padding:14px 16px;
+  border-radius:14px;
+  margin-bottom:14px;
+  line-height:1.7;
+  font-size:15px;
+  white-space:pre-wrap;
 }
-.ai{background:var(--ai);border:1px solid var(--border);margin:auto}
-.user{background:var(--user);margin-right:auto}
-.input-box{border-top:1px solid var(--border);background:#fff;padding:10px}
-.input-wrap{display:flex;gap:8px;align-items:center}
-input{
-  flex:1;padding:14px 16px;border-radius:14px;
-  border:1px solid var(--border);font-size:15px;outline:none
+
+.ai{
+  background:var(--ai);
+  border:1px solid var(--border);
+  margin-inline:auto;
 }
-button{
-  width:44px;height:44px;border-radius:50%;
-  border:none;background:#111827;color:#fff;font-size:18px
+
+.user{
+  background:var(--user);
+  margin-right:auto;
+}
+
+/* INPUT */
+.input-box{
+  border-top:1px solid var(--border);
+  background:#fff;
+  padding:10px;
+}
+
+.input-wrap{
+  display:flex;
+  gap:8px;
+}
+
+.input-wrap input{
+  flex:1;
+  padding:14px 16px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  font-size:15px;
+}
+
+.input-wrap button{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:none;
+  background:#111827;
+  color:#fff;
+  font-size:18px;
 }
 </style>
 </head>
 
 <body>
+
 <div class="app">
+
   <div class="header">أيهم</div>
 
   <div id="chat" class="chat">
-    <div class="msg ai">مرحبًا، أنا أيهم. كيف أساعدك؟</div>
+    <div class="msg ai">مرحبًا، كيف أستطيع مساعدتك؟</div>
   </div>
 
   <div class="input-box">
     <div class="input-wrap">
-      <input id="input" placeholder="اكتب سؤالك…" autocomplete="off">
+      <input id="input" placeholder="اسأل عن أي شيء…" autocomplete="off">
       <button id="send">➤</button>
     </div>
   </div>
+
 </div>
 
-<script src="ayhem-enhance.js"></script>
-
 <script>
-/* ===== ربط الذكاء بالهاتف ===== */
-const API = "https://autumn-brook-5828.samiaymen720.workers.dev";
+/* ===== الإعداد ===== */
+const WORKER_URL = "https://autumn-brook-5828.samiaymen720.workers.dev";
+const chat  = document.getElementById("chat");
 const input = document.getElementById("input");
 const send  = document.getElementById("send");
-const chat  = document.getElementById("chat");
 
+/* ===== إضافة رسالة ===== */
 function addMsg(text,type){
-  const d=document.createElement("div");
-  d.className="msg "+type;
-  d.textContent=text;
-  chat.appendChild(d);
+  const div=document.createElement("div");
+  div.className="msg "+type;
+  div.textContent=text;
+  chat.appendChild(div);
   chat.scrollTop=chat.scrollHeight;
-  return d;
+  return div;
 }
 
-send.onclick = async ()=>{
+/* ===== إرسال ===== */
+async function sendMsg(){
   const text=input.value.trim();
   if(!text) return;
   input.value="";
+
   addMsg(text,"user");
   const wait=addMsg("أيهم يفكر…","ai");
-  if(window.showTyping) showTyping("أيهم يفكر…");
 
   try{
-    const res=await fetch(API,{
+    if(window.showTyping) showTyping("أيهم يفكر…");
+
+    const res=await fetch(WORKER_URL,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({message:text})
     });
+
     const reply=await res.text();
     wait.textContent=reply;
+
   }catch{
     wait.textContent="⚠️ خطأ في الاتصال";
+  }finally{
+    if(window.hideTyping) hideTyping();
   }
-  if(window.hideTyping) hideTyping();
-};
+}
 
+/* أحداث */
+send.onclick=sendMsg;
 input.addEventListener("keydown",e=>{
-  if(e.key==="Enter") send.click();
+  if(e.key==="Enter") sendMsg();
 });
+</script>
 
+<script src="ayhem-enhance.js"></script>
+
+<script>
 /* تسجيل Service Worker */
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js");
 }
 </script>
+
 </body>
 </html>
