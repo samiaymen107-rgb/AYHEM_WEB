@@ -1,21 +1,16 @@
 import {askAYHEM} from "./ayhem-network.js";
 import {speak} from "./ayhem-voice.js";
-import {
-  rememberNameFromText,
-  getRememberedName
-} from "./ayhem-memory.js";
+import {rememberNameFromText, getRememberedName} from "./ayhem-memory.js";
 
 window.AYHEM_SEND = async function(text, addMsg){
 
   // حفظ الاسم دائمًا
   rememberNameFromText(text);
 
-  // اعتراض سؤال الاسم (ذاكرة محلية حاكمة)
+  // اعتراض محلي حاسم لسؤال الاسم
   if (/ما\s+اسمي|هل\s+تتذكر\s+اسمي/.test(text)) {
     const name = getRememberedName();
-    const reply = name
-      ? `نعم، اسمك ${name}.`
-      : "لم تخبرني باسمك بعد.";
+    const reply = name ? `نعم، اسمك ${name}.` : "لم تخبرني باسمك بعد.";
     addMsg(reply,"ai");
     speak(reply);
     return;
