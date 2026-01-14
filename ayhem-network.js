@@ -1,14 +1,17 @@
-import {getMemory,saveMemory} from "./ayhem-memory.js";
-const API="https://autumn-brook-5828.samiaymen720.workers.dev";
-export async function askAYHEM(prompt,persona){
-  const memory=getMemory();
-  const r=await fetch(API,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({prompt,memory,persona,identity:"AYHEM"})
-  });
-  const d=await r.json();
-  saveMemory("user",prompt);
-  saveMemory("assistant",d.reply);
-  return d.reply;
+const DB="AYHEM_LONG_MEMORY";
+
+export async function loadMemory(){
+  return JSON.parse(localStorage.getItem(DB)||"[]");
+}
+
+export async function saveMemory(entry){
+  const m=await loadMemory();
+  m.push({...entry,time:Date.now()});
+  localStorage.setItem(DB,JSON.stringify(m.slice(-200)));
+}
+
+export function summarizeMemory(){
+  return loadMemory().then(m =>
+    m.slice(-20).map(x=>`${x.role}: ${x.text}`).join("\n")
+  );
 }
