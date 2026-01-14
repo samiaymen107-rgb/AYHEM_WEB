@@ -3,34 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
 <title>أيهم</title>
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#111827">
+<meta name="theme-color" content="#0f172a">
 
 <style>
-:root{
-  --bg:#f7f7f8;
-  --ai:#ffffff;
-  --user:#e6f0ff;
-  --text:#111827;
-  --sub:#6b7280;
-  --border:#e5e7eb;
-}
-
-*{box-sizing:border-box}
-
 body{
   margin:0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background:#f8fafc;
   height:100vh;
-  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-  background:var(--bg);
-  color:var(--text);
 }
-
-/* APP */
 .app{
   max-width:720px;
   margin:auto;
@@ -38,154 +23,118 @@ body{
   display:flex;
   flex-direction:column;
 }
-
-/* HEADER */
 .header{
   height:56px;
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#fff;
-  border-bottom:1px solid var(--border);
+  background:#0f172a;
+  color:#fff;
   font-weight:600;
 }
-
-/* CHAT */
 .chat{
   flex:1;
   overflow-y:auto;
   padding:16px;
 }
-
-/* MESSAGES */
 .msg{
-  max-width:92%;
   padding:14px 16px;
   border-radius:14px;
-  margin-bottom:14px;
+  margin-bottom:12px;
   line-height:1.7;
   font-size:15px;
-  white-space:pre-wrap;
 }
-
 .ai{
-  background:var(--ai);
-  border:1px solid var(--border);
-  margin-inline:auto;
+  background:#fff;
+  border:1px solid #e5e7eb;
 }
-
 .user{
-  background:var(--user);
-  margin-right:auto;
+  background:#e0ecff;
 }
-
-/* INPUT */
 .input-box{
-  border-top:1px solid var(--border);
+  border-top:1px solid #e5e7eb;
   background:#fff;
   padding:10px;
 }
-
 .input-wrap{
   display:flex;
   gap:8px;
 }
-
-.input-wrap input{
+input{
   flex:1;
-  padding:14px 16px;
+  padding:14px;
   border-radius:14px;
-  border:1px solid var(--border);
-  font-size:15px;
+  border:1px solid #e5e7eb;
 }
-
-.input-wrap button{
+button{
   width:44px;
   height:44px;
   border-radius:50%;
   border:none;
-  background:#111827;
+  background:#0f172a;
   color:#fff;
-  font-size:18px;
 }
 </style>
 </head>
 
 <body>
-
 <div class="app">
-
   <div class="header">أيهم</div>
-
-  <div id="chat" class="chat">
-    <div class="msg ai">مرحبًا، كيف أستطيع مساعدتك؟</div>
-  </div>
+  <div id="chat" class="chat"></div>
 
   <div class="input-box">
     <div class="input-wrap">
-      <input id="input" placeholder="اسأل عن أي شيء…" autocomplete="off">
-      <button id="send">➤</button>
+      <input id="input" placeholder="اسأل أيهم…" />
+      <button onclick="send()">➤</button>
     </div>
   </div>
-
 </div>
 
-<script>
-/* ===== الإعداد ===== */
-const WORKER_URL = "https://autumn-brook-5828.samiaymen720.workers.dev";
-const chat  = document.getElementById("chat");
-const input = document.getElementById("input");
-const send  = document.getElementById("send");
+<script src="ayhem-memory.js"></script>
+<script src="ayhem-voice.js"></script>
 
-/* ===== إضافة رسالة ===== */
+<script>
+const API = "https://autumn-brook-5828.samiaymen720.workers.dev";
+
 function addMsg(text,type){
-  const div=document.createElement("div");
-  div.className="msg "+type;
-  div.textContent=text;
-  chat.appendChild(div);
+  const d=document.createElement("div");
+  d.className="msg "+type;
+  d.textContent=text;
+  chat.appendChild(d);
   chat.scrollTop=chat.scrollHeight;
-  return div;
+  return d;
 }
 
-/* ===== إرسال ===== */
-async function sendMsg(){
-  const text=input.value.trim();
-  if(!text) return;
+async function send(){
+  const t=input.value.trim();
+  if(!t) return;
   input.value="";
+  addMsg(t,"user");
 
-  addMsg(text,"user");
+  saveMemory("user",t);
+
   const wait=addMsg("أيهم يفكر…","ai");
 
   try{
-    if(window.showTyping) showTyping("أيهم يفكر…");
-
-    const res=await fetch(WORKER_URL,{
+    const res=await fetch(API,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:text})
+      body:JSON.stringify({
+        prompt:t,
+        memory:getMemory()
+      })
     });
-
-    const reply=await res.text();
-    wait.textContent=reply;
-
+    const data=await res.json();
+    wait.textContent=data.reply;
+    saveMemory("assistant",data.reply);
+    speak(data.reply);
   }catch{
-    wait.textContent="⚠️ خطأ في الاتصال";
-  }finally{
-    if(window.hideTyping) hideTyping();
+    wait.textContent="خطأ في الاتصال";
   }
 }
-
-/* أحداث */
-send.onclick=sendMsg;
-input.addEventListener("keydown",e=>{
-  if(e.key==="Enter") sendMsg();
-});
 </script>
 
-<script src="ayhem-enhance.js"></script>
-
 <script>
-/* تسجيل Service Worker */
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js");
 }
