@@ -1,12 +1,12 @@
 import {askAYHEM} from "./ayhem-network.js";
 import {speak} from "./ayhem-voice.js";
 
-/* ===== ذاكرة الاسم المحلية (حاكمة) ===== */
+/* ===== ذاكرة الاسم (حاكمة) ===== */
 function getName(){
   return localStorage.getItem("AYHEM_OWNER_NAME");
 }
 
-function saveNameFromText(text){
+function saveName(text){
   const m = text.match(/اسمي\s+(.+)/);
   if(m){
     localStorage.setItem("AYHEM_OWNER_NAME", m[1].trim());
@@ -14,21 +14,21 @@ function saveNameFromText(text){
 }
 
 window.AYHEM_SEND = async function(text, addMsg){
-  // حفظ الاسم فورًا إن ذُكر
-  saveNameFromText(text);
+  // خزّن الاسم فورًا
+  saveName(text);
 
   // اعتراض سؤال الاسم محليًا (بدون API)
-  if (/هل\s+تتذكر\s+اسمي|ما\s+اسمي/.test(text)) {
+  if (/ما\s+اسمي|هل\s+تتذكر\s+اسمي/.test(text)) {
     const name = getName();
     const reply = name
       ? `نعم، اسمك ${name}.`
       : "لم تخبرني باسمك بعد.";
-    const w = addMsg(reply, "ai");
+    const w = addMsg(reply,"ai");
     speak(reply);
     return;
   }
 
-  const w = addMsg("أيهم يفكر…", "ai");
+  const w = addMsg("أيهم يفكر…","ai");
   try{
     const r = await askAYHEM(text);
     w.textContent = r;
