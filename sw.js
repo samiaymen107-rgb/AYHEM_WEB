@@ -1,13 +1,11 @@
-self.addEventListener("install", e => {
+self.addEventListener("install",e=>{
   e.waitUntil(
-    caches.open("ayhem-v1").then(c =>
-      c.addAll(["./","index.html","manifest.json"])
-    )
+    caches.open("ayhem").then(c=>c.addAll(["./"]))
   );
 });
 
-self.addEventListener("fetch", e => {
+self.addEventListener("fetch",e=>{
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+    fetch(e.request).catch(()=>caches.match(e.request))
   );
 });
