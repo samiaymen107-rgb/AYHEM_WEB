@@ -1,11 +1,9 @@
-const KEY = "AYHEM_MEMORY";
-
-function getMemory(){
-  return JSON.parse(localStorage.getItem(KEY) || "[]").slice(-10);
+const KEY="AYHEM_MEMORY";
+export function getMemory(){
+  return JSON.parse(localStorage.getItem(KEY)||"[]").slice(-20);
 }
-
-function saveMemory(role, content){
-  const m = getMemory();
-  m.push({ role, content });
-  localStorage.setItem(KEY, JSON.stringify(m));
+export function saveMemory(role,content){
+  const m=getMemory();
+  m.push({role,content,t:Date.now()});
+  localStorage.setItem(KEY,JSON.stringify(m));
 }
