@@ -6,25 +6,15 @@
 <title>AYHEM</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#111827">
-<style>
-body{margin:0;font-family:system-ui;background:#f7f7f8}
-.app{max-width:720px;margin:auto;height:100vh;display:flex;flex-direction:column}
-.header{height:56px;display:flex;align-items:center;justify-content:center;background:#fff;border-bottom:1px solid #e5e7eb;font-weight:600}
-.chat{flex:1;overflow:auto;padding:16px}
-.msg{padding:14px;border-radius:14px;margin-bottom:12px;line-height:1.7}
-.ai{background:#fff;border:1px solid #e5e7eb}
-.user{background:#e6f0ff}
-.input-box{border-top:1px solid #e5e7eb;padding:10px;background:#fff}
-.input-wrap{display:flex;gap:8px}
-input{flex:1;padding:14px;border-radius:14px;border:1px solid #e5e7eb}
-button{width:44px;border-radius:50%;border:none;background:#111827;color:#fff}
-</style>
+<link rel="stylesheet" href="ayhem-style.css">
 </head>
 <body>
 <div class="app">
   <div class="header">AYHEM</div>
-  <div id="chat" class="chat"><div class="msg ai">مرحبًا، أنا أيهم.</div></div>
-  <div class="input-box">
+  <div id="chat" class="chat">
+    <div class="msg ai">مرحبًا، أنا أيهم.</div>
+  </div>
+  <div class="input-box input-bar">
     <div class="input-wrap">
       <input id="input" placeholder="اسأل…" autocomplete="off">
       <button onclick="send()">➤</button>
@@ -40,17 +30,24 @@ import {renderDashboard} from "./ayhem-dashboard.js";
 const chat=document.getElementById("chat");
 function addMsg(t,type){
   const d=document.createElement("div");
-  d.className="msg "+type; d.textContent=t;
-  chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
+  d.className="msg "+type;
+  d.textContent=t;
+  chat.appendChild(d);
+  chat.scrollTop=chat.scrollHeight;
   return d;
 }
 window.send=function(){
-  const i=document.getElementById("input"); const t=i.value.trim();
-  if(!t) return; i.value="";
-  addMsg(t,"user"); AYHEM_SEND(t,addMsg);
+  const i=document.getElementById("input");
+  const t=i.value.trim();
+  if(!t) return;
+  i.value="";
+  addMsg(t,"user");
+  AYHEM_SEND(t,addMsg);
 };
 renderDashboard();
-if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js");}
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js");
+}
 </script>
 </body>
 </html>
