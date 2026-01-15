@@ -2,89 +2,30 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#111827">
-
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>AYHEM</title>
 
-<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+
 <link rel="stylesheet" href="ayhem-style.css">
 </head>
 
 <body>
 <div class="app">
-
   <div class="header">AYHEM</div>
 
   <div id="chat" class="chat">
-    <div class="msg ai">مرحبًا، أنا أيهم.</div>
+    <div class="msg ai">مرحبًا، أنا أيهم. في انتظار سؤالك.</div>
   </div>
 
-  <!-- حل تيك توك -->
-  <div id="tapToStart" onclick="startAYHEM()" class="tap">
-    اضغط للبدء
+  <div class="input-bar">
+    <input id="input" placeholder="اكتب سؤالك…" autocomplete="off">
+    <button onclick="send()">➤</button>
   </div>
-
-  <div class="input-box input-bar">
-    <div class="input-wrap">
-      <input id="input" placeholder="اكتب سؤالك…" autocomplete="off">
-      <button onclick="send()">➤</button>
-    </div>
-  </div>
-
 </div>
 
-<script src="ayhem-enhance.js"></script>
-
-<script type="module">
-import "./ayhem-core.js";
-import { renderDashboard } from "./ayhem-dashboard.js";
-
-const chat = document.getElementById("chat");
-
-function addMsg(text, type){
-  const d = document.createElement("div");
-  d.className = "msg " + type;
-  d.textContent = text;
-  chat.appendChild(d);
-  chat.scrollTop = chat.scrollHeight;
-  return d;
-}
-
-window.send = function(){
-  const i = document.getElementById("input");
-  const t = i.value.trim();
-  if(!t) return;
-  i.value = "";
-  addMsg(t, "user");
-  AYHEM_SEND(t, addMsg);
-};
-
-// دعم تيك توك
-window.startAYHEM = function(){
-  document.getElementById("tapToStart").style.display = "none";
-  document.getElementById("input").focus();
-};
-
-// رسالة تلقائية لزوار تيك توك
-if (navigator.userAgent.includes("TikTok")) {
-  addMsg("👋 مرحبًا… أنا أيهم. اكتب سؤالك.", "ai");
-}
-
-// تركيز تلقائي
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    document.getElementById("input")?.focus();
-  }, 600);
-});
-
-renderDashboard();
-
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
-}
-</script>
+<script type="module" src="./ayhem-core.js"></script>
+<script src="./ayhem-keyboard-fix.js"></script>
 </body>
 </html>
