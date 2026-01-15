@@ -4,28 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>AYHEM</title>
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111827">
 <link rel="stylesheet" href="ayhem-style.css">
 </head>
-
 <body>
 <div class="app">
   <div class="header">AYHEM</div>
-
   <div id="chat" class="chat">
-    <div class="msg ai">مرحبًا، أنا أيهم. في انتظار سؤالك.</div>
+    <div class="msg ai">مرحبًا، أنا أيهم.</div>
   </div>
-
   <div class="input-bar">
-    <input id="input" placeholder="اكتب سؤالك…" autocomplete="off">
+    <input id="input" placeholder="اسأل…" autocomplete="off">
     <button onclick="send()">➤</button>
   </div>
 </div>
-
 <script type="module" src="./ayhem-core.js"></script>
-<script src="./ayhem-keyboard-fix.js"></script>
+<script src="./ayhem-safe-mobile.js"></script>
 </body>
 </html>
