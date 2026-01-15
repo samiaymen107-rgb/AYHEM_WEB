@@ -1,32 +1,29 @@
-import { getMemory, saveMemory } from "./ayhem-memory.js";
-import { analyzeInteraction, compressMemory, getLearningContext } from "./ayhem-learning.js";
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
 
-const API = "https://autumn-brook-5828.samiaymen720.workers.dev";
+/* رابط Workers (كما كان يعمل سابقًا) */
+const WORKERS_URL = "https://YOUR-WORKER-URL";
 
-window.AYHEM_SEND = async function(prompt, addMsg){
+function addMsg(text,type){
+  const d=document.createElement("div");
+  d.className="msg "+type;
+  d.textContent=text;
+  chat.appendChild(d);
+  chat.scrollTop=chat.scrollHeight;
+}
 
-  analyzeInteraction(prompt);
+window.send = async function(){
+  const text = input.value.trim();
+  if(!text) return;
+  input.value="";
+  addMsg(text,"user");
 
-  const memory = getMemory();
-  if (memory.length % 15 === 0) compressMemory(memory);
-
-  const learning = getLearningContext();
-
-  const r = await fetch(API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      prompt,
-      memory,
-      learning,
-      identity: "AYHEM"
-    })
+  const res = await fetch(WORKERS_URL,{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ message:text })
   });
 
-  const d = await r.json();
-
-  saveMemory("user", prompt);
-  saveMemory("assistant", d.reply);
-
-  addMsg(d.reply, "ai");
+  const data = await res.json();
+  addMsg(data.reply,"ai");
 };
