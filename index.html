@@ -3,10 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AYHEM</title>
+<title>أيهم – AYHEM</title>
 <link rel="stylesheet" href="ayhem-style.css">
 </head>
+
 <body>
+
+<!-- عنوان واضح -->
+<header style="text-align:center;padding:10px;font-weight:bold;">
+  أيهم – AYHEM
+</header>
 
 <div id="chat"></div>
 
@@ -15,26 +21,11 @@
   <button id="sendBtn">إرسال</button>
 </div>
 
-<!-- الهوية والمنطق -->
-<script src="ayhem-identity.js"></script>
-<script src="ayhem-core.js"></script>
+<!-- الربط بالواركس (إجباري قبل core) -->
 <script src="ayhem-network.js"></script>
 
-<!-- الذاكرة -->
-<script src="ayhem-memory.js"></script>
-<script src="ayhem-long-memory.js"></script>
-<script src="ayhem-smart-memory.js"></script>
-<script src="persistent-memory.js"></script>
-
-<!-- التعلم والتحسين -->
-<script src="ayhem-learning.js"></script>
-<script src="ayhem-enhance.js"></script>
-
-<!-- الصوت -->
-<script src="ayhem-voice.js"></script>
-
-<!-- الواجهة -->
-<script src="ayhem-dashboard.js"></script>
+<!-- منطق الإرسال -->
+<script src="ayhem-core.js"></script>
 
 </body>
 </html>
