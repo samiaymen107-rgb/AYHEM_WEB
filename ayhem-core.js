@@ -1,27 +1,32 @@
-import {askAYHEM} from "./ayhem-network.js";
-import {speak} from "./ayhem-voice.js";
-import {rememberNameFromText, getRememberedName} from "./ayhem-memory.js";
+import { getMemory, saveMemory } from "./ayhem-memory.js";
+import { analyzeInteraction, compressMemory, getLearningContext } from "./ayhem-learning.js";
 
-window.AYHEM_SEND = async function(text, addMsg){
+const API = "https://autumn-brook-5828.samiaymen720.workers.dev";
 
-  // حفظ الاسم دائمًا
-  rememberNameFromText(text);
+window.AYHEM_SEND = async function(prompt, addMsg){
 
-  // اعتراض محلي حاسم لسؤال الاسم
-  if (/ما\s+اسمي|هل\s+تتذكر\s+اسمي/.test(text)) {
-    const name = getRememberedName();
-    const reply = name ? `نعم، اسمك ${name}.` : "لم تخبرني باسمك بعد.";
-    addMsg(reply,"ai");
-    speak(reply);
-    return;
-  }
+  analyzeInteraction(prompt);
 
-  const w = addMsg("أيهم يفكر…","ai");
-  try{
-    const r = await askAYHEM(text);
-    w.textContent = r;
-    speak(r);
-  }catch{
-    w.textContent = "⚠️ خطأ اتصال";
-  }
+  const memory = getMemory();
+  if (memory.length % 15 === 0) compressMemory(memory);
+
+  const learning = getLearningContext();
+
+  const r = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      prompt,
+      memory,
+      learning,
+      identity: "AYHEM"
+    })
+  });
+
+  const d = await r.json();
+
+  saveMemory("user", prompt);
+  saveMemory("assistant", d.reply);
+
+  addMsg(d.reply, "ai");
 };
