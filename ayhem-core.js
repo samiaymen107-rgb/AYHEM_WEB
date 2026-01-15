@@ -13,8 +13,20 @@ function addMsg(text, type){
 sendBtn.onclick = async () => {
   const t = input.value.trim();
   if (!t) return;
+
   input.value = "";
   addMsg(t, "user");
-  const r = await window.AYHEM_SEND(t);
-  addMsg(r || "…", "ai");
+
+  addMsg("...", "ai"); // مؤقت
+
+  const reply = await window.AYHEM_SEND(t);
+
+  // إزالة الثلاث نقاط
+  chat.removeChild(chat.lastChild);
+
+  if (reply && reply.trim()) {
+    addMsg(reply, "ai");
+  } else {
+    addMsg("⚠️ الواركس لم يُرجع رد", "ai");
+  }
 };
