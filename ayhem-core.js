@@ -1,29 +1,19 @@
-const chat = document.getElementById("chat");
-const input = document.getElementById("input");
+const WORKER_URL = "https://YOUR-WORKER.yourname.workers.dev";
 
-/* رابط Workers (كما كان يعمل سابقًا) */
-const WORKERS_URL = "https://YOUR-WORKER-URL";
+window.AYHEM_SEND = async function (text, addMsg) {
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: text,
+        session: "ayhem-main"
+      })
+    });
 
-function addMsg(text,type){
-  const d=document.createElement("div");
-  d.className="msg "+type;
-  d.textContent=text;
-  chat.appendChild(d);
-  chat.scrollTop=chat.scrollHeight;
-}
-
-window.send = async function(){
-  const text = input.value.trim();
-  if(!text) return;
-  input.value="";
-  addMsg(text,"user");
-
-  const res = await fetch(WORKERS_URL,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ message:text })
-  });
-
-  const data = await res.json();
-  addMsg(data.reply,"ai");
+    const data = await res.json();
+    addMsg(data.reply || "…", "ai");
+  } catch (e) {
+    addMsg("⚠️ تعذر الاتصال بالواركس", "ai");
+  }
 };
