@@ -2,7 +2,7 @@ const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
 
-function addMsg(text, type) {
+function addMsg(text, type){
   const d = document.createElement("div");
   d.className = "msg " + type;
   d.textContent = text;
@@ -11,11 +11,10 @@ function addMsg(text, type) {
 }
 
 sendBtn.onclick = async () => {
-  const text = input.value.trim();
-  if (!text) return;
+  const t = input.value.trim();
+  if (!t) return;
   input.value = "";
-  addMsg(text, "user");
-
-  const reply = await window.AYHEM_SEND(text);
-  addMsg(reply, "ai");
+  addMsg(t, "user");
+  const r = await window.AYHEM_SEND(t);
+  addMsg(r || "…", "ai");
 };
