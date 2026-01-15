@@ -1,29 +1,23 @@
-import {getMemory, saveMemory} from "./ayhem-memory.js";
-import {extractFacts, smartCompress, getSmartContext} from "./ayhem-smart-memory.js";
+const WORKER_URL = "PUT_YOUR_OLD_WORKER_URL_HERE";
 
-const API = "https://autumn-brook-5828.samiaymen720.workers.dev";
+window.AYHEM_SEND = async function (text) {
+  if (!text || !text.trim()) return null;
 
-export async function askAYHEM(prompt, persona){
-  extractFacts(prompt);
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: text,
+        session: "ayhem-main"
+      })
+    });
 
-  const memory = getMemory();
-  const compressedMemory = smartCompress(memory);
-  const smart = getSmartContext();
+    const data = await res.json();
+    return data.reply || null;
 
-  const r = await fetch(API,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      prompt,
-      memory: compressedMemory,
-      smart,
-      persona,
-      identity:"AYHEM"
-    })
-  });
-
-  const d = await r.json();
-  saveMemory("user", prompt);
-  saveMemory("assistant", d.reply);
-  return d.reply;
-}
+  } catch (e) {
+    console.error("AYHEM NETWORK ERROR", e);
+    return null;
+  }
+};
