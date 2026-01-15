@@ -2,24 +2,47 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AYHEM</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#111827">
 <link rel="stylesheet" href="ayhem-style.css">
 </head>
+
 <body>
 <div class="app">
   <div class="header">AYHEM</div>
+
   <div id="chat" class="chat">
     <div class="msg ai">مرحبًا، أنا أيهم.</div>
   </div>
+
   <div class="input-bar">
     <input id="input" placeholder="اسأل…" autocomplete="off">
-    <button onclick="send()">➤</button>
+    <button id="sendBtn">➤</button>
   </div>
 </div>
-<script type="module" src="./ayhem-core.js"></script>
-<script src="./ayhem-safe-mobile.js"></script>
+
+<script type="module">
+import "./ayhem-core.js";
+
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const btn = document.getElementById("sendBtn");
+
+function addMsg(t,type){
+  const d=document.createElement("div");
+  d.className="msg "+type;
+  d.textContent=t;
+  chat.appendChild(d);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+btn.onclick = () => {
+  const t = input.value.trim();
+  if(!t) return;
+  input.value="";
+  addMsg(t,"user");
+  AYHEM_SEND(t,(m,ty)=>addMsg(m,ty||"ai"));
+};
+</script>
 </body>
 </html>
