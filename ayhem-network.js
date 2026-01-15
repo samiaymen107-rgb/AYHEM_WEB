@@ -5,11 +5,25 @@ window.AYHEM_SEND = async function (text) {
     const res = await fetch(WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text, session: "ayhem-main" })
+      body: JSON.stringify({
+        message: text,
+        session: "ayhem-main"
+      })
     });
+
+    if (!res.ok) {
+      return "⚠️ الواركس لم يرد";
+    }
+
     const data = await res.json();
-    return data.reply || "";
-  } catch {
-    return "";
+
+    if (!data || !data.reply) {
+      return "⚠️ رد غير صالح من الواركس";
+    }
+
+    return data.reply;
+
+  } catch (e) {
+    return "⚠️ انقطع الاتصال بالواركس";
   }
 };
