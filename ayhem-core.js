@@ -9,6 +9,7 @@
     div.textContent = text;
     chat.appendChild(div);
     chat.scrollTop = chat.scrollHeight;
+    return div;
   }
 
   async function send() {
@@ -17,13 +18,23 @@
 
     addMsg(text, "me");
     input.value = "";
-    addMsg("…", "ai");
+
+    // أيهم يفكر
+    const aiMsg = addMsg("🤔 أيهم يفكّر...", "ai");
+
+    // تأخير ذكي (نظرة)
+    await new Promise(r => setTimeout(r, 600));
+    aiMsg.textContent = "👀 أيهم يراجع...";
+
+    // تأخير (يكتب)
+    await new Promise(r => setTimeout(r, 600));
+    aiMsg.textContent = "✍️ أيهم يكتب...";
 
     if (typeof window.AYHEM_SEND === "function") {
       const reply = await window.AYHEM_SEND(text);
-      chat.lastChild.textContent = reply;
+      aiMsg.textContent = reply;
     } else {
-      chat.lastChild.textContent = "⚠️ الربط غير متوفر";
+      aiMsg.textContent = "⚠️ الربط غير متوفر";
     }
   }
 
