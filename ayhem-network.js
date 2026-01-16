@@ -1,4 +1,4 @@
-const WORKER_URL = "PUT_YOUR_EXISTING_WORKER_URL_HERE";
+const WORKER_URL = "https://old-fire-ef22.samiaymen107.workers.dev";
 
 window.AYHEM_SEND = async function (text) {
   try {
