@@ -1,37 +1,29 @@
-// ayhem-core.js
-(function () {
-  const input = document.getElementById("input");
-  const sendBtn = document.getElementById("sendBtn");
-  const chat = document.getElementById("chat");
+const WORKER_URL = "https://old-fire-ef22.samiaymen107.workers.dev";
 
-  function addMsg(text, who) {
-    const div = document.createElement("div");
-    div.className = "msg " + who;
-    div.textContent = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-  }
+window.AYHEM_SEND = async function (text) {
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: text,
+        session: "ayhem-main"
+      })
+    });
 
-  async function send() {
-    const text = input.value.trim();
-    if (!text) return;
-
-    addMsg(text, "me");
-    input.value = "";
-    addMsg("…", "ai");
-
-    // 🔗 الربط الحاسم مع الواركس
-    if (typeof window.AYHEM_SEND === "function") {
-      await window.AYHEM_SEND(text, (reply) => {
-        chat.lastChild.textContent = reply;
-      });
-    } else {
-      chat.lastChild.textContent = "⚠️ الربط غير متوفر";
+    if (!res.ok) {
+      return "⚠️ الواركس لم يرد";
     }
-  }
 
-  sendBtn.onclick = send;
-  input.addEventListener("keydown", e => {
-    if (e.key === "Enter") send();
-  });
-})();
+    const data = await res.json();
+
+    if (!data || !data.reply) {
+      return "⚠️ رد غير صالح من الواركس";
+    }
+
+    return data.reply;
+
+  } catch (e) {
+    return "⚠️ انقطع الاتصال بالواركس";
+  }
+};
