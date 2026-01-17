@@ -20,12 +20,19 @@
   <button id="sendBtn">إرسال</button>
 </div>
 
-<!-- الربط بالواركس (إجباري قبل core) -->
-<script src="ayhem-network.js"></script>
-
-<!-- منطق الإرسال -->
-<script src="ayhem-core.js"></script>
+<!-- واجهة التشغيل الآمن (لا تمس القديم) -->
+<hr>
 <button id="ayhemOneBtn">تشغيل أيهم</button>
 <pre id="ayhemOneOut"></pre>
+
+<!-- الشبكة (الاتصال بالـ Worker / API) -->
+<script src="ayhem-network.js"></script>
+
+<!-- المنطق الأساسي القديم -->
+<script src="ayhem-core.js"></script>
+
+<!-- زر التشغيل الواحد (الجديد) -->
+<script src="ayhem-one-button.js"></script>
+
 </body>
 </html>
