@@ -1,27 +1,27 @@
-import { ayhemSafeThink } from "./ayhem-core-safe.js";
+const AYHEM_ENDPOINT = "https://ayhem-core.yourname.workers.dev";
 
-// واجهة اختبار آمنة (Console فقط)
-window.AYHEM_LOCAL = function (text = "اختبار آمن") {
-  const result = ayhemSafeThink(text);
-  console.log("🧠 AYHEM LOCAL:", result);
-  return result;
-};
-
-// واجهة AI الحقيقية (Worker)
-const AYHEM_API = "https://autumn-brook-5828.samiaymen720.workers.dev";
-
-window.AYHEM_AI = async function (prompt) {
+export async function talkToAyhem(input) {
   try {
-    const response = await fetch(AYHEM_API, {
+    const res = await fetch(AYHEM_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ input })
     });
-    const data = await response.json();
-    console.log("🤖 AYHEM AI:", data);
+
+    if (!res.ok) {
+      throw new Error("AYHEM NETWORK ERROR");
+    }
+
+    const data = await res.json();
     return data;
-  } catch {
-    console.warn("أيهم صامت الآن");
-    return { reply: "أيهم صامت الآن" };
+
+  } catch (e) {
+    return {
+      state: "offline",
+      output: "أيهم صامت الآن",
+      error: e.message
+    };
   }
-};
+}
