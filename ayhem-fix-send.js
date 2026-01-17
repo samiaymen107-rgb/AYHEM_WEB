@@ -1,31 +1,11 @@
-(function () {
-  if (window.__AYHEM_SEND_FIXED__) return;
-  window.__AYHEM_SEND_FIXED__ = true;
+import { talkToAyhem } from "./ayhem-bridge-safe.js";
 
-  const WORKER_URL = "https://old-fire-ef22.samiaymen107.workers.dev";
+sendButton.onclick = async () => {
+  const userInput = inputField.value;
 
-  async function fixedSend(text) {
-    try {
-      const res = await fetch(WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: text,
-          session: "ayhem-main"
-        })
-      });
+  displayUser(userInput);
 
-      if (!res.ok) return "⚠️ الواركس لم يرد";
+  const response = await talkToAyhem(userInput);
 
-      const data = await res.json();
-      return data.reply || "⚠️ رد غير صالح";
-    } catch {
-      return "⚠️ انقطع الاتصال";
-    }
-  }
-
-  // لا نكسر: نعيد التوجيه فقط
-  window.AYHEM_SEND = fixedSend;
-
-  console.log("AYHEM FIX: تم تثبيت قناة الإرسال");
-})();
+  displayAyhem(response.output);
+};
