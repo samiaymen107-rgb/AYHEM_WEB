@@ -1,45 +1,62 @@
-(function () {
-  const input = document.getElementById("input");
-  const sendBtn = document.getElementById("sendBtn");
-  const chat = document.getElementById("chat");
+// ayhem-core.js
 
-  function addMsg(text, who) {
-    const div = document.createElement("div");
-    div.className = "msg " + who;
-    div.textContent = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-    return div;
-  }
+import { AyhemMemory } from "./ayhem-memory.js";
+import { AyhemIdentity } from "./ayhem-identity.js";
+import { AyhemSafety } from "./ayhem-core-safe.js";
 
-  async function send() {
-    const text = input.value.trim();
-    if (!text) return;
+/* =========================
+   AYHEM STATE ENGINE
+========================= */
+const AYHEM_STATE = Object.freeze({
+  IDLE: "idle",
+  ARCHIVE: "archive",
+  LEARN: "learn",
+  RECALL: "recall",
+  SAFE: "safe"
+});
 
-    addMsg(text, "me");
-    input.value = "";
+/* =========================
+   AYHEM CORE
+========================= */
+export const AyhemCore = (() => {
+  let state = AYHEM_STATE.IDLE;
 
-    // أيهم يفكر
-    const aiMsg = addMsg("🤔 أيهم يفكّر...", "ai");
+  const identity = AyhemIdentity.init();
+  const memory = AyhemMemory.init();
+  const safety = AyhemSafety?.init ? AyhemSafety.init() : null;
 
-    // تأخير ذكي (نظرة)
-    await new Promise(r => setTimeout(r, 600));
-    aiMsg.textContent = "👀 أيهم يراجع...";
-
-    // تأخير (يكتب)
-    await new Promise(r => setTimeout(r, 600));
-    aiMsg.textContent = "✍️ أيهم يكتب...";
-
-    if (typeof window.AYHEM_SEND === "function") {
-      const reply = await window.AYHEM_SEND(text);
-      aiMsg.textContent = reply;
-    } else {
-      aiMsg.textContent = "⚠️ الربط غير متوفر";
+  function setState(newState) {
+    if (!Object.values(AYHEM_STATE).includes(newState)) {
+      throw new Error("[AYHEM] Invalid state transition");
     }
+    state = newState;
   }
 
-  sendBtn.onclick = send;
-  input.addEventListener("keydown", e => {
-    if (e.key === "Enter") send();
+  function getState() {
+    return state;
+  }
+
+  function archive(entry) {
+    if (safety?.check) safety.check();
+
+    setState(AYHEM_STATE.ARCHIVE);
+    memory.write(entry);
+    setState(AYHEM_STATE.IDLE);
+  }
+
+  function recall(query) {
+    setState(AYHEM_STATE.RECALL);
+    const result = memory.read(query);
+    setState(AYHEM_STATE.IDLE);
+    return result;
+  }
+
+  return Object.freeze({
+    identity,
+    getState,
+    setState,
+    archive,
+    recall,
+    STATE: AYHEM_STATE
   });
 })();
