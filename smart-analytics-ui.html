@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AYHEM — التحليل والتنبيهات الذكية</title>
+  <link rel="stylesheet" href="ultimate-advanced-ui.css">
+</head>
+<body>
+  <h1>AYHEM — التحليل والتنبيهات الذكية</h1>
+
+  <div class="container">
+    <h3>التنبيهات الحالية:</h3>
+    <pre id="alerts"></pre>
+
+    <button id="clearAlerts">مسح التنبيهات</button>
+  </div>
+
+  <script type="module">
+    import { SmartAnalyticsModule } from "./smart-analytics-module.js";
+
+    const alertsEl = document.getElementById("alerts");
+    const clearBtn = document.getElementById("clearAlerts");
+
+    const analytics = SmartAnalyticsModule.init();
+
+    function updateAlerts() {
+      const data = analytics.getAlerts();
+      alertsEl.textContent = data.map(r => `[${new Date(r.timestamp).toLocaleTimeString()}] ${r.priority} - ${JSON.stringify(r.data)}`).join("\n") || "لا توجد تنبيهات";
+    }
+
+    // تحديث تلقائي كل 2 ثانية
+    setInterval(updateAlerts, 2000);
+
+    clearBtn.addEventListener("click", () => {
+      analytics.clearAlerts();
+      updateAlerts();
+    });
+  </script>
+</body>
+</html>
