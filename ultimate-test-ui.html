@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>واجهة اختبار نهائية AYHEM</title>
+  <link rel="stylesheet" href="test-ui.css">
+</head>
+<body>
+  <h1>واجهة اختبار نهائية AYHEM</h1>
+
+  <div class="container">
+    <label>أدخل بيانات للأرشفة:</label>
+    <input type="text" id="archiveInput" placeholder="اكتب هنا...">
+    <button id="archiveBtn">أرشفة</button>
+
+    <label>ابحث في الذاكرة:</label>
+    <input type="text" id="searchInput" placeholder="اكتب كلمة للبحث">
+    <button id="searchBtn">بحث</button>
+
+    <h3>نتائج البحث:</h3>
+    <pre id="results"></pre>
+
+    <h3>Timeline الذاكرة الحية:</h3>
+    <pre id="timeline"></pre>
+
+    <h3>الحالة اللحظية لـ AYHEM:</h3>
+    <pre id="state"></pre>
+  </div>
+
+  <script type="module" src="ultimate-test-ui.js"></script>
+</body>
+</html>
