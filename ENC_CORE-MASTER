@@ -1,0 +1,31 @@
+// ENC_CORE-MASTER
+// النواة المشفرة الرئيسية لمشروع أيهم
+// تحتوي على المفاتيح الأساسية والخوارزميات الأساسية للتحكم في جميع طبقات المشروع
+
+export const ENC_CORE_MASTER = (() => {
+  const masterKeys = [];
+  const modules = [];
+
+  function addKey(key) {
+    masterKeys.push({ key, timestamp: Date.now() });
+  }
+
+  function getKeys() {
+    return masterKeys.map(k => k.key);
+  }
+
+  function registerModule(name, config) {
+    modules.push({ name, config, registeredAt: Date.now() });
+  }
+
+  function listModules() {
+    return modules.map(m => m.name);
+  }
+
+  return {
+    addKey,
+    getKeys,
+    registerModule,
+    listModules
+  };
+})();
