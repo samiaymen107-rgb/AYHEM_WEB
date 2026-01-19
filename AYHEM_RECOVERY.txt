@@ -1,0 +1,36 @@
+// AYHEM_RECOVERY.txt
+// ملف استرجاع خارجي لمشروع أيهم
+// يحتوي على نسخ احتياطية أساسية للذاكرة والملفات الحيوية لضمان الاسترجاع في حالة الفقدان أو التعطل
+
+/*
+استخدام:
+1. تخزين نسخة احتياطية من كل ملفات المشروع المهمة.
+2. التأكد من أن النسخ في مكان مستقل عن الخادم الرئيسي.
+3. يمكن استرجاع الملفات عبر السكريبتات الداخلية أو يدويًا عند الحاجة.
+*/
+
+export const AYHEM_RECOVERY = {
+  description: "نسخة احتياطية كاملة لمشروع أيهم 2026",
+  lastUpdated: "2026-01-19",
+  files: [
+    "NODE-AI+.js",
+    "NODE-CyberForce.js",
+    "NODE-ESI.js",
+    "NODE-SentinelX.js",
+    "TEMPLATE_SESSION_LAYER.js",
+    "TEMPLATE_SYMBOLIC_LAYER.js",
+    "TEMPLATE_TEMP_MATRIX.js",
+    "TEMPLATE_COMMANDS.js",
+    "TEMPLATE_PREDICTIVE_ENGINE.js",
+    "TEMPLATE_CONNECTIVE_LOGIC.js",
+    "AYHEM_KEY_2025",
+    "ENC_CORE-MASTER",
+    "ENC_CORE-01",
+    "ENC_CORE-02",
+    "ENC_CORE-03",
+    "ENC_PRE-2009",
+    "ENC_POST-2009",
+    "ENC_VISUAL_MASTER",
+    "ENC_LEGAL_DECISIONS"
+  ]
+};
