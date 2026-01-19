@@ -1,0 +1,32 @@
+// ENC_PRE-2009
+// أرشيف النواة قبل عام 2009
+// تخزين وتحليل البيانات التاريخية والتقارير القديمة
+
+export const ENC_PRE_2009 = (() => {
+  const archive = [];
+
+  function addRecord(record) {
+    archive.push({ record, timestamp: Date.now() });
+  }
+
+  function getRecord(index) {
+    return archive[index] ? archive[index].record : null;
+  }
+
+  function getAllRecords() {
+    return archive.map(r => r.record);
+  }
+
+  function stats() {
+    return {
+      totalRecords: archive.length
+    };
+  }
+
+  return {
+    addRecord,
+    getRecord,
+    getAllRecords,
+    stats
+  };
+})();
