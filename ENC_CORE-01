@@ -1,0 +1,25 @@
+// ENC_CORE-01
+// الوحدة الأساسية 01 للنواة المشفرة
+// مسؤولة عن الربط بين الطبقات الأولية والتحكم بالبيانات الأساسية
+
+export const ENC_CORE_01 = (() => {
+  const dataStore = [];
+
+  function storeData(entry) {
+    dataStore.push({ entry, timestamp: Date.now() });
+  }
+
+  function retrieveData(index) {
+    return dataStore[index] ? dataStore[index].entry : null;
+  }
+
+  function allData() {
+    return dataStore.map(d => d.entry);
+  }
+
+  return {
+    storeData,
+    retrieveData,
+    allData
+  };
+})();
