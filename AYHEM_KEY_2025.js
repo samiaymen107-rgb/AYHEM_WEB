@@ -1,0 +1,19 @@
+// المفتاح الرئيسي للمشروع لعام 2025
+// يستخدم لتشفير البيانات والوصول إلى جميع الطبقات والملفات الحساسة داخل مشروع أيهم
+
+export const AYHEM_KEY_2025 = (() => {
+  const key = "AYHEM-2025-MASTER-KEY-ENCRYPTED";
+
+  function getKey() {
+    return key;
+  }
+
+  function validate(inputKey) {
+    return inputKey === key;
+  }
+
+  return {
+    getKey,
+    validate
+  };
+})();
