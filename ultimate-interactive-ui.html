@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AYHEM — Ultimate Interactive UI</title>
+  <link rel="stylesheet" href="ultimate-nextgen-ui.css">
+</head>
+<body>
+  <h1>AYHEM — العقل الرقمي الحي (Ultimate Interactive UI)</h1>
+  
+  <div class="container">
+
+    <section>
+      <label>أدخل بيانات للأرشفة:</label>
+      <input type="text" id="archiveInput" placeholder="اكتب هنا...">
+      <button id="archiveBtn">أرشفة</button>
+    </section>
+
+    <section>
+      <h3>الأنماط المتعلمة:</h3>
+      <pre id="patterns"></pre>
+    </section>
+
+    <section>
+      <h3>التنبيهات الذكية:</h3>
+      <pre id="alerts"></pre>
+      <button id="clearAlerts">مسح التنبيهات</button>
+    </section>
+
+    <section>
+      <h3>التنبؤات المستقبلية:</h3>
+      <pre id="predictions"></pre>
+      <button id="clearPredictions">مسح التنبؤات</button>
+    </section>
+
+  </div>
+
+  <script type="module">
+    import { AyhemCore } from "./ayhem-core.js";
+    import { SelfEvolvingUnit } from "./self-evolving-unit.js";
+    import { SmartAnalyticsUnit } from "./smart-analytics-unit.js";
+    import { GlobalPredictiveModule } from "./global-predictive-module.js";
+
+    const coreUnit = SelfEvolvingUnit.init();
+    const analyticsUnit = SmartAnalyticsUnit.init();
+    const predictiveModule = GlobalPredictiveModule.init();
+
+    const archiveInput = document.getElementById("archiveInput");
+    const archiveBtn = document.getElementById("archiveBtn");
+    const patternsEl = document.getElementById("patterns");
+    const alertsEl = document.getElementById("alerts");
+    const predictionsEl = document.getElementById("predictions");
+    const clearAlertsBtn = document.getElementById("clearAlerts");
+    const clearPredictionsBtn = document.getElementById("clearPredictions");
+
+    archiveBtn.addEventListener("click", () => {
+      const text = archiveInput.value.trim();
+      if(text){
+        AyhemCore.archive({text});
+        predictiveModule.analyzePatterns();
+        archiveInput.value = "";
+        updateUI();
+      }
+    });
+
+    clearAlertsBtn.addEventListener("click", () => {
+      analyticsUnit.clearAlerts();
+      updateUI();
+    });
+
+    clearPredictionsBtn.addEventListener("click", () => {
+      predictiveModule.clearPredictions();
+      updateUI();
+    });
+
+    function updateUI(){
+      // تحديث الأنماط
+      patternsEl.textContent = coreUnit.getPatterns()
+        .map(r=>`[${new Date(r.timestamp).toLocaleTimeString()}] ${r.priority} - ${r.text}`)
+        .join("\n") || "لا توجد بيانات بعد";
+
+      // تحديث التنبيهات
+      alertsEl.textContent = analyticsUnit.getAlerts()
+        .map(r=>`[${new Date(r.timestamp).toLocaleTimeString()}] ${r.priority} - ${r.data.text}`)
+        .join("\n") || "لا توجد تنبيهات";
+
+      // تحديث التنبؤات
+      predictionsEl.textContent = predictiveModule.getPredictions()
+        .map(r=>`[${new Date(r.timestamp).toLocaleTimeString()}] ${r.priority} - ${r.predictedEvent}`)
+        .join("\n") || "لا توجد تنبؤات";
+    }
+
+    setInterval(updateUI, 1000);
+  </script>
+</body>
+</html>
