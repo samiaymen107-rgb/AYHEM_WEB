@@ -1,0 +1,25 @@
+// ENC_CORE-02
+// الوحدة الأساسية 02 للنواة المشفرة
+// توسعة للربط والتحكم بالبيانات بين الطبقات العليا والدنيا
+
+export const ENC_CORE_02 = (() => {
+  const layerData = [];
+
+  function addLayerEntry(entry) {
+    layerData.push({ entry, timestamp: Date.now() });
+  }
+
+  function getLayerEntry(id) {
+    return layerData[id] ? layerData[id].entry : null;
+  }
+
+  function getAllEntries() {
+    return layerData.map(d => d.entry);
+  }
+
+  return {
+    addLayerEntry,
+    getLayerEntry,
+    getAllEntries
+  };
+})();
