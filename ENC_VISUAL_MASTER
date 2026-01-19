@@ -1,0 +1,32 @@
+// ENC_VISUAL_MASTER
+// النواة البصرية الرئيسية
+// تخزين وتمثيل البيانات بصريًا وربطها مع باقي الطبقات
+
+export const ENC_VISUAL_MASTER = (() => {
+  const visualStore = [];
+
+  function addVisual(entry) {
+    visualStore.push({ entry, timestamp: Date.now() });
+  }
+
+  function getVisual(index) {
+    return visualStore[index] ? visualStore[index].entry : null;
+  }
+
+  function getAllVisuals() {
+    return visualStore.map(v => v.entry);
+  }
+
+  function stats() {
+    return {
+      totalVisuals: visualStore.length
+    };
+  }
+
+  return {
+    addVisual,
+    getVisual,
+    getAllVisuals,
+    stats
+  };
+})();
