@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM — Ultimate Global Brain UI</title>
+<link rel="stylesheet" href="ultimate-ui.css">
+</head>
+<body>
+<h1>AYHEM — العقل الرقمي الحي الأعلى عالميًا</h1>
+
+<div class="container">
+  <section>
+    <input id="inputData" placeholder="أدخل بيانات للتعلم">
+    <button id="learnBtn">تعلم</button>
+  </section>
+
+  <section>
+    <h3>الأنماط المتعلمة</h3>
+    <pre id="patterns"></pre>
+  </section>
+
+  <section>
+    <h3>التنبؤات المستقبلية</h3>
+    <pre id="predictions"></pre>
+    <button id="clearPredictions">مسح التنبؤات</button>
+  </section>
+</div>
+
+<script type="module">
+import { UltimateSelfEvolvingUnit } from "./ultimate-self-evolving-unit.js";
+import { UltimateGlobalPredictive } from "./ultimate-global-predictive.js";
+
+const selfUnit = UltimateSelfEvolvingUnit.init();
+const predictive = UltimateGlobalPredictive.init();
+
+const inputData = document.getElementById("inputData");
+const learnBtn = document.getElementById("learnBtn");
+const patternsEl = document.getElementById("patterns");
+const predictionsEl = document.getElementById("predictions");
+const clearPredictionsBtn = document.getElementById("clearPredictions");
+
+learnBtn.addEventListener("click", ()=>{
+  const val = inputData.value.trim();
+  if(val){
+    selfUnit.learn(val);
+    predictive.analyze();
+    inputData.value="";
+    updateUI();
+  }
+});
+
+clearPredictionsBtn.addEventListener("click", ()=>{
+  predictive.clearPredictions();
+  updateUI();
+});
+
+function updateUI(){
+  patternsEl.textContent = selfUnit.getPatterns()
+    .map(r=>`[${new Date(r.timestamp).toLocaleTimeString()}] ${r.priority} - ${r.text}`)
+    .join("\n") || "لا توجد بيانات";
+
+  predictionsEl.textContent = predictive.getPredictions()
+    .map(r=>`[${new Date(r.timestamp).toLocaleTimeString()}] ${r.priority} - ${r.predictedEvent}`)
+    .join("\n") || "لا توجد تنبؤات";
+}
+
+setInterval(updateUI,1000);
+</script>
+</body>
+</html>
