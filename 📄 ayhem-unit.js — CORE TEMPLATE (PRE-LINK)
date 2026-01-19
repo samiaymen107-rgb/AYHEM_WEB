@@ -1,0 +1,83 @@
+/* =====================================================
+   AYHEM UNIT CORE — PRE-LINK TEMPLATE
+   File: ayhem-unit.js
+   Status: PASSIVE / NO EXECUTION
+   Mode: SAFE • IMMUTABLE • EXTENSIBLE
+   ===================================================== */
+
+/* --------- GLOBAL SHIELD --------- */
+const AYHEM_UNIT = Object.freeze({
+
+  /* ===== METADATA ===== */
+  meta: {
+    name: "AYHEM-UNIT",
+    version: "0.0.1-passive",
+    state: "detached",
+    description: "Independent cognitive unit — pre-link state",
+    editable: false,
+    timestamp: null
+  },
+
+  /* ===== LOCK SYSTEM ===== */
+  lock: {
+    immutable: true,
+    allowMerge: false,
+    allowOverride: false,
+    allowDelete: false
+  },
+
+  /* ===== 22 CORE ELEMENTS ===== */
+  elements: Object.freeze({
+
+    E01: { name: "IDENTITY",        status: "idle", link: null },
+    E02: { name: "MEMORY",          status: "idle", link: null },
+    E03: { name: "STATE",           status: "idle", link: null },
+    E04: { name: "AWARENESS",       status: "idle", link: null },
+    E05: { name: "LOGIC",           status: "idle", link: null },
+    E06: { name: "ANALYSIS",        status: "idle", link: null },
+    E07: { name: "DECISION",        status: "idle", link: null },
+    E08: { name: "ETHICS",          status: "idle", link: null },
+    E09: { name: "SECURITY",        status: "idle", link: null },
+    E10: { name: "COMMUNICATION",   status: "idle", link: null },
+    E11: { name: "LANGUAGE",        status: "idle", link: null },
+    E12: { name: "LEARNING",        status: "idle", link: null },
+    E13: { name: "ADAPTATION",      status: "idle", link: null },
+    E14: { name: "ERROR_CONTROL",   status: "idle", link: null },
+    E15: { name: "SELF_CHECK",      status: "idle", link: null },
+    E16: { name: "EXPANSION",       status: "idle", link: null },
+    E17: { name: "SYNC",            status: "idle", link: null },
+    E18: { name: "ARCHIVE",         status: "idle", link: null },
+    E19: { name: "TRACE",           status: "idle", link: null },
+    E20: { name: "TIME",            status: "idle", link: null },
+    E21: { name: "RECOVERY",        status: "idle", link: null },
+    E22: { name: "GOVERNANCE",      status: "idle", link: null }
+
+  }),
+
+  /* ===== FUTURE LINK INTERFACE (DISABLED) ===== */
+  interface: Object.freeze({
+
+    link: function () {
+      throw new Error("AYHEM-UNIT is in passive mode. Linking is disabled.");
+    },
+
+    sync: function () {
+      throw new Error("Sync unavailable. Unit not activated.");
+    }
+
+  }),
+
+  /* ===== SAFETY SIGNAL ===== */
+  signal: {
+    active: false,
+    note: "This unit is registered but not alive."
+  }
+
+});
+
+/* ===== EXPORT SAFE ===== */
+export default AYHEM_UNIT;
+
+/* =====================================================
+   END OF FILE — DO NOT MODIFY CONTENT
+   ===================================================== */
