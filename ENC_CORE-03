@@ -1,0 +1,32 @@
+// ENC_CORE-03
+// الوحدة الأساسية 03 للنواة المشفرة
+// تعزيز الربط والتحكم المتقدم بالطبقات المختلفة للذاكرة والتحليلات
+
+export const ENC_CORE_03 = (() => {
+  const coreData = [];
+
+  function addEntry(entry) {
+    coreData.push({ entry, timestamp: Date.now() });
+  }
+
+  function getEntry(index) {
+    return coreData[index] ? coreData[index].entry : null;
+  }
+
+  function getAllEntries() {
+    return coreData.map(e => e.entry);
+  }
+
+  function stats() {
+    return {
+      totalEntries: coreData.length
+    };
+  }
+
+  return {
+    addEntry,
+    getEntry,
+    getAllEntries,
+    stats
+  };
+})();
