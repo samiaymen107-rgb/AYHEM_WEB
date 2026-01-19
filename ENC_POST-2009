@@ -1,0 +1,32 @@
+// ENC_POST-2009
+// أرشيف النواة بعد عام 2009
+// تخزين وتحليل البيانات الحديثة والتقارير بعد 2009
+
+export const ENC_POST_2009 = (() => {
+  const archive = [];
+
+  function addRecord(record) {
+    archive.push({ record, timestamp: Date.now() });
+  }
+
+  function getRecord(index) {
+    return archive[index] ? archive[index].record : null;
+  }
+
+  function getAllRecords() {
+    return archive.map(r => r.record);
+  }
+
+  function stats() {
+    return {
+      totalRecords: archive.length
+    };
+  }
+
+  return {
+    addRecord,
+    getRecord,
+    getAllRecords,
+    stats
+  };
+})();
