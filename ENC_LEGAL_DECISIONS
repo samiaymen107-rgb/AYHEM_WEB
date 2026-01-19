@@ -1,0 +1,34 @@
+// ENC_LEGAL_DECISIONS
+// طبقة القرارات القانونية
+// تخزين جميع القرارات القانونية وربطها بالتحليلات والذاكرة الرقمية
+
+export const ENC_LEGAL_DECISIONS = (() => {
+  const legalRecords = [];
+
+  function addDecision(decision) {
+    legalRecords.push({ decision, timestamp: Date.now() });
+  }
+
+  function getDecision(index) {
+    return legalRecords[index] ? legalRecords[index].decision : null;
+  }
+
+  function search(query) {
+    return legalRecords.filter(r =>
+      JSON.stringify(r.decision).includes(query)
+    );
+  }
+
+  function stats() {
+    return {
+      totalDecisions: legalRecords.length
+    };
+  }
+
+  return {
+    addDecision,
+    getDecision,
+    search,
+    stats
+  };
+})();
