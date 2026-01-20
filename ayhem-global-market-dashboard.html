@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM – لوحة الفرص العالمية</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#f9f9f9; color:#222; }
+  h3 { margin-top:0; }
+  .gap-entry { background:#fff; padding:8px; margin:5px 0; border-radius:5px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+  #top-gaps { max-width:600px; margin:auto; padding:10px; border:1px solid #ccc; background:#eee; border-radius:8px; }
+</style>
+</head>
+<body>
+
+<h2 style="text-align:center;">🌍 لوحة الفرص الاقتصادية العالمية – أيهم</h2>
+
+<div id="top-gaps">
+  <h3>أفضل الفجوات العالمية</h3>
+  <!-- الفرص ستعرض هنا تلقائيًا -->
+</div>
+
+<script src="ayhem-market-gap-engine.js"></script>
+<script src="ayhem-economic-predictor.js"></script>
+<script src="ayhem-market-awareness-loop.js"></script>
+<script src="ayhem-top-gaps-dashboard.js"></script>
+
+<script>
+// مثال على إرسال إشارات تلقائية (Auto Signal Feed)
+const exampleSignals = [
+  "فرصة AI في التعليم الأوروبي",
+  "حاجة لحلول أمنية في أفريقيا",
+  "حلول صحية رقمية مفقودة في MENA",
+  "منتجات B2B تقنية جديدة في آسيا",
+  "ترخيص IP غير مستغل في أمريكا"
+];
+
+// إرسال كل إشارة عبر حلقة أيهم
+exampleSignals.forEach((sig, idx) => {
+  setTimeout(() => {
+    AYHEM_MARKET_LOOP.scan(sig);
+  }, idx * 1000); // إرسال متتابع لتوضيح التحديث الحي
+});
+</script>
+
+</body>
+</html>
