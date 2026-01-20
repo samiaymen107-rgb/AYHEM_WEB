@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>AYHEM Dashboard Control</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: monospace;
+      background: #0b0f14;
+      color: #e0e6ed;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 10px;
+      padding: 10px;
+    }
+    .box {
+      border: 1px solid #1f2a36;
+      padding: 10px;
+      background: #111823;
+    }
+    h3 {
+      margin-top: 0;
+      color: #4da3ff;
+    }
+    video {
+      width: 100%;
+      background: black;
+    }
+    pre {
+      white-space: pre-wrap;
+      font-size: 12px;
+    }
+    button {
+      margin: 2px;
+      padding: 4px 8px;
+      background: #1f2a36;
+      color: #e0e6ed;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #4da3ff;
+      color: #0b0f14;
+    }
+  </style>
+</head>
+<body>
+
+<div class="grid">
+  <div class="box">
+    <h3>👁️ الرؤية</h3>
+    <video id="cam" autoplay muted></video>
+    <button onclick="AYHEM_VISION.start(document.getElementById('cam'))">تشغيل العين</button>
+    <button onclick="AYHEM_VISION.stop()">إيقاف العين</button>
+  </div>
+
+  <div class="box">
+    <h3>👂 السمع</h3>
+    <pre id="audio"></pre>
+    <button onclick="AYHEM_AUDIO_EAR.start()">تشغيل الأذن</button>
+    <button onclick="AYHEM_AUDIO_EAR.stop()">إيقاف الأذن</button>
+    <button onclick="AYHEM_AUDIO_LEARNING.start()">تشغيل التعلم السمعي</button>
+    <button onclick="AYHEM_AUDIO_LEARNING.stop()">إيقاف التعلم السمعي</button>
+  </div>
+
+  <div class="box">
+    <h3>🧠 السياق</h3>
+    <pre id="context"></pre>
+    <button onclick="AYHEM_VISUAL_LEARNING.start(document.getElementById('cam'))">تشغيل التعلم البصري</button>
+    <button onclick="AYHEM_VISUAL_LEARNING.stop()">إيقاف التعلم البصري</button>
+  </div>
+
+  <div class="box">
+    <h3>🧭 القرار / الرد</h3>
+    <pre id="decision"></pre>
+    <button onclick="AYHEM_FUSION_LISTENER.start()">تشغيل الدمج</button>
+    <button onclick="AYHEM_FUSION_LISTENER.stop()">إيقاف الدمج</button>
+    <button onclick="AYHEM_AWARENESS_LOOP.start()">تشغيل الوعي</button>
+    <button onclick="AYHEM_AWARENESS_LOOP.stop()">إيقاف الوعي</button>
+  </div>
+</div>
+
+<script src="ayhem-node-registry.js"></script>
+<script src="ayhem-memory-cell.js"></script>
+<script src="ayhem-vision-cell.js"></script>
+<script src="ayhem-audio-ear.js"></script>
+<script src="ayhem-audio-memory.js"></script>
+<script src="ayhem-audio-learning.js"></script>
+<script src="ayhem-fusion-core.js"></script>
+<script src="ayhem-fusion-listener.js"></script>
+<script src="ayhem-context-memory.js"></script>
+<script src="ayhem-ai-interpreter.js"></script>
+<script src="ayhem-decision-core.js"></script>
+<script src="ayhem-response-engine.js"></script>
+<script src="ayhem-awareness-loop.js"></script>
+<script src="ayhem-voice-out.js"></script>
+<script src="ayhem-dashboard-live.js"></script>
+
+</body>
+</html>
