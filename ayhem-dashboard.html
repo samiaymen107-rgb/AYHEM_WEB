@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>AYHEM Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: monospace;
+      background: #0b0f14;
+      color: #e0e6ed;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 10px;
+      padding: 10px;
+    }
+    .box {
+      border: 1px solid #1f2a36;
+      padding: 10px;
+      background: #111823;
+    }
+    h3 {
+      margin-top: 0;
+      color: #4da3ff;
+    }
+    video {
+      width: 100%;
+      background: black;
+    }
+    pre {
+      white-space: pre-wrap;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="grid">
+  <div class="box">
+    <h3>👁️ الرؤية</h3>
+    <video id="cam" autoplay muted></video>
+  </div>
+
+  <div class="box">
+    <h3>👂 السمع</h3>
+    <pre id="audio"></pre>
+  </div>
+
+  <div class="box">
+    <h3>🧠 السياق</h3>
+    <pre id="context"></pre>
+  </div>
+
+  <div class="box">
+    <h3>🧭 القرار / الرد</h3>
+    <pre id="decision"></pre>
+  </div>
+</div>
+
+<script src="ayhem-dashboard.js"></script>
+</body>
+</html>
