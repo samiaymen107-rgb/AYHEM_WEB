@@ -1,0 +1,7 @@
+{
+  "nonDestructive": true,
+  "autoEvolution": true,
+  "humanContextRequired": true,
+  "blockDeviation": true,
+  "audit": "ENABLED"
+}
