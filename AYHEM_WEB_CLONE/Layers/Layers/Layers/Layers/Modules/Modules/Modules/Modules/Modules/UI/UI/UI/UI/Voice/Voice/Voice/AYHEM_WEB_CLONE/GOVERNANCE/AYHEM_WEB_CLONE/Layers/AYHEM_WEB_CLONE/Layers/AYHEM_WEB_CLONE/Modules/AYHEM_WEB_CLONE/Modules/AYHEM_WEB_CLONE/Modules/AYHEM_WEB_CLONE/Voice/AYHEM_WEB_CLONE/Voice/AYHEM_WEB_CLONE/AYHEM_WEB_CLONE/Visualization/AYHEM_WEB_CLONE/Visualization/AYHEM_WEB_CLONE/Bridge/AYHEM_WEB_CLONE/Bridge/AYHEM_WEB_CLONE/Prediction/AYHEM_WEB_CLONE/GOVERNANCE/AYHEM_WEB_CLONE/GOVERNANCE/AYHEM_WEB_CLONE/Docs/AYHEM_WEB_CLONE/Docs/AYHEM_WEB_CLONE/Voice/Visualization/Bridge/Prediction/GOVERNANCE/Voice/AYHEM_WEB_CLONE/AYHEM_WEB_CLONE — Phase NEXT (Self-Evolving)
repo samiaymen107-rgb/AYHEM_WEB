@@ -1,0 +1,19 @@
+AYHEM_WEB_CLONE/
+├─ Visualization/
+│  └─ ayhem-visual-map.html
+├─ Bridge/
+│  ├─ legacy-linker.js
+│  └─ auto-router.js
+├─ Prediction/
+│  ├─ human-based-predictor.js
+│  └─ deviation-guard.js
+├─ Governance/
+│  ├─ SUPREME_MANDATE.md
+│  └─ AUTO_POLICY.json
+├─ Observer/
+│  └─ ai-observer.js
+├─ Voice/
+│  └─ ayhem-voice-bridge.js
+├─ Core/
+│  └─ ayhem-core.js
+└─ ayhem-manifest.json
