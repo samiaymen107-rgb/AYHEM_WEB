@@ -1,0 +1,18 @@
+"watchdog": [
+  {"name":"AI_WATCHDOG.js","path":"GOVERNANCE/AI_WATCHDOG.js"}
+],
+"human": [
+  {"name":"HUMAN_EXPERIENCE_BINDER.md","path":"Layers/HUMAN_EXPERIENCE_BINDER.md"},
+  {"name":"human-experience-map.js","path":"Layers/human-experience-map.js"}
+],
+"sandbox": [
+  {"name":"sandbox-evolution.js","path":"Modules/sandbox-evolution.js"},
+  {"name":"sandbox-log.js","path":"Modules/sandbox-log.js"}
+],
+"auto_doc": [
+  {"name":"auto-doc-brain.js","path":"Modules/auto-doc-brain.js"}
+],
+"voice": [
+  {"name":"ayhem-voice-out.js","path":"Voice/ayhem-voice-out.js"},
+  {"name":"voice-governor.js","path":"Voice/voice-governor.js"}
+]
