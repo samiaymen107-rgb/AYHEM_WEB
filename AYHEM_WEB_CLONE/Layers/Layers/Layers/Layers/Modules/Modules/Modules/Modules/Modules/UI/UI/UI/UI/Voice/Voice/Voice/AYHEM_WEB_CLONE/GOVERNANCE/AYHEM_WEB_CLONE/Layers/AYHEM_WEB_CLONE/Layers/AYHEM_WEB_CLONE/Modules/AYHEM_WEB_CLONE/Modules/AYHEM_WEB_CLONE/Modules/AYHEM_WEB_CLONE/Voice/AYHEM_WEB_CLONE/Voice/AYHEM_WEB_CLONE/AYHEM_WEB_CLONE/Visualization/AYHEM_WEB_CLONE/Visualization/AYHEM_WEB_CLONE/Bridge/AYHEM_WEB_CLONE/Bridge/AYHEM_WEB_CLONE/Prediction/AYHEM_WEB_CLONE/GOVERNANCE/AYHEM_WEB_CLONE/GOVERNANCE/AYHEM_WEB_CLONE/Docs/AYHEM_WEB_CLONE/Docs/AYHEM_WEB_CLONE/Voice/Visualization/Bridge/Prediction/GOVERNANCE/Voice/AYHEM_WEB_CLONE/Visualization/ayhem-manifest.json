@@ -1,0 +1,11 @@
+{
+  "project": "AYHEM",
+  "clone": true,
+  "core": ["Core/ayhem-core.js"],
+  "visualization": ["Visualization/ayhem-visual-map.html"],
+  "bridge": ["Bridge/legacy-linker.js", "Bridge/auto-router.js"],
+  "prediction": ["Prediction/human-based-predictor.js", "Prediction/deviation-guard.js"],
+  "governance": ["Governance/SUPREME_MANDATE.md", "Governance/AUTO_POLICY.json"],
+  "observer": ["Observer/ai-observer.js"],
+  "voice": ["Voice/ayhem-voice-bridge.js"]
+}
