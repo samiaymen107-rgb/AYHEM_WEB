@@ -1,0 +1,7 @@
+[
+  { "name": "ayhem-core.js", "path": "../ayhem-core.js" },
+  { "name": "ayhem-memory.js", "path": "../ayhem-memory.js" },
+  { "name": "self-evolving-unit.js", "path": "../self-evolving-unit.js" },
+  { "name": "ultimate-ayhem-ui.js", "path": "../ultimate-ayhem-ui.js" },
+  { "name": "ultimate-global-predictive.js", "path": "../ultimate-global-predictive.js" }
+]
