@@ -1,0 +1,32 @@
+AYHEM_WEB_CLONE/
+├─ index.html
+├─ map.js
+├─ config.json
+├─ map.css
+├─ README.md
+├─ LICENSE
+├─ Layers/
+│  ├─ AYHEM_CORE_SYSTEM.md
+│  ├─ AYHEM_ECONOMIC_LAYER.js
+│  ├─ ayhem-unit.js
+│  └─ persistent-memory.js
+├─ Modules/
+│  ├─ self-evolving-unit.js
+│  ├─ ultimate-global-predictive.js
+│  ├─ ayhem-decision-core.js
+│  ├─ ayhem-fusion-core.js
+│  └─ global-predictive-module.js
+├─ UI/
+│  ├─ ultimate-ayhem-ui.html
+│  ├─ smart-analytics-ui.html
+│  ├─ nextgen-global-leap-ui.html
+│  └─ ayhem-dashboard.html
+├─ Voice/
+│  ├─ ayhem-voice.js
+│  ├─ voice-module.js
+│  └─ ayhem-voice-out.js
+└─ ENC/
+   ├─ ENC_CORE-MASTER
+   ├─ ENC_LEGAL_DECISIONS
+   ├─ ENC_VISUAL_MASTER
+   └─ AYHEM_KEY_2025
