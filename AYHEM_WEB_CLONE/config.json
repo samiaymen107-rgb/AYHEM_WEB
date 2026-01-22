@@ -1,0 +1,32 @@
+{
+  "layers": [
+    {"name":"AYHEM_CORE_SYSTEM.md","path":"Layers/AYHEM_CORE_SYSTEM.md"},
+    {"name":"AYHEM_ECONOMIC_LAYER.js","path":"Layers/AYHEM_ECONOMIC_LAYER.js"},
+    {"name":"ayhem-unit.js","path":"Layers/ayhem-unit.js"},
+    {"name":"persistent-memory.js","path":"Layers/persistent-memory.js"}
+  ],
+  "modules": [
+    {"name":"self-evolving-unit.js","path":"Modules/self-evolving-unit.js"},
+    {"name":"ultimate-global-predictive.js","path":"Modules/ultimate-global-predictive.js"},
+    {"name":"ayhem-decision-core.js","path":"Modules/ayhem-decision-core.js"},
+    {"name":"ayhem-fusion-core.js","path":"Modules/ayhem-fusion-core.js"},
+    {"name":"global-predictive-module.js","path":"Modules/global-predictive-module.js"}
+  ],
+  "ui": [
+    {"name":"ultimate-ayhem-ui.html","path":"UI/ultimate-ayhem-ui.html"},
+    {"name":"smart-analytics-ui.html","path":"UI/smart-analytics-ui.html"},
+    {"name":"nextgen-global-leap-ui.html","path":"UI/nextgen-global-leap-ui.html"},
+    {"name":"ayhem-dashboard.html","path":"UI/ayhem-dashboard.html"}
+  ],
+  "voice": [
+    {"name":"ayhem-voice.js","path":"Voice/ayhem-voice.js"},
+    {"name":"voice-module.js","path":"Voice/voice-module.js"},
+    {"name":"ayhem-voice-out.js","path":"Voice/ayhem-voice-out.js"}
+  ],
+  "enc": [
+    {"name":"ENC_CORE-MASTER","path":"ENC/ENC_CORE-MASTER"},
+    {"name":"ENC_LEGAL_DECISIONS","path":"ENC/ENC_LEGAL_DECISIONS"},
+    {"name":"ENC_VISUAL_MASTER","path":"ENC/ENC_VISUAL_MASTER"},
+    {"name":"AYHEM_KEY_2025","path":"ENC/AYHEM_KEY_2025"}
+  ]
+}
