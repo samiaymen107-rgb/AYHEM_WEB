@@ -1,0 +1,4 @@
+<script type="module">
+  import { AI_OBSERVER } from "../Observer/ai-observer.js";
+  AI_OBSERVER.watch("VISUAL_MAP_LOADED");
+</script>
