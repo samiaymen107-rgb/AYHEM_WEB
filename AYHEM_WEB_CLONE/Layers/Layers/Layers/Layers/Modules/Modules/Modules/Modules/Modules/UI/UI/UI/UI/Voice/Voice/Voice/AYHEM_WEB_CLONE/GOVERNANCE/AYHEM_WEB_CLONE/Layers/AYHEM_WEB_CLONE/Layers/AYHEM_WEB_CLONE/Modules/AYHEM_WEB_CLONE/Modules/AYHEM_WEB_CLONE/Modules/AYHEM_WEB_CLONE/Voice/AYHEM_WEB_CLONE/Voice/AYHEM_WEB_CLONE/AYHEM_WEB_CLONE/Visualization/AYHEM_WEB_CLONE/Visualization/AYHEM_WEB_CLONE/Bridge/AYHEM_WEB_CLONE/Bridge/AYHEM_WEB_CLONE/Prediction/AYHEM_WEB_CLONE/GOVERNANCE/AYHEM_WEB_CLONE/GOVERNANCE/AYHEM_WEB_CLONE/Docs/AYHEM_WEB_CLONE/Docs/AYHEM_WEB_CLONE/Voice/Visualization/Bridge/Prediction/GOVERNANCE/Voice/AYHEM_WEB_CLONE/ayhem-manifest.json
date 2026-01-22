@@ -1,0 +1,9 @@
+{
+  "project": "AYHEM",
+  "mode": "NON_DESTRUCTIVE_CLONE",
+  "visualization": ["Visualization/ayhem-visual-map.html"],
+  "bridge": ["Bridge/legacy-linker.js"],
+  "prediction": ["Prediction/human-based-predictor.js"],
+  "governance": ["GOVERNANCE/SUPREME_MANDATE.md"],
+  "voice": ["Voice/ayhem-voice-bridge.js"]
+}
