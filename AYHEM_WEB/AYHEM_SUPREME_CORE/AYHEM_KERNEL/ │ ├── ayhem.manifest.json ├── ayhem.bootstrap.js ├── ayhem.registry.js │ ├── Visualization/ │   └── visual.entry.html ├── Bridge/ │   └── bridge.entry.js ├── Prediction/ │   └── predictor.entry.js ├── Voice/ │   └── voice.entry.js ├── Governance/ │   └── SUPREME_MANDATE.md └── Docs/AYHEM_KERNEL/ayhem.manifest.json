@@ -1,0 +1,28 @@
+{
+  "kernel": "AYHEM",
+  "version": "1.0.0",
+  "mode": "SELF_EVOLVING",
+  "authority": "SUPREME_MANDATE",
+  "modules": {
+    "visualization": [
+      {"name": "ayhem-visual-map.html", "source": "Visualization"}
+    ],
+    "bridge": [
+      {"name": "legacy-linker.js", "source": "Bridge"}
+    ],
+    "prediction": [
+      {"name": "human-based-predictor.js", "source": "Prediction"}
+    ],
+    "voice": [
+      {"name": "ayhem-voice-evolved.js", "source": "Voice"}
+    ],
+    "governance": [
+      {"name": "SUPREME_MANDATE.md", "source": "Governance"}
+    ]
+  },
+  "rules": {
+    "no_override": true,
+    "no_delete": true,
+    "link_only": true
+  }
+}
