@@ -1,0 +1,29 @@
+AYHEM_SUPREME_CORE/
+│
+├─ manifest/
+│   ├─ ayhem-manifest.json          # وصف النواة، التعريفات، وإصدارات النظام
+│   └─ SUPREME_MANDATE.md          # الوثيقة العليا للأوامر والسيادة
+│
+├─ bridge/
+│   ├─ ayhem-voice-bridge.js       # كوبري الصوت والتحكم بالواجهة
+│   ├─ ayhem-data-bridge.js        # كوبري البيانات بين الوحدات
+│   └─ legacy-linker.js            # ربط النسخ القديمة بالنسخة العليا
+│
+├─ governance/
+│   ├─ human-based-predictor.js    # آليات التنبؤ البشري
+│   └─ ai-governor.js              # حاكم الذكاء الاصطناعي
+│
+├─ visualization/
+│   ├─ ayhem-visual-map.html       # الخريطة البصرية للوحدات
+│   └─ ayhem-visual-core.js        # تحكم في تمثيل النواة بصريًا
+│
+├─ voice/
+│   ├─ ayhem-voice-evolved.js      # معالجة الصوت المتقدمة
+│   └─ ayhem-voice-core.js         # النواة الصوتية
+│
+├─ prediction/
+│   └─ ai-predictor.js             # التنبؤ الذكي متعدد المصادر
+│
+├─ auto-history.js                 # سجل التشغيل الآلي لجميع الأنشطة
+│
+└─ README.md                       # تعريف النواة وطريقة استخدامها
