@@ -1,4 +1,6 @@
 kernel
+boot
+datakernel
 core
 memory
 ai
