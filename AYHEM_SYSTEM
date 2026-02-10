@@ -1,6 +1,6 @@
 kernel
 boot
-datakernel
+data
 core
 memory
 ai
@@ -8,5 +8,3 @@ nodes
 api
 ui
 security
-data
-boot
