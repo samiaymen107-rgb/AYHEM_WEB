@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM NETWORK LIVE 3D - Advanced</title>
+<style>
+body{margin:0;padding:0;background:#111;color:#fff;font-family:sans-serif;overflow:hidden;}
+header{padding:15px;text-align:center;font-size:1.6em;background:#222;position:absolute;width:100%;z-index:10;}
+canvas{display:block;}
+</style>
+</head>
+<body>
+<header>AYHEM AUTO-FULL NETWORK 3D LIVE - الشبكة ثلاثية الأبعاد</header>
+<canvas id="networkCanvas"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
+<script>
+let canvas=document.getElementById('networkCanvas');
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let scene=new THREE.Scene();
+let camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,5000);
+let renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+
+camera.position.z=500;
+
+let cells=[];
+let links=[];
+let cellMeshes=[];
+let linkMeshes=[];
+let colors=['#0f0','#00f','#f00','#ff0','#0ff','#f0f','#fff'];
+
+// ==== إنشاء خلية جديدة في المشهد ====
+function createCellMesh(cell){
+    let geometry=new THREE.SphereGeometry(5 + 15*cell.energy,16,16);
+    let material=new THREE.MeshBasicMaterial({color:new THREE.Color(Math.random(),Math.random(),Math.random())});
+    let mesh=new THREE.Mesh(geometry,material);
+    mesh.position.set(cell.x,cell.y,cell.z);
+    scene.add(mesh);
+    return mesh;
+}
+
+// ==== إنشاء رابط بين خليتين ====
+function createLinkMesh(a,b){
+    let material=new THREE.LineBasicMaterial({color:new THREE.Color(Math.random(),Math.random(),Math.random())});
+    let points=[new THREE.Vector3(a.x,a.y,a.z), new THREE.Vector3(b.x,b.y,b.z)];
+    let geometry=new THREE.BufferGeometry().setFromPoints(points);
+    let line=new THREE.Line(geometry,material);
+    scene.add(line);
+    return line;
+}
+
+// ==== جلب البيانات الحية من الخادم ====
+async function fetchCells(){
+    try{
+        const res=await fetch('/report');
+        const data=await res.json();
+        cells=data.results.map(c=>({
+            name:c.cell||c.component,
+            x:c.x||Math.random()*400-200,
+            y:c.y||Math.random()*400-200,
+            z:c.z||Math.random()*400-200,
+            energy:c.energy||0,
+            awareness:c.awareness||0,
+            prediction:c.prediction||0
+        }));
+        links=[];
+        for(let i=0;i<cells.length;i++){
+            for(let j=i+1;j<cells.length;j++){
+                if(Math.random()>0.6) links.push([i,j]);
+            }
+        }
+    }catch(e){console.error("خطأ في جلب البيانات:",e);}
+}
+
+// ==== تحديث الخلايا وروابطها ====
+function updateScene(){
+    // إزالة الم meshes القديمة
+    cellMeshes.forEach(m=>scene.remove(m));
+    linkMeshes.forEach(l=>scene.remove(l));
+    cellMeshes=[];
+    linkMeshes=[];
+    
+    // إضافة الخلايا
+    cells.forEach(c=>{
+        // حركة خفيفة
+        c.x+=Math.random()*4-2;
+        c.y+=Math.random()*4-2;
+        c.z+=Math.random()*4-2;
+        c.energy=Math.min(1,Math.max(0,c.energy + (Math.random()*0.05-0.025)));
+        let mesh=createCellMesh(c);
+        cellMeshes.push(mesh);
+    });
+
+    // إضافة الروابط
+    links.forEach(l=>{
+        let a=cells[l[0]], b=cells[l[1]];
+        let line=createLinkMesh(a,b);
+        linkMeshes.push(line);
+    });
+}
+
+// ==== الحلقة الرئيسية للتحديث والتصيير ====
+async function animate(){
+    await fetchCells();
+    updateScene();
+    renderer.render(scene,camera);
+    requestAnimationFrame(animate);
+}
+
+// ==== التحكم بالنافذة ====
+window.addEventListener('resize',()=>{
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+animate();
+</script>
+</body>
+</html>
