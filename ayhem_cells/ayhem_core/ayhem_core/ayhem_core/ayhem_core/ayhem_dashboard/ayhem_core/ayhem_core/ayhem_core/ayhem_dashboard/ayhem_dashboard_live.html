@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM WOLF ULTRA Dashboard Live</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{font-family:sans-serif;background:#111;color:#fff;margin:0;padding:0;}
+header{padding:10px;text-align:center;font-size:1.5em;background:#222;}
+section{display:flex;flex-wrap:wrap;justify-content:center;padding:10px;}
+.card{background:#1a1a1a;margin:10px;padding:15px;border-radius:8px;width:280px;}
+canvas{background:#222;border-radius:5px;}
+</style>
+</head>
+<body>
+<header>AYHEM AUTO-LIVE WOLF ULTRA</header>
+<section id="cellsContainer"></section>
+<script>
+const MEMORY_URL="/memory";
+const REPORT_URL="/report";
+const refreshInterval=5000;
+
+async function fetchData(url){const res=await fetch(url);return await res.json();}
+
+function createCellCard(cellName){
+  const container=document.getElementById("cellsContainer");
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`<h3>${cellName}</h3><canvas id="${cellName}_chart"></canvas>`;
+  container.appendChild(card);
+  const ctx=document.getElementById(`${cellName}_chart`).getContext('2d');
+  const chart=new Chart(ctx,{
+    type:'line',
+    data:{labels:[],datasets:[{label:'طاقة/وعي/تنبؤ',data:[],borderColor:'#00f',fill:false,tension:0.3}]},
+    options:{animation:false,scales:{y:{min:0,max:1}}}
+  });
+  return chart;
+}
+
+let cellCharts={};
+
+async function updateDashboard(){
+  const report=await fetchData(REPORT_URL);
+  for(const res of report.results){
+    const name=res.cell || res.component;
+    if(!cellCharts[name]) cellCharts[name]=createCellCard(name);
+    const chart=cellCharts[name];
+    const val=(res.output || 0);
+    const now=new Date().toLocaleTimeString();
+    chart.data.labels.push(now);
+    chart.data.datasets[0].data.push(val>1?1:val);
+    if(chart.data.labels.length>20){chart.data.labels.shift();chart.data.datasets[0].data.shift();}
+    chart.update();
+  }
+}
+
+setInterval(updateDashboard,refreshInterval);
+updateDashboard();
+</script>
+</body>
+</html>
