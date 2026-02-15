@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM NETWORK LIVE - بيانات حقيقية</title>
+<style>
+body{margin:0;padding:0;background:#111;color:#fff;font-family:sans-serif;}
+header{padding:15px;text-align:center;font-size:1.6em;background:#222;}
+canvas{display:block;margin:auto;background:#111;}
+#networkCanvas{width:100%;height:90vh;}
+</style>
+</head>
+<body>
+<header>AYHEM AUTO-FULL NETWORK LIVE - خريطة الشبكة الحية الحقيقية</header>
+<canvas id="networkCanvas"></canvas>
+<script>
+const canvas=document.getElementById('networkCanvas');
+const ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let cells = []; // كل الخلايا
+let links = []; // روابط بين الخلايا
+let colors = ['#0f0','#00f','#f00','#ff0','#0ff','#f0f','#fff'];
+
+// ==== جلب البيانات من Auto-Full Server ====
+async function fetchCells(){
+  try {
+    const res = await fetch('/report'); // تأكد أن Server يعرض JSON لجميع الخلايا
+    const data = await res.json();
+    cells = data.results.map(c=>({
+      name: c.cell || c.component,
+      x: c.x || Math.random()*canvas.width,
+      y: c.y || Math.random()*canvas.height,
+      energy: c.energy || 0,
+      awareness: c.awareness || 0,
+      prediction: c.prediction || 0
+    }));
+    links = [];
+    for(let i=0;i<cells.length;i++){
+      for(let j=i+1;j<cells.length;j++){
+        if(Math.random()>0.6) links.push([i,j]);
+      }
+    }
+  } catch(e){ console.error("خطأ في جلب البيانات:", e); }
+}
+
+// ==== رسم الشبكة الحية ====
+function drawNetwork(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // روابط
+  links.forEach(l=>{
+    const a=cells[l[0]], b=cells[l[1]];
+    ctx.strokeStyle=colors[Math.floor(Math.random()*colors.length)];
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.lineTo(b.x,b.y);
+    ctx.stroke();
+  });
+  // الخلايا
+  cells.forEach(c=>{
+    ctx.fillStyle=colors[Math.floor(Math.random()*colors.length)];
+    const size=5+20*c.energy;
+    ctx.beginPath();
+    ctx.arc(c.x,c.y,size,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.font='12px sans-serif';
+    ctx.fillText(c.name, c.x+8, c.y-8);
+  });
+}
+
+// ==== تحديث مواقع الخلايا بشكل طفيف لإظهار الحركة ====
+function updatePositions(){
+  cells.forEach(c=>{
+    c.x+=Math.random()*4-2;
+    c.y+=Math.random()*4-2;
+    c.energy=Math.min(1,Math.max(0,c.energy + (Math.random()*0.05-0.025)));
+    c.awareness=Math.min(1,Math.max(0,c.awareness + (Math.random()*0.05-0.025)));
+    c.prediction=Math.min(1,Math.max(0,c.prediction + (Math.random()*0.05-0.025)));
+  });
+}
+
+// ==== الحلقة الرئيسية للتحديث الحي ====
+async function updateLoop(){
+  await fetchCells();
+  updatePositions();
+  drawNetwork();
+  requestAnimationFrame(updateLoop);
+}
+
+// ==== البداية ====
+updateLoop();
+
+</script>
+</body>
+</html>
