@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM NETWORK LIVE MAP</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{background:#111;color:#fff;font-family:sans-serif;margin:0;padding:0;}
+header{padding:10px;text-align:center;font-size:1.5em;background:#222;}
+section{display:flex;flex-wrap:wrap;justify-content:center;padding:10px;}
+.card{background:#1a1a1a;margin:10px;padding:15px;border-radius:8px;width:300px;}
+canvas{background:#222;border-radius:5px;}
+</style>
+</head>
+<body>
+<header>AYHEM AUTO-FULL NETWORK LIVE</header>
+<section id="cellsContainer"></section>
+<script>
+const REPORT_URL="/report";
+const REFRESH_INTERVAL=5000;
+
+async function fetchData(url){return await (await fetch(url)).json();}
+
+let cellCharts={};
+
+function createCellCard(cellName){
+  const container=document.getElementById("cellsContainer");
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`<h3>${cellName}</h3><canvas id="${cellName}_chart"></canvas>`;
+  container.appendChild(card);
+  const ctx=document.getElementById(`${cellName}_chart`).getContext('2d');
+  const chart=new Chart(ctx,{
+    type:'line',
+    data:{labels:[],datasets:[
+      {label:'طاقة',data:[],borderColor:'#00f',fill:false,tension:0.3},
+      {label:'وعي',data:[],borderColor:'#0f0',fill:false,tension:0.3},
+      {label:'تنبؤ',data:[],borderColor:'#f00',fill:false,tension:0.3}
+    ]},
+    options:{animation:false,scales:{y:{min:0,max:1}}}
+  });
+  return chart;
+}
+
+async function updateDashboard(){
+  const report=await fetchData(REPORT_URL);
+  for(const res of report.results){
+    const name=res.cell || res.component;
+    if(!cellCharts[name]) cellCharts[name]=createCellCard(name);
+    const chart=cellCharts[name];
+    const now=new Date().toLocaleTimeString();
+    chart.data.labels.push(now);
+    chart.data.datasets[0].data.push(res.energy || 0);
+    chart.data.datasets[1].data.push(res.awareness || 0);
+    chart.data.datasets[2].data.push(res.prediction || 0);
+    if(chart.data.labels.length>20){
+      chart.data.labels.shift();
+      chart.data.datasets.forEach(ds=>ds.data.shift());
+    }
+    chart.update();
+  }
+}
+
+setInterval(updateDashboard,REFRESH_INTERVAL);
+updateDashboard();
+</script>
+</body>
+</html>
