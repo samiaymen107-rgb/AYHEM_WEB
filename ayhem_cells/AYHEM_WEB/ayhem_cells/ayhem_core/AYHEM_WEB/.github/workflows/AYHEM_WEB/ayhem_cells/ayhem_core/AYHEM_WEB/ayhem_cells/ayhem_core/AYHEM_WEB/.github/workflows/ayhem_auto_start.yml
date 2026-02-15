@@ -1,0 +1,29 @@
+name: AYHEM TOTAL AUTO START
+
+on:
+  push:
+    branches:
+      - main
+      - 'ayhem/**' # أي فرع يبدأ بـ ayhem
+
+jobs:
+  run-AYHEM:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd ayhem_cells/ayhem_core
+          npm install
+
+      - name: Run AYHEM_TOTAL_AUTO_START
+        run: |
+          cd ayhem_cells/ayhem_core
+          node AYHEM_TOTAL_AUTO_START.js
