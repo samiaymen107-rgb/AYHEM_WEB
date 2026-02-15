@@ -1,0 +1,54 @@
+AYHEM_CELLS:
+  - id: CH1_RARITY
+    name: "الندرة والغياب"
+    description: "الظهور المتعمد والتحكم بالبيانات للحفاظ على الهيبة."
+    ai_support: true
+    output: "جدولة التحديثات والمخرجات المهمة."
+    automation:
+      api_link: "http://localhost:8080/ayhem/api/schedule"
+      triggers: ["new_data", "update_request"]
+
+  - id: CH2_HUMILITY
+    name: "التواضع الظاهر"
+    description: "الاستفادة من النفوذ دون مواجهة مباشرة."
+    ai_support: true
+    output: "تحليل تفاعل الآخرين وبناء النفوذ المخفي."
+    automation:
+      api_link: "http://localhost:8080/ayhem/api/interaction"
+      triggers: ["user_observation", "external_input"]
+
+  - id: CH3_SPARSE_WORDS
+    name: "الكلام القليل"
+    description: "إنتاج تقارير مختصرة ومؤثرة."
+    ai_support: true
+    output: "توصيات وتقارير مختصرة قابلة للتنفيذ."
+    automation:
+      api_link: "http://localhost:8080/ayhem/api/reports"
+      triggers: ["data_analysis", "summary_request"]
+
+  - id: CH4_IMAGE
+    name: "الصورة الذهنية"
+    description: "الحفاظ على الهوية الرقمية وصورة المشروع المميزة."
+    ai_support: true
+    output: "رموز بصرية وواجهة مستخدم موحدة."
+    automation:
+      api_link: "http://localhost:8080/ayhem/api/ui"
+      triggers: ["visual_update", "branding_change"]
+
+  - id: CH5_INDEPENDENCE
+    name: "الاستقلالية"
+    description: "قدرة المشروع على اتخاذ القرارات الذكية داخليًا."
+    ai_support: true
+    output: "إدارة المخاطر والبيانات تلقائيًا."
+    automation:
+      api_link: "http://localhost:8080/ayhem/api/decision"
+      triggers: ["internal_analysis", "risk_detected"]
+
+  - id: CH6_WISE_POWER
+    name: "القوة بالتقوى"
+    description: "استخدام القوة بحكمة لتحقيق الهدف الأسمى وحماية الحقوق."
+    ai_support: true
+    output: "ضمان سلامة البيانات والمخرجات الأخلاقية."
+    automation:
+      api_link: "http://localhost:8080/ayhem/api/ethics"
+      triggers: ["decision_made", "audit_request"]
