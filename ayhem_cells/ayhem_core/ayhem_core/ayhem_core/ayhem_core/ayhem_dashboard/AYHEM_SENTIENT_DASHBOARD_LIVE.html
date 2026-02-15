@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM SENTIENT DASHBOARD LIVE</title>
+<style>
+body { font-family: Arial, sans-serif; background:#111; color:#eee; margin:0; padding:0; }
+header { background:#222; padding:15px; text-align:center; font-size:1.5em; color:#0f0; }
+section { padding:10px 20px; }
+h2 { color:#0ff; }
+.cell { border:1px solid #333; margin:10px 0; padding:10px; border-radius:6px; background:#1a1a1a; }
+.status-ok { color:#0f0; }
+.status-error { color:#f33; }
+.status-link { color:#ff0; }
+</style>
+</head>
+<body>
+<header>لوحة تحكم AYHEM SENTIENT LIVE</header>
+<section>
+<h2>ملخص الشبكة الذكية</h2>
+<div id="network-summary"></div>
+</section>
+<section>
+<h2>خلايا WOLF ULTRA</h2>
+<div id="wolf-ultra-cells"></div>
+</section>
+<section>
+<h2>خلايا SENTIENT MASTER</h2>
+<div id="sentient-cells"></div>
+</section>
+<section>
+<h2>تقارير الذاكرة</h2>
+<div id="memory-report"></div>
+</section>
+
+<script>
+// رابط الواجهة بالذاكرة والتقارير
+const WOLF_MEMORY_URL = "../ayhem_core/wolf_ultra_memory.json";
+const WOLF_REPORT_URL = "../ayhem_core/wolf_ultra_report.json";
+const SENTIENT_MEMORY_URL = "../ayhem_core/sentient_network_memory.json";
+const SENTIENT_REPORT_URL = "../ayhem_core/sentient_network_report.json";
+
+async function fetchJSON(url){ 
+  try{ const res = await fetch(url+"?"+Date.now()); return await res.json(); } 
+  catch(e){ return {error:e.toString()}; } 
+}
+
+async function updateDashboard(){
+  const wolfMem = await fetchJSON(WOLF_MEMORY_URL);
+  const wolfRep = await fetchJSON(WOLF_REPORT_URL);
+  const sentMem = await fetchJSON(SENTIENT_MEMORY_URL);
+  const sentRep = await fetchJSON(SENTIENT_REPORT_URL);
+
+  document.getElementById("network-summary").innerHTML = `
+    <p>الدورة: ${wolfRep?.cycle || 0}</p>
+    <p>الوعي: ${wolfRep?.awareness || 0}</p>
+    <p>التنبؤ: ${wolfRep?.predictive || 0}</p>
+    <p>عدد الخلايا: ${wolfRep?.cells?.length || 0}</p>
+    <p>خلايا جديدة: ${wolfRep?.cells_created || 0}</p>
+  `;
+
+  const wolfDiv = document.getElementById("wolf-ultra-cells");
+  wolfDiv.innerHTML = "";
+  (wolfRep?.cells || []).forEach(c=>wolfDiv.innerHTML += `<div class="cell ${c.status==="OK"?"status-ok":c.status==="ERROR"?"status-error":"status-link"}">
+    <b>${c.cell || c.component}</b> → ${c.status} | ${c.output||c.error||""}</div>`);
+
+  const sentDiv = document.getElementById("sentient-cells");
+  sentDiv.innerHTML = "";
+  (sentRep?.results || []).forEach(c=>sentDiv.innerHTML += `<div class="cell ${c.status==="OK"?"status-ok":c.status==="ERROR"?"status-error":"status-link"}">
+    <b>${c.cell || c.component}</b> → ${c.status} | ${c.output||c.error||""}</div>`);
+
+  const memDiv = document.getElementById("memory-report");
+  memDiv.innerHTML = `<pre>${JSON.stringify({WOLF_MEMORY:wolfMem,SENTIENT_MEMORY:sentMem},null,2)}</pre>`;
+}
+
+// تحديث تلقائي كل 5 ثوانٍ
+updateDashboard();
+setInterval(updateDashboard,5000);
+</script>
+</body>
+</html>
