@@ -1,0 +1,9 @@
+{
+    "system": "AYHEM",
+    "engine": "ARGUS",
+    "mode": "TEMPLATE",
+    "auto_run": false,
+    "storage": "LOCAL",
+    "security": "ENABLED",
+    "log_level": "INFO"
+}
