@@ -1,0 +1,19 @@
+AYHEM_WEB/
+│
+├─ AYHEM_INTELLIGENCE_SYSTEM/
+│   ├─ AUTO_FILE_MANAGER.py
+│   ├─ AYHEM_AI_RECON_BRIDGE.js
+│   ├─ AYHEM_INTELLIGENCE_ARCH.js
+│   ├─ AYHEM_INTELLIGENCE_LINK.js
+│   ├─ TEMPLATE_CONFIG.json
+│   ├─ TEMPLATE_CORE.py
+│   ├─ TEMPLATE_LINK.js
+│   ├─ system.config
+│   └─ AYHEM_AUTO_DAEMON.py
+│
+├─ .github/
+│   └─ workflows/
+│       └─ ayhem_publish.yml
+│
+├─ README.md
+└─ LICENSE (MIT)
