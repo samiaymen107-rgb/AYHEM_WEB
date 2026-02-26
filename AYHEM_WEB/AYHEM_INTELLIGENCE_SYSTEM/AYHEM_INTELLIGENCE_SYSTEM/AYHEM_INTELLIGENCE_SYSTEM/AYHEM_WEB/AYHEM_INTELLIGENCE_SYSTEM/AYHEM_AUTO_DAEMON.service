@@ -1,0 +1,16 @@
+[Unit]
+Description=AYHEM Auto Daemon Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /path/to/AYHEM_WEB/AYHEM_INTELLIGENCE_SYSTEM/AYHEM_AUTO_DAEMON.py
+Restart=always
+RestartSec=10
+User=your_username
+WorkingDirectory=/path/to/AYHEM_WEB/AYHEM_INTELLIGENCE_SYSTEM
+StandardOutput=append:/path/to/AYHEM_WEB/AYHEM_INTELLIGENCE_SYSTEM/daemon.log
+StandardError=append:/path/to/AYHEM_WEB/AYHEM_INTELLIGENCE_SYSTEM/daemon.log
+
+[Install]
+WantedBy=multi-user.target
