@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AYMEN‑824 | مؤشر الصدق</title>
+
+<style>
+body{
+font-family:Arial;
+direction:rtl;
+background:#1e293b;
+color:white;
+padding:20px
+}
+
+.container{
+max-width:900px;
+margin:auto
+}
+
+h1{
+text-align:center
+}
+
+.step{
+background:white;
+color:#333;
+padding:15px;
+border-radius:10px;
+margin:10px 0
+}
+
+textarea{
+width:100%;
+height:70px;
+margin-top:10px
+}
+
+input[type=number]{
+width:60px;
+margin-top:10px
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:8px;
+cursor:pointer;
+margin-top:15px
+}
+
+.result{
+margin-top:20px;
+background:white;
+color:black;
+padding:15px;
+border-radius:10px
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>نظام تحليل الصدق AYMEN‑824</h1>
+
+<div class="step">
+خط الأساس
+<textarea id="t1"></textarea>
+درجة (0‑10): <input type="number" id="s1">
+</div>
+
+<div class="step">
+الأسئلة التحضيرية
+<textarea id="t2"></textarea>
+درجة (0‑10): <input type="number" id="s2">
+</div>
+
+<div class="step">
+الأسئلة الحساسة
+<textarea id="t3"></textarea>
+درجة (0‑10): <input type="number" id="s3">
+</div>
+
+<div class="step">
+ملاحظة التناقضات
+<textarea id="t4"></textarea>
+درجة (0‑10): <input type="number" id="s4">
+</div>
+
+<div class="step">
+التحليل النهائي
+<textarea id="t5"></textarea>
+درجة (0‑10): <input type="number" id="s5">
+</div>
+
+<button onclick="calculate()">حساب مؤشر الصدق</button>
+
+<div class="result" id="result"></div>
+
+</div>
+
+<script>
+
+function calculate(){
+
+let scores=[
+Number(s1.value)||0,
+Number(s2.value)||0,
+Number(s3.value)||0,
+Number(s4.value)||0,
+Number(s5.value)||0
+]
+
+let total=scores.reduce((a,b)=>a+b,0)
+
+let index=(total/50)*100
+
+let status=""
+
+if(index>75) status="🟢 صدق مرتفع"
+else if(index>50) status="🟡 صدق متوسط"
+else status="🔴 احتمال تضليل"
+
+result.innerHTML=`
+مؤشر الصدق: ${index.toFixed(1)} % <br><br>
+التقييم: ${status}
+`
+
+}
+
+</script>
+
+</body>
+</html>
