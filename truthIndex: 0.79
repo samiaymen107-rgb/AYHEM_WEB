@@ -1,0 +1,107 @@
+/*
+AYHEM TRUTH ENGINE
+حساب مؤشر الصدق للمعلومات
+Version 1.1
+*/
+
+class TruthEngine {
+
+    constructor(){
+        this.weights = {
+            sources: 0.3,
+            memory: 0.3,
+            logic: 0.2,
+            language: 0.2
+        }
+    }
+
+    analyze(statement = "", sources = [], memoryMatch = 0.5){
+
+        const text = statement.toString().trim()
+
+        const sourceScore = this.evaluateSources(sources)
+        const memoryScore = this.evaluateMemory(memoryMatch)
+        const logicScore = this.evaluateLogic(text)
+        const languageScore = this.evaluateLanguage(text)
+
+        let truthIndex =
+            (sourceScore * this.weights.sources) +
+            (memoryScore * this.weights.memory) +
+            (logicScore * this.weights.logic) +
+            (languageScore * this.weights.language)
+
+        truthIndex = Math.min(Math.max(truthIndex,0),1)
+
+        return {
+            statement: text,
+            truthIndex: Number(truthIndex.toFixed(3)),
+            details: {
+                sources: sourceScore,
+                memory: memoryScore,
+                logic: logicScore,
+                language: languageScore
+            }
+        }
+    }
+
+    evaluateSources(sources){
+
+        if(!Array.isArray(sources) || sources.length === 0)
+            return 0.2
+
+        if(sources.length === 1)
+            return 0.5
+
+        if(sources.length === 2)
+            return 0.7
+
+        return 0.9
+    }
+
+    evaluateMemory(match){
+
+        if(typeof match !== "number")
+            return 0.5
+
+        return Math.min(Math.max(match,0),1)
+    }
+
+    evaluateLogic(statement){
+
+        const contradictions = [
+            "مستحيل",
+            "غير ممكن",
+            "لا يمكن"
+        ]
+
+        for(const word of contradictions){
+            if(statement.includes(word)){
+                return 0.2
+            }
+        }
+
+        return 0.8
+    }
+
+    evaluateLanguage(statement){
+
+        const uncertainWords = [
+            "ربما",
+            "أظن",
+            "قد",
+            "ممكن",
+            "يحتمل"
+        ]
+
+        for(const word of uncertainWords){
+            if(statement.includes(word)){
+                return 0.4
+            }
+        }
+
+        return 0.9
+    }
+
+}
+
+module.exports = TruthEngine
