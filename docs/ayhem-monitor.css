@@ -1,0 +1,96 @@
+/* ayhem-monitor.css – تصميم لوحة مراقبة أيهم */
+body {
+    font-family: "Arial", sans-serif;
+    background-color: #0d1117;
+    color: #c9d1d9;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #161b22;
+    padding: 1rem 2rem;
+    text-align: center;
+    border-bottom: 2px solid #30363d;
+}
+
+header h1 {
+    color: #58a6ff;
+    font-size: 1.8rem;
+}
+
+main {
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+section {
+    background-color: #161b22;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(88, 166, 255, 0.2);
+}
+
+section h2 {
+    color: #79c0ff;
+    border-bottom: 1px solid #30363d;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+#system-status div {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    background-color: #0d1117;
+    border-left: 4px solid #58a6ff;
+    border-radius: 5px;
+}
+
+#control-panel button {
+    background-color: #238636;
+    color: #c9d1d9;
+    border: none;
+    padding: 0.6rem 1rem;
+    margin-right: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#control-panel button:hover {
+    background-color: #2ea043;
+}
+
+#alerts ul, #alerts-list {
+    list-style: none;
+    padding-left: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#alerts-list li {
+    background-color: #261c2c;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border-left: 4px solid #ff7b72;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #161b22;
+    border-top: 2px solid #30363d;
+    color: #8b949e;
+    font-size: 0.85rem;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    main {
+        grid-template-columns: 1fr;
+    }
+}
