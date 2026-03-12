@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة المراقبة الحية - أيهم</title>
+<link rel="stylesheet" href="ui/css/dashboard.css">
+<style>
+  body { font-family: Arial, sans-serif; background: #121212; color: #f0f0f0; }
+  #system-status div { padding: 6px; margin: 4px 0; border-left: 5px solid #2ea043; background: #1e1e1e; }
+  #alerts-list { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; }
+  #control-panel button { margin: 4px; padding: 6px 12px; cursor: pointer; background: #2ea043; border: none; color: #fff; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<h1>لوحة المراقبة الحية - مشروع أيهم</h1>
+
+<section id="system-status">
+  <!-- حالة العقد والخلايا ستظهر هنا -->
+</section>
+
+<section>
+<h2>التنبيهات الحية</h2>
+<ul id="alerts-list"></ul>
+</section>
+
+<section id="control-panel">
+<h2>لوحة التحكم</h2>
+<button data-action="sync-nodes">مزامنة العقد</button>
+<button data-action="reset-loads">إعادة تحميل العقد</button>
+<button data-action="run-diagnostics">تشغيل التشخيص</button>
+</section>
+
+<script src="core/ayhem-core.js"></script>
+<script src="core/ayhem-decision-core.js"></script>
+<script src="memory/ayhem-memory.js"></script>
+<script src="ai/ayhem-ai.js"></script>
+<script src="nodes/NODE-AI+.js"></script>
+<script src="ayhem-monitor-live.js"></script>
+
+</body>
+</html>
