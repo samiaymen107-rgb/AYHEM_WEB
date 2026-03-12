@@ -1,0 +1,17 @@
+<svg width="1000" height="800" xmlns="http://www.w3.org/2000/svg">
+  <!-- طبقة ENC -->
+  <rect x="50" y="50" width="300" height="100" fill="#8B4513"/>
+  <text x="60" y="110" fill="white" font-size="16">ENC / KEYS / LEGAL</text>
+  
+  <!-- طبقة CORE -->
+  <rect x="50" y="200" width="300" height="200" fill="#1E90FF"/>
+  <text x="60" y="220" fill="white" font-size="16">CORE / MEMORY / AI / NODES</text>
+  
+  <!-- طبقة UI -->
+  <rect x="50" y="450" width="300" height="150" fill="#4682B4"/>
+  <text x="60" y="470" fill="white" font-size="16">UI / UX / TEST / VOICE</text>
+  
+  <!-- خطوط الربط -->
+  <line x1="200" y1="150" x2="200" y2="200" stroke="black" stroke-width="2"/>
+  <line x1="200" y1="400" x2="200" y2="450" stroke="black" stroke-width="2"/>
+</svg>
