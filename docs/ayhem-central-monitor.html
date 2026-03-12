@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AYHEM Central Monitor</title>
+<link rel="stylesheet" href="ui/css/ayhem-monitor.css">
+<script src="core/ayhem-core.js"></script>
+<script src="core/ayhem-fusion-core.js"></script>
+<script src="memory/ayhem-memory.js"></script>
+<script src="memory/ayhem-smart-memory.js"></script>
+<script src="ai/ayhem-ai.js"></script>
+<script src="predictive/global-predictive-module.js"></script>
+<script src="nodes/NODE-AI+.js"></script>
+<script src="nodes/NODE-SentinelX.js"></script>
+<script src="nodes/NODE-CyberForce.js"></script>
+<script src="ui/dashboard/ayhem-dashboard.js"></script>
+</head>
+<body>
+<header>
+  <h1>لوحة مراقبة أيهم – النظام المركزي</h1>
+</header>
+
+<main>
+  <section id="system-status">
+    <h2>حالة الأنظمة والخلايا</h2>
+    <div id="core-status"></div>
+    <div id="memory-status"></div>
+    <div id="ai-status"></div>
+    <div id="nodes-status"></div>
+    <div id="predictive-status"></div>
+  </section>
+
+  <section id="control-panel">
+    <h2>لوحة التحكم</h2>
+    <button onclick="ayhemFusion.activateAll()">تشغيل كل الوحدات</button>
+    <button onclick="ayhemFusion.deactivateAll()">إيقاف كل الوحدات</button>
+    <button onclick="ayhemFusion.syncAll()">مزامنة البيانات</button>
+  </section>
+
+  <section id="alerts">
+    <h2>تنبيهات النظام</h2>
+    <ul id="alerts-list"></ul>
+  </section>
+</main>
+
+<footer>
+  <p>© 2026 AYHEM – أول عقل رقمي حي</p>
+</footer>
+
+<script>
+  // تهيئة الربط التلقائي لكل الأنظمة
+  ayhemFusion.init({
+    core: ayhemCore,
+    memory: [ayhemMemory, ayhemSmartMemory],
+    ai: ayhemAI,
+    predictive: globalPredictiveModule,
+    nodes: [NODE_AIPlus, NODE_SentinelX, NODE_CyberForce],
+    dashboard: document.getElementById('system-status')
+  });
+
+  // تفعيل تحديث حالة النظام كل 2 ثانية
+  setInterval(() => {
+    ayhemFusion.updateDashboard();
+  }, 2000);
+
+  // التقاط التنبيهات وعرضها
+  ayhemFusion.onAlert((alert) => {
+    const list = document.getElementById('alerts-list');
+    const item = document.createElement('li');
+    item.textContent = alert.message + ' | مستوى: ' + alert.level;
+    list.prepend(item);
+  });
+</script>
+</body>
+</html>
