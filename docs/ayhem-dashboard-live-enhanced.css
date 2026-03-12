@@ -1,0 +1,95 @@
+/* ===========================================
+   AYHEM Live Dashboard - Enhanced CSS
+   File: ayhem-dashboard-live-enhanced.css
+   Purpose: Smooth UI, automatic system-cell-AI linking
+   Compatible with all current AYHEM systems
+   =========================================== */
+
+/* Reset & base */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0d0d0d;
+    color: #e0e0e0;
+}
+
+/* Dashboard container */
+.dashboard-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 12px;
+    padding: 16px;
+}
+
+/* Panel styling */
+.dashboard-panel {
+    background: linear-gradient(145deg, #1a1a1a, #111);
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    transition: all 0.3s ease-in-out;
+}
+
+/* Panel hover */
+.dashboard-panel:hover {
+    transform: scale(1.02);
+    border-color: #00bcd4;
+    box-shadow: 0 6px 15px rgba(0,188,212,0.6);
+}
+
+/* Panel header */
+.dashboard-panel h2 {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    color: #00bcd4;
+}
+
+/* Live data */
+.dashboard-panel .live-data {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    min-height: 30px;
+}
+
+/* Status indicators */
+.status-online { color: #4caf50; }
+.status-offline { color: #f44336; }
+.status-warning { color: #ff9800; }
+
+/* AI & Memory integration */
+.ai-indicator {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #9c27b0;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Smooth transitions for all live updates */
+.dashboard-panel .live-data, .ai-indicator {
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+/* Scrollable content if overflow */
+.dashboard-panel .content-scroll {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+/* Highlight updates */
+.update-flash {
+    animation: flashUpdate 1s ease-in-out;
+}
+@keyframes flashUpdate {
+    0%,100% { background-color: transparent; }
+    50% { background-color: rgba(0,188,212,0.3); }
+}
