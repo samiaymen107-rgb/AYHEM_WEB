@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AYHEM Live Dashboard</title>
+    <link rel="stylesheet" href="ayhem-dashboard-live-enhanced.css">
+</head>
+<body>
+    <div class="dashboard-container">
+
+        <!-- Panel 1: AI Core Status -->
+        <div class="dashboard-panel">
+            <h2>AI Core</h2>
+            <div class="live-data" id="ai-core-status">جارٍ التحميل...</div>
+            <div class="ai-indicator">ربط تلقائي: فعال</div>
+        </div>
+
+        <!-- Panel 2: Memory Nodes -->
+        <div class="dashboard-panel">
+            <h2>Memory Nodes</h2>
+            <div class="live-data" id="memory-status">جارٍ التحميل...</div>
+            <div class="ai-indicator">نظام الذاكرة طويل المدى متصل</div>
+        </div>
+
+        <!-- Panel 3: Global Predictive -->
+        <div class="dashboard-panel">
+            <h2>Global Predictive</h2>
+            <div class="live-data" id="predictive-status">جارٍ التحميل...</div>
+            <div class="ai-indicator">تحديثات فورية للبيانات الاقتصادية</div>
+        </div>
+
+        <!-- Panel 4: Nodes Network -->
+        <div class="dashboard-panel">
+            <h2>Nodes Network</h2>
+            <div class="live-data" id="nodes-status">جارٍ التحميل...</div>
+            <div class="ai-indicator">جميع العقد مرتبطة تلقائيًا</div>
+        </div>
+
+    </div>
+
+    <!-- Scripts for Live Updates -->
+    <script>
+        // مثال محاكاة البيانات الحية
+        function simulateLiveData(id) {
+            const statuses = ['متصل', 'غير متصل', 'تحذير'];
+            const colors = ['status-online', 'status-offline', 'status-warning'];
+            const index = Math.floor(Math.random() * statuses.length);
+            const el = document.getElementById(id);
+            el.textContent = statuses[index];
+            el.className = 'live-data ' + colors[index] + ' update-flash';
+        }
+
+        // تحديث تلقائي كل 3 ثواني
+        setInterval(() => {
+            simulateLiveData('ai-core-status');
+            simulateLiveData('memory-status');
+            simulateLiveData('predictive-status');
+            simulateLiveData('nodes-status');
+        }, 3000);
+    </script>
+</body>
+</html>
