@@ -1,0 +1,26 @@
+✅ npm audit fix
+✅ CSP Headers  
+✅ Input sanitization
+✅ Secret scanning
+تقدم: 80% | خطورة: 🟢 1/10
+JS 65% | HTML 30% | Python 3.7%
+مالك: أيمن "روح" @samiaymen107-rgb
+ثغرة؟ → samiaymen107-rgb@protonmail.com
+P0:24h | P1:72h | P2:7d
+
+***
+
+## **✅ كيف تطبقه (مرة واحدة):**
+# AYHEM_WEB – الحماية الكاملة
+PRIVATE/
+ENC_* *.ayh *.key AYHEM_KEY_*
+node_modules/ .env* npm-debug.log*
+.vscode/ .idea/ .DS_Store
+PRIVATE/
+├── ENC_CORE-MASTER.ayh
+├── ENC_PRE-2009
+├── ENC_POST-2009 (MEMO_A1)
+└── AYHEM_KEY_2025
+PRIVATE/ENC/* ← ayhem-unit.js → CORE/MEMORY/AI → UI/VOICE
+                 ↓ 95% مكتمل ↓
+L1:95% L2:90% L3:85% L4:75% L5:65%
