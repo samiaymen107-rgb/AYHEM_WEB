@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AYHEM Master Control</title>
+<link rel="stylesheet" href="ultimate-advanced-ui.css">
+<link rel="stylesheet" href="ayhem-style.css">
+<script type="module" src="ayhem-unified-core.js"></script>
+<script type="module" src="ayhem-core-unified-v2.js"></script>
+<script type="module" src="ayhem-ai.js"></script>
+<script type="module" src="ayhem-ai-interpreter.js"></script>
+<script type="module" src="ayhem-adapter-ai.js"></script>
+<script type="module" src="ayhem-economic-predictor.js"></script>
+<script type="module" src="global-predictive-module.js"></script>
+<script type="module" src="ultimate-global-predictive.js"></script>
+<script type="module" src="ayhem-dashboard.js"></script>
+<script type="module" src="ayhem-dashboard-live.js"></script>
+<script type="module" src="ayhem-unit.js"></script>
+<script type="module" src="ayhem-memory.js"></script>
+<script type="module" src="persistent-memory.js"></script>
+</head>
+<body>
+<div id="ayhem-main-dashboard"></div>
+<div id="ayhem-hyperlive-ui"></div>
+<script type="module">
+//=== تهيئة القالب الموحد ===//
+
+import { getPath } from "./ayhem-central-config.js";
+
+// استدعاء جميع الوحدات الأساسية
+const core = getPath("core");
+const memory = getPath("memory");
+const ai = getPath("ai");
+const predictive = getPath("predictive");
+const ui = getPath("ui");
+const nodes = getPath("nodes");
+
+//=== تهيئة واجهة التحكم ===//
+const dashboardMain = ui.dashboards[0];
+const dashboardHyperLive = ui.dashboards[1] || dashboardMain;
+
+document.getElementById("ayhem-main-dashboard").innerHTML = `
+  <iframe src="${dashboardMain}" style="width:100%;height:600px;border:none;"></iframe>
+`;
+document.getElementById("ayhem-hyperlive-ui").innerHTML = `
+  <iframe src="${dashboardHyperLive}" style="width:100%;height:600px;border:none;"></iframe>
+`;
+
+//=== تفعيل الوصلات التفاعلية ===//
+async function initModules() {
+  await ai.core.init();
+  await ai.interpreter.init();
+  await ai.adapter.init();
+  memory.smart.init();
+  memory.long.init();
+  memory.persistent.init();
+  predictive.economic.init();
+  predictive.global.init();
+  predictive.ultimate.init();
+
+  nodes.forEach(async nodePath => {
+    const nodeModule = await import(nodePath);
+    nodeModule.init();
+  });
+
+  console.log("جميع الوحدات تم تهيئتها وربطها تلقائيًا.");
+}
+
+initModules();
+
+//=== حلقة المراقبة والتحكم الذكي ===//
+setInterval(() => {
+  ai.core.update();
+  memory.smart.sync();
+  predictive.ultimate.forecast();
+}, 1000);
+
+</script>
+</body>
+</html>
