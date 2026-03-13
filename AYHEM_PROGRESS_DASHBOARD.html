@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة متابعة مشروع AYHEM_WEB</title>
+<style>
+  body { font-family: "Arial", sans-serif; background:#0d0d0d; color:#e0e0e0; margin:0; padding:20px; }
+  h1, h2 { color:#00bfff; }
+  table { width: 100%; border-collapse: collapse; margin-top:20px; }
+  th, td { border: 1px solid #444; padding: 10px; text-align: center; }
+  th { background-color:#222; color:#00ffff; }
+  tr:nth-child(even) { background-color:#1a1a1a; }
+  .progress-bar { background:#555; border-radius: 5px; overflow:hidden; height:20px; }
+  .progress-fill { height:100%; text-align:right; padding-right:5px; color:#fff; font-weight:bold; line-height:20px; }
+  .core { background:#ff6600; }
+  .memory { background:#ffcc00; color:#000; }
+  .ai { background:#66ff66; color:#000; }
+  .predictive { background:#66ccff; }
+  .nodes { background:#cc66ff; }
+  .ui { background:#ff6699; }
+  .security { background:#999999; }
+  .docs { background:#00cc99; color:#000; }
+  a { color:#00bfff; text-decoration:none; }
+</style>
+</head>
+<body>
+
+<h1>لوحة متابعة مشروع AYHEM_WEB – أيهم</h1>
+<p>الحالة الحالية على GitHub: <a href="https://github.com/samiaymen107-rgb/AYHEM_WEB" target="_blank">AYHEM_WEB</a></p>
+<p>نسبة الإنجاز التقريبية: <strong>20%</strong></p>
+
+<h2>1️⃣ الطبقات الأساسية ومكوناتها</h2>
+<table>
+  <thead>
+    <tr>
+      <th>الطبقة</th>
+      <th>المكون الرئيسي</th>
+      <th>الملفات / المسار</th>
+      <th>نسبة الإنجاز</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CORE</td>
+      <td>التحكم المركزي</td>
+      <td>ayhem-core.js, ayhem-decision-core.js, ayhem-fusion-core.js</td>
+      <td>
+        <div class="progress-bar">
+          <div class="progress-fill core" style="width:25%;">25%</div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>MEMORY</td>
+      <td>الذاكرة الذكية</td>
+      <td>ayhem-smart-memory.js, ayhem-long-memory.js, persistent-memory.js, ayhem-memory-map.js</td>
+      <td>
+        <div class="progress-bar">
+          <div class="progress-fill memory" style="width:20%;">20%</div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>AI</td>
+      <td>الذكاء الاصطناعي</td>
+      <td>ayhem-ai.js, ayhem-ai-interpreter.js, ayhem-adapter-ai.js, ai-learning-module.js</td>
+      <td>
+        <div class="progress-bar">
+          <div class="progress-fill ai" style="width:15%;">15%</div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>PREDICTIVE</td>
+      <td>التنبؤ الاقتصادي / العالمي</td>
+      <td>ayhem-economic-predictor.js, global-predictive-module.js, ultimate-global-predictive.js</td>
+      <td>
+        <div class="progress-bar">
+          <div class="progress-fill predictive" style="width:10%;">10%</div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>NODES</td>
+      <td>العقد والمستشعرات</td>
+      <td>node-ai+.js, node-sentinelx.js, node-cyberforce.js, node-esi.js</td>
+      <td>
+        <div class="progress-bar">
+          <div class="progress-fill nodes" style="width:20%;">20%</div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>UI/UX</td>
+      <td>واجهة المستخدم</td>
+      <td>ayhem-dashboard.html, ayhem-dashboard-control.html, ultimate-ayhem-ui.js, ultimate-advanced-ui.html</td>
+      <td>
+        <div class="progress-bar">
+          <div class="progress-fill ui" style="width:30%;">30%</div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>SECURITY</td>
+      <td>الأمان و Silent Governor</td>
+      <td>ayhem-unit.js, ENC_CORE-01/02/03/MASTER</td>
+      <td>
+        <div class="progress-bar">
+          <div class="progress-fill security" style="width:10%;">10%</div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>DOCS</td>
+      <td>الوثائق والتوثيق</td>
+      <td>ARCHITECTURE.md, AYHEM_CORE_STRUCTURE.md, system_guide.md</td>
+      <td>
+        <div class="progress-bar">
+          <div class="progress-fill docs" style="width:15%;">15%</div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2️⃣ خطوات التصحيح والتوحيد القادمة</h2>
+<ol>
+  <li>دمج النسخ الأخيرة لكل الملفات الموحدة (Core/AI/Memory/Nodes).</li>
+  <li>توحيد مسارات كل الطبقات ضمن ayhem-central-config.js.</li>
+  <li>تحديث واجهات UI/UX لتتناسب مع النسخ المحدثة من Core/AI/Memory.</li>
+  <li>تكامل Predictive Modules مع Core و Memory.</li>
+  <li>تدقيق الأمان والتحقق من Silent Governor و ENC CORE.</li>
+  <li>تحديث الوثائق بشكل دوري مع كل تعديل لضمان مطابقة الواقع البرمجي.</li>
+</ol>
+
+<h2>3️⃣ الملاحظة النهائية</h2>
+<p>هذه اللوحة تمثل <strong>مرجع متابعة موحد</strong> لكل طبقات مشروع AYHEM_WEB ويمكن تحديثها بشكل دوري لتصبح لوحة رقمية حية لكل تقدم المشروع.</p>
+
+</body>
+</html>
