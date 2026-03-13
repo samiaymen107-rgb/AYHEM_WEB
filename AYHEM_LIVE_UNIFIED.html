@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AYHEM Live Unified Dashboard</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#0d0d0d; color:#f0f0f0; margin:0; padding:0; }
+  header { padding:20px; text-align:center; background:#111; font-size:1.6em; color:#4fc3f7; }
+  #dashboard-container { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:10px; }
+  .unit-panel { background:#1a1a1a; padding:15px; border-radius:6px; overflow:auto; height:600px; }
+  h2 { color:#f39c12; font-size:1.2em; margin-bottom:10px; }
+  ul { padding-left:20px; list-style-type:none; }
+  li { margin-bottom:5px; }
+  a { color:#4fc3f7; text-decoration:none; }
+  a:hover { text-decoration:underline; }
+</style>
+</head>
+<body>
+<header>AYHEM – لوحة تحكم موحدة مباشرة</header>
+
+<div id="dashboard-container">
+  <div class="unit-panel" id="core-panel">
+    <h2>CORE / النواة</h2>
+    <ul id="core-list"></ul>
+  </div>
+  <div class="unit-panel" id="memory-panel">
+    <h2>MEMORY / الذاكرة</h2>
+    <ul id="memory-list"></ul>
+  </div>
+  <div class="unit-panel" id="ai-panel">
+    <h2>AI / الذكاء الاصطناعي</h2>
+    <ul id="ai-list"></ul>
+  </div>
+  <div class="unit-panel" id="nodes-panel">
+    <h2>NODES / العقد</h2>
+    <ul id="nodes-list"></ul>
+  </div>
+</div>
+
+<script type="module">
+//=== القالب الموحد الجاهز للتنفيذ ===//
+
+// استدعاء مسارات الطبقات من ملف الإعداد المركزي
+import { getPath } from "./ayhem-central-config.js";
+
+const coreUnits = getPath("core");
+const memoryUnits = getPath("memory");
+const aiUnits = getPath("ai");
+const nodesUnits = getPath("nodes");
+
+// دالة عرض الوحدات مع روابطها
+function displayUnits(containerId, units) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+  Object.entries(units).forEach(([key, value]) => {
+    const li = document.createElement("li");
+    if(typeof value === "string") {
+      li.innerHTML = `<a href="${value}" target="_blank">${key}</a>`;
+    } else if(typeof value === "object") {
+      li.innerHTML = `<strong>${key}</strong>`;
+      const subUl = document.createElement("ul");
+      Object.entries(value).forEach(([subKey, subVal]) => {
+        const subLi = document.createElement("li");
+        subLi.innerHTML = `<a href="${subVal}" target="_blank">${subKey}</a>`;
+        subUl.appendChild(subLi);
+      });
+      li.appendChild(subUl);
+    }
+    container.appendChild(li);
+  });
+}
+
+// عرض الوحدات لكل طبقة
+displayUnits("core-list", coreUnits);
+displayUnits("memory-list", memoryUnits);
+displayUnits("ai-list", aiUnits);
+displayUnits("nodes-list", nodesUnits);
+
+// تهيئة الوحدات الذكية
+async function initModules() {
+  try {
+    if(aiUnits.core) await (await import(aiUnits.core)).init();
+    if(aiUnits.interpreter) await (await import(aiUnits.interpreter)).init();
+    if(aiUnits.adapter) await (await import(aiUnits.adapter)).init();
+
+    if(memoryUnits.smart) memoryUnits.smart.init();
+    if(memoryUnits.long) memoryUnits.long.init();
+    if(memoryUnits.persistent) memoryUnits.persistent.init();
+
+    Object.values(nodesUnits).forEach(async nodePath => {
+      const node = await import(nodePath);
+      if(node.init) node.init();
+    });
+
+    console.log("جميع الوحدات تم تهيئتها وربطها تلقائيًا.");
+  } catch(e) {
+    console.error("خطأ أثناء تهيئة الوحدات:", e);
+  }
+}
+
+initModules();
+
+// حلقة مراقبة ذكية لتحديث الذكاء والذاكرة
+setInterval(() => {
+  if(aiUnits.core) aiUnits.core.update?.();
+  if(memoryUnits.smart) memoryUnits.smart.sync?.();
+}, 1000);
+
+</script>
+</body>
+</html>
