@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AYHEM Dashboard HyperLive</title>
+    <link rel="stylesheet" href="ayhem-style.css">
+    <link rel="stylesheet" href="ultimate-advanced-ui.css">
+    <script type="module" src="ayhem-central-config.js"></script>
+    <script type="module" src="ayhem-core-unified-v2.js"></script>
+    <script type="module" src="ayhem-memory.js"></script>
+    <script type="module" src="ayhem-ai.js"></script>
+    <script type="module" src="ayhem-dashboard.js"></script>
+    <script type="module" src="ayhem-market-gap-engine-v2.js"></script>
+</head>
+<body>
+    <header>
+        <h1>لوحة تحكم أيهم – HyperLive</h1>
+        <p>متابعة حية لجميع وحدات المشروع: CORE | MEMORY | AI | NODES</p>
+    </header>
+
+    <section id="live-dashboard">
+        <!-- مكان الرسوم البيانية والخرائط التفاعلية -->
+        <div id="market-dashboard"></div>
+        <div id="memory-map-advanced"></div>
+        <div id="ai-response-engine"></div>
+    </section>
+
+    <section id="control-panel">
+        <!-- عناصر التحكم الرئيسية -->
+        <button id="refresh-all">تحديث الكل</button>
+        <button id="run-ai-cycle">تشغيل الذكاء الموحد</button>
+        <button id="export-report">تصدير التقرير</button>
+    </section>
+
+    <footer>
+        <p>© 2026 مشروع أيهم – أول عقل حي</p>
+        <p>نسخة HyperLive للتطوير والمتابعة</p>
+    </footer>
+
+    <script>
+        import { getPath } from './ayhem-central-config.js';
+
+        // استدعاء المسارات الأساسية
+        const corePath = getPath("core");
+        const memoryPath = getPath("memory");
+        const aiPath = getPath("ai");
+
+        console.log("Core Path:", corePath);
+        console.log("Memory Path:", memoryPath);
+        console.log("AI Path:", aiPath);
+
+        // إعداد لوحة التحكم الحية
+        const refreshButton = document.getElementById("refresh-all");
+        refreshButton.addEventListener("click", () => {
+            console.log("تحديث جميع الوحدات...");
+            // وظائف التحديث
+        });
+
+        const aiButton = document.getElementById("run-ai-cycle");
+        aiButton.addEventListener("click", () => {
+            console.log("تشغيل الذكاء الموحد...");
+            // وظائف تشغيل AI
+        });
+
+        const exportButton = document.getElementById("export-report");
+        exportButton.addEventListener("click", () => {
+            console.log("تصدير التقرير...");
+            // وظائف التصدير
+        });
+
+        // تشغيل الواجهة التفاعلية فور التحميل
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("لوحة تحكم HyperLive جاهزة للعمل.");
+            // تهيئة الرسوم البيانية
+        });
+    </script>
+</body>
+</html>
