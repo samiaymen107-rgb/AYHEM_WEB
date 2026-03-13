@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة متابعة حية – AYHEM_WEB</title>
+<style>
+  body { font-family: "Arial", sans-serif; background:#0d0d0d; color:#e0e0e0; margin:0; padding:20px; }
+  h1, h2 { color:#00bfff; }
+  table { width: 100%; border-collapse: collapse; margin-top:20px; }
+  th, td { border: 1px solid #444; padding: 10px; text-align: center; }
+  th { background-color:#222; color:#00ffff; }
+  tr:nth-child(even) { background-color:#1a1a1a; }
+  .progress-bar { background:#555; border-radius: 5px; overflow:hidden; height:20px; }
+  .progress-fill { height:100%; text-align:right; padding-right:5px; color:#fff; font-weight:bold; line-height:20px; transition: width 0.5s; }
+  .core { background:#ff6600; }
+  .memory { background:#ffcc00; color:#000; }
+  .ai { background:#66ff66; color:#000; }
+  .predictive { background:#66ccff; }
+  .nodes { background:#cc66ff; }
+  .ui { background:#ff6699; }
+  .security { background:#999999; }
+  .docs { background:#00cc99; color:#000; }
+  a { color:#00bfff; text-decoration:none; }
+</style>
+</head>
+<body>
+
+<h1>لوحة متابعة حية – AYHEM_WEB</h1>
+<p>المستودع: <a href="https://github.com/samiaymen107-rgb/AYHEM_WEB" target="_blank">AYHEM_WEB</a></p>
+<p>نسبة الإنجاز التقريبية الكلية: <strong id="overallProgress">0%</strong></p>
+
+<h2>1️⃣ الطبقات الأساسية</h2>
+<table>
+  <thead>
+    <tr>
+      <th>الطبقة</th>
+      <th>المكون الرئيسي</th>
+      <th>الملفات / المسار</th>
+      <th>نسبة الإنجاز</th>
+    </tr>
+  </thead>
+  <tbody id="layerTable">
+    <!-- سيتم ملء الصفوف ديناميكياً -->
+  </tbody>
+</table>
+
+<script>
+const layers = [
+  { name:"CORE", main:"التحكم المركزي", files:["ayhem-core.js","ayhem-decision-core.js","ayhem-fusion-core.js"], color:"core" },
+  { name:"MEMORY", main:"الذاكرة الذكية", files:["ayhem-smart-memory.js","ayhem-long-memory.js","persistent-memory.js","ayhem-memory-map.js"], color:"memory" },
+  { name:"AI", main:"الذكاء الاصطناعي", files:["ayhem-ai.js","ayhem-ai-interpreter.js","ayhem-adapter-ai.js","ai-learning-module.js"], color:"ai" },
+  { name:"PREDICTIVE", main:"التنبؤ الاقتصادي / العالمي", files:["ayhem-economic-predictor.js","global-predictive-module.js","ultimate-global-predictive.js"], color:"predictive" },
+  { name:"NODES", main:"العقد والمستشعرات", files:["node-ai+.js","node-sentinelx.js","node-cyberforce.js","node-esi.js"], color:"nodes" },
+  { name:"UI/UX", main:"واجهة المستخدم", files:["ayhem-dashboard.html","ayhem-dashboard-control.html","ultimate-ayhem-ui.js","ultimate-advanced-ui.html"], color:"ui" },
+  { name:"SECURITY", main:"الأمان و Silent Governor", files:["ayhem-unit.js","ENC_CORE-01","ENC_CORE-02","ENC_CORE-03","ENC_CORE-MASTER"], color:"security" },
+  { name:"DOCS", main:"الوثائق والتوثيق", files:["ARCHITECTURE.md","AYHEM_CORE_STRUCTURE.md","system_guide.md"], color:"docs" }
+];
+
+// محاكاة نسبة الإنجاز لكل ملف (يمكن لاحقاً ربطها بالتحقق الفعلي)
+function getFileProgress(fileName) {
+  // لتقريب المثال: نولّد نسبة عشوائية بين 10% و 50%
+  return Math.floor(Math.random() * 41) + 10;
+}
+
+function updateDashboard() {
+  const tbody = document.getElementById("layerTable");
+  tbody.innerHTML = "";
+  let totalProgress = 0;
+  let totalFiles = 0;
+
+  layers.forEach(layer => {
+    let layerTotal = 0;
+    layer.files.forEach(f => layerTotal += getFileProgress(f));
+    const layerAvg = Math.floor(layerTotal / layer.files.length);
+    totalProgress += layerTotal;
+    totalFiles += layer.files.length;
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${layer.name}</td>
+      <td>${layer.main}</td>
+      <td>${layer.files.join(", ")}</td>
+      <td>
+        <div class="progress-bar">
+          <div class="progress-fill ${layer.color}" style="width:${layerAvg}%;"></div>
+        </div>
+        ${layerAvg}%
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  document.getElementById("overallProgress").textContent = Math.floor(totalProgress / totalFiles) + "%";
+}
+
+// تحديث تلقائي كل 10 ثواني لمحاكاة تقدم المشروع
+updateDashboard();
+setInterval(updateDashboard, 10000);
+</script>
+
+</body>
+</html>
