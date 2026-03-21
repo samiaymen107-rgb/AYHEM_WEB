@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM Social Core - مجتمع العقول الحي</title>
+<style>
+body { margin:0; font-family: Arial; background:#0a0a0a; color:#0ff; }
+header { padding:15px; text-align:center; font-size:22px; border-bottom:2px solid #0ff; }
+#dashboard { display:flex; flex-wrap:wrap; justify-content:space-around; padding:20px; }
+.module { background:#111; border:1px solid #0ff; border-radius:12px; padding:15px; margin:10px; width:340px; height:280px; overflow:auto;}
+button { padding:10px 18px; margin:5px; background:#111; color:#0ff; border:1px solid #0ff; border-radius:6px; cursor:pointer; }
+button:hover { background:#222; }
+#log { margin:20px; padding:12px; border:1px solid #0ff; max-height:350px; overflow:auto; background:#000; font-size:13px;}
+</style>
+</head>
+<body>
+
+<header>🧠 AYHEM Social Core - مجتمع العقول الحي</header>
+
+<div id="dashboard">
+    <div class="module" id="network-module">
+        <h3>شبكة العقول الحية</h3>
+        <div id="network-log"></div>
+        <button onclick="connectSocialNetwork()">اتصال الشبكة</button>
+    </div>
+    <div class="module" id="social-ai-module">
+        <h3>الذكاء الاجتماعي</h3>
+        <div id="social-log"></div>
+    </div>
+    <div class="module" id="community-module">
+        <h3>إدارة المجتمع الحي</h3>
+        <div id="community-log"></div>
+        <button onclick="addCommunityUser('مشرف')">أضف مشرف</button>
+        <button onclick="addCommunityUser('مطور')">أضف مطور</button>
+        <button onclick="addCommunityUser('عقل رقمي')">أضف عقل رقمي</button>
+    </div>
+</div>
+
+<div id="log"></div>
+
+<script>
+let socialCoreRunning=false;
+let communityUsers=[];
+const logDiv=document.getElementById("log");
+const networkLog=document.getElementById("network-log");
+const socialLog=document.getElementById("social-log");
+const communityLog=document.getElementById("community-log");
+
+function log(msg){ const p=document.createElement("p"); p.textContent=new Date().toLocaleTimeString()+" - "+msg; logDiv.appendChild(p); logDiv.scrollTop=logDiv.scrollHeight; }
+
+function startSocialCore(){
+    if(socialCoreRunning) return;
+    socialCoreRunning=true;
+    log("SOCIAL CORE: بدأ مجتمع العقول الحي بالكامل");
+    integrateSocialModules();
+    socialLoop();
+}
+
+function integrateSocialModules(){
+    const modules=["ayhem-core.js","ayhem-social-ai.js","ayhem-network.js","ayhem-memory-map.js"];
+    modules.forEach(m=>{ const script=document.createElement("script"); script.src="./"+m; script.onload=()=>log("MODULE: "+m+" تم دمجه بنجاح"); script.onerror=()=>log("ERROR: فشل تحميل "+m); document.body.appendChild(script); });
+}
+
+function socialLoop(){
+    if(!socialCoreRunning) return;
+    socialLog.innerHTML+="تحليل سلوك العقول، تحسين التفاعلات، وتوليد اقتراحات ذكية...<br>";
+    networkLog.innerHTML+="ربط العقول الجديدة ومزامنة القرارات الجماعية...<br>";
+    setTimeout(socialLoop,3000);
+}
+
+function connectSocialNetwork(){
+    log("NETWORK: يتم إنشاء شبكة العقول الحية والتواصل الذكي");
+    // محاكاة WebSocket للتواصل الجماعي
+    setTimeout(()=>log("NETWORK: الاتصال الحي مع كل العقول تم"),1000);
+}
+
+function addCommunityUser(role){
+    const id=communityUsers.length+1;
+    communityUsers.push({id,role});
+    communityLog.innerHTML+="User #"+id+" - "+role+" تم إضافته<br>";
+    log("COMMUNITY: إضافة مستخدم جديد "+role+" (#"+id+")");
+}
+
+// بدء المرحلة النهائية تلقائيًا
+startSocialCore();
+</script>
+
+</body>
+</html>
