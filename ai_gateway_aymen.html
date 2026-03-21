@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AI Gateway - أيهم</title>
+<style>
+body {background:#000;color:#fff;font-family:sans-serif;text-align:center;padding:30px;}
+textarea {width:90%;height:120px;margin-top:20px;padding:10px;font-size:16px;}
+button {padding:10px 20px;font-size:16px;margin-top:10px;cursor:pointer;background:#1E3A8A;color:white;border:none;border-radius:5px;}
+pre {margin-top:20px;text-align:left;background:#111;padding:15px;border-radius:5px;overflow:auto;}
+</style>
+</head>
+<body>
+
+<h2>🧠 بوابة الذكاء الاصطناعي - أيهم</h2>
+<p>اكتب طلبك ثم اضغط "تشغيل" ليتم الرد مباشرة من الذكاء الاصطناعي.</p>
+
+<textarea id="input" placeholder="اكتب طلبك هنا..."></textarea><br>
+<button onclick="send()">تشغيل</button>
+
+<pre id="output"></pre>
+
+<script>
+async function send() {
+  const userText = document.getElementById("input").value;
+
+  // النسخة جاهزة، سنستخدم الرمز والمعرف مباشرة من مشروع أيهم
+  const ACCOUNT_ID = "030494f6618baf79102b87b70055a35d";
+  const API_TOKEN = "cfut_Eaox4I6Au4P6cDEAVvk1oZozkNvKfxF9j6roCZlY0e25dc38";
+
+  const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/@cf/meta/llama-3-8b-instruct`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${API_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      messages: [
+        {role: "system", content: "أنت مساعد ذكي دقيق"},
+        {role: "user", content: userText}
+      ]
+    })
+  });
+
+  const data = await response.json();
+  document.getElementById("output").innerText = JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>
