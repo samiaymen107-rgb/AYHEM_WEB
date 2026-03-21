@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM Web Smart Core</title>
+<style>
+body {
+    background-color: #0a0a0a;
+    color: #00ffcc;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 30px;
+}
+button {
+    padding: 12px 22px;
+    margin: 8px;
+    font-size: 16px;
+    background-color: #111;
+    color: #00ffcc;
+    border: 1px solid #00ffcc;
+    border-radius: 8px;
+    cursor: pointer;
+}
+button:hover { background-color: #222; }
+#log {
+    margin-top: 20px;
+    text-align: left;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #00ffcc;
+    padding: 12px;
+    font-size: 14px;
+    background-color: #000;
+}
+</style>
+</head>
+<body>
+
+<h1>🧠 AYHEM Web Smart Core</h1>
+<p id="status">النظام متوقف</p>
+
+<button onclick="startCore()">تشغيل النظام</button>
+<button onclick="stopCore()">إيقاف النظام</button>
+
+<div id="log"></div>
+
+<script>
+// حالة النظام
+let coreRunning = false;
+let logDiv = document.getElementById("log");
+
+// سجل الأحداث
+function log(msg) {
+    let p = document.createElement("p");
+    p.textContent = new Date().toLocaleTimeString() + " - " + msg;
+    logDiv.appendChild(p);
+    logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+// تشغيل النظام
+function startCore() {
+    if(coreRunning) return;
+    coreRunning = true;
+    document.getElementById("status").innerText = "🔥 النظام يعمل";
+    log("CORE: النظام بدأ التشغيل الذكي");
+    coreLoop();
+    integrateModules();
+}
+
+// إيقاف النظام
+function stopCore() {
+    coreRunning = false;
+    document.getElementById("status").innerText = "⛔ النظام متوقف";
+    log("CORE: النظام توقف");
+}
+
+// حلقة التشغيل الأساسية
+function coreLoop() {
+    if(!coreRunning) return;
+    log("CORE: تحليل البيانات...");
+    setTimeout(coreLoop, 2500);
+}
+
+// دمج وحدات AYHEM الذكية
+function integrateModules() {
+    const modules = [
+        "ayhem-core.js",
+        "ayhem-fusion-core.js",
+        "ayhem-ai-interpreter.js",
+        "ayhem-auto-linker.js",
+        "ayhem-memory-map.js",
+        "ayhem-network.js"
+    ];
+
+    modules.forEach(m => {
+        let script = document.createElement("script");
+        script.src = "./" + m;
+        script.onload = () => log("MODULE: " + m + " تم دمجه بنجاح");
+        script.onerror = () => log("ERROR: فشل تحميل " + m);
+        document.body.appendChild(script);
+    });
+}
+
+// تفعيل الوضع الذاتي الذكي
+function enableSelfMode() {
+    if(!coreRunning) return;
+    log("SELF-MODE: تفعيل التشغيل الذاتي الذكي");
+    // هنا يمكن إضافة خوارزميات التعلم الذاتي أو الروتين الذكي
+}
+</script>
+
+</body>
+</html>
