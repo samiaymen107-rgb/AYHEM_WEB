@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AYHEM Dashboard</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #0f111a; color: #f0f0f0; margin:0; padding:0; }
+  header { background: #1e3a8a; padding: 15px; text-align:center; font-size:1.4em; font-weight:bold; }
+  main { padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .card { background:#1b1d2b; padding:15px; border-radius:10px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+  h2 { margin-top:0; }
+  button { padding:8px 12px; border:none; border-radius:5px; cursor:pointer; margin-top:5px; }
+  .btn-stop { background:#e63946; color:white; }
+  .btn-start { background:#2a9d8f; color:white; }
+  pre { background:#111222; padding:10px; border-radius:5px; max-height:300px; overflow:auto; }
+  ul { list-style:none; padding:0; }
+  li { padding:5px 0; border-bottom:1px solid #333; }
+  .loaded { color:#2a9d8f; }
+  .pending { color:#f4a261; }
+</style>
+</head>
+<body>
+
+<header>AYHEM Dashboard — الحالة الحية للعقل الرقمي</header>
+<main>
+  <div class="card">
+    <h2>وحدات المشروع</h2>
+    <ul id="unitsList"></ul>
+    <button id="btn-refresh" class="btn-start">تحديث يدوي للوحدات</button>
+  </div>
+  <div class="card">
+    <h2>السجل الذكي</h2>
+    <pre id="logArea"></pre>
+    <button id="btn-export" class="btn-start">تصدير السجل</button>
+  </div>
+  <div class="card">
+    <h2>التحكم بالتحديث التلقائي</h2>
+    <button id="btn-toggle" class="btn-stop">إيقاف التحديث التلقائي</button>
+    <div style="margin-top:10px;">
+      <label>سرعة المسح (مللي ثانية): </label>
+      <input type="number" id="scanInterval" value="5000" style="width:80px;">
+      <button id="btn-setInterval" class="btn-start">تطبيق</button>
+    </div>
+  </div>
+</main>
+
+<script>
+(async function () {
+  const AYHEM = window.AYHEM_AI_CORE;
+  if (!AYHEM) {
+    console.error("AYHEM_AI_CORE غير موجود. تأكد من تحميل النواة قبل Dashboard.");
+    return;
+  }
+
+  const unitsListEl = document.getElementById("unitsList");
+  const logArea = document.getElementById("logArea");
+  const btnRefresh = document.getElementById("btn-refresh");
+  const btnExport = document.getElementById("btn-export");
+  const btnToggle = document.getElementById("btn-toggle");
+  const scanInput = document.getElementById("scanInterval");
+  const btnSetInterval = document.getElementById("btn-setInterval");
+
+  function renderUnits() {
+    unitsListEl.innerHTML = "";
+    AYHEM.units.forEach(u => {
+      const li = document.createElement("li");
+      li.textContent = u.path;
+      li.className = AYHEM.registry[u.path]?.loaded ? "loaded" : "pending";
+      unitsListEl.appendChild(li);
+    });
+  }
+
+  function renderLog() {
+    logArea.textContent = AYHEM.exportLog();
+    logArea.scrollTop = logArea.scrollHeight;
+  }
+
+  btnRefresh.onclick = async () => { await AYHEM.scanUnits(); renderUnits(); renderLog(); };
+  btnExport.onclick = () => { 
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(AYHEM.exportLog());
+    const a = document.createElement("a");
+    a.setAttribute("href", dataStr);
+    a.setAttribute("download", "AYHEM_log.json");
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  btnToggle.onclick = () => {
+    AYHEM.autoUpdate = !AYHEM.autoUpdate;
+    btnToggle.textContent = AYHEM.autoUpdate ? "إيقاف التحديث التلقائي" : "تشغيل التحديث التلقائي";
+    btnToggle.className = AYHEM.autoUpdate ? "btn-stop" : "btn-start";
+  };
+
+  btnSetInterval.onclick = () => {
+    const val = parseInt(scanInput.value);
+    if (!isNaN(val) && val > 0) {
+      AYHEM.scanInterval = val;
+      renderLog();
+      AYHEM.logAction(`تم تحديث سرعة المسح إلى ${val} مللي ثانية`);
+    }
+  };
+
+  // تحديث دوري للعرض
+  setInterval(() => { renderUnits(); renderLog(); }, 1000);
+
+})();
+</script>
+
+</body>
+</html>
