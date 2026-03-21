@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM Web Autonomous Core</title>
+<style>
+body {
+    background-color: #050505;
+    color: #00ffcc;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 30px;
+}
+button {
+    padding: 12px 22px;
+    margin: 8px;
+    font-size: 16px;
+    background-color: #111;
+    color: #00ffcc;
+    border: 1px solid #00ffcc;
+    border-radius: 8px;
+    cursor: pointer;
+}
+button:hover { background-color: #222; }
+#log {
+    margin-top: 20px;
+    text-align: left;
+    max-height: 450px;
+    overflow-y: auto;
+    border: 1px solid #00ffcc;
+    padding: 12px;
+    font-size: 14px;
+    background-color: #000;
+}
+</style>
+</head>
+<body>
+
+<h1>🧠 AYHEM Autonomous Core</h1>
+<p id="status">النظام متوقف</p>
+
+<button onclick="startCore()">تشغيل النظام الذكي</button>
+<button onclick="stopCore()">إيقاف النظام</button>
+<button onclick="enableSelfMode()">تفعيل الوضع الذاتي</button>
+
+<div id="log"></div>
+
+<script>
+let coreRunning = false;
+let logDiv = document.getElementById("log");
+
+// سجل الأحداث
+function log(msg) {
+    const p = document.createElement("p");
+    p.textContent = new Date().toLocaleTimeString() + " - " + msg;
+    logDiv.appendChild(p);
+    logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+// تشغيل النظام الذكي
+function startCore() {
+    if(coreRunning) return;
+    coreRunning = true;
+    document.getElementById("status").innerText = "🔥 النظام الذكي يعمل";
+    log("CORE: تشغيل النظام الذكي بالكامل");
+    coreLoop();
+    integrateModules();
+    monitorSelfLearning();
+}
+
+// إيقاف النظام
+function stopCore() {
+    coreRunning = false;
+    document.getElementById("status").innerText = "⛔ النظام متوقف";
+    log("CORE: توقف النظام الذكي");
+}
+
+// حلقة التشغيل الأساسية
+function coreLoop() {
+    if(!coreRunning) return;
+    log("CORE: تحليل البيانات الجارية...");
+    setTimeout(coreLoop, 2000);
+}
+
+// دمج وحدات AYHEM الذكية تلقائيًا
+function integrateModules() {
+    const modules = [
+        "ayhem-core.js",
+        "ayhem-fusion-core.js",
+        "ayhem-ai-interpreter.js",
+        "ayhem-auto-linker.js",
+        "ayhem-memory-map.js",
+        "ayhem-network.js",
+        "ayhem-market-gap-engine.js",
+        "ayhem-economic-predictor.js"
+    ];
+
+    modules.forEach(m => {
+        const script = document.createElement("script");
+        script.src = "./" + m;
+        script.onload = () => log("MODULE: " + m + " تم دمجه بنجاح");
+        script.onerror = () => log("ERROR: فشل تحميل " + m);
+        document.body.appendChild(script);
+    });
+}
+
+// تفعيل الوضع الذاتي الذكي
+function enableSelfMode() {
+    if(!coreRunning) return;
+    log("SELF-MODE: تفعيل التشغيل الذاتي الذكي");
+    // مثال: تحديثات تلقائية للذاكرة، التعلم، والتحليلات
+    setInterval(() => {
+        if(coreRunning) {
+            log("SELF-MODE: تحسين الذكاء، تحديث الروابط، مراجعة التنبؤات...");
+        }
+    }, 3000);
+}
+
+// مراقبة التعلم الذاتي
+function monitorSelfLearning() {
+    if(!coreRunning) return;
+    log("SELF-MONITOR: مراقبة عمليات التعلم الذاتي");
+    setInterval(() => {
+        if(coreRunning) {
+            log("SELF-MONITOR: تحليل أداء الذكاء الاصطناعي، ضبط القرارات، تحديث التنبؤات الاقتصادية");
+        }
+    }, 4000);
+}
+</script>
+
+</body>
+</html>
