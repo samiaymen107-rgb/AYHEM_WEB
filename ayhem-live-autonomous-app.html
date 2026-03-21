@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM Live Autonomous App</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #0a0a0a, #111122);
+    color: #00ffcc;
+}
+header {
+    background-color: #000;
+    padding: 15px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    border-bottom: 2px solid #00ffcc;
+}
+#dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 20px;
+}
+.module {
+    background-color: #111;
+    border: 1px solid #00ffcc;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px;
+    width: 300px;
+    height: 250px;
+    overflow-y: auto;
+}
+button {
+    padding: 10px 18px;
+    margin: 5px;
+    font-size: 14px;
+    background-color: #111;
+    color: #00ffcc;
+    border: 1px solid #00ffcc;
+    border-radius: 6px;
+    cursor: pointer;
+}
+button:hover { background-color: #222; }
+#log {
+    margin: 20px;
+    padding: 12px;
+    border: 1px solid #00ffcc;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: #000;
+    font-size: 13px;
+}
+</style>
+</head>
+<body>
+
+<header>🧠 AYHEM Live Autonomous App</header>
+
+<div id="dashboard">
+    <div class="module" id="status-module">
+        <h3>حالة النظام</h3>
+        <p id="status">⛔ متوقف</p>
+        <button onclick="startCore()">تشغيل</button>
+        <button onclick="stopCore()">إيقاف</button>
+        <button onclick="enableSelfMode()">الوضع الذاتي</button>
+    </div>
+    <div class="module" id="analytics-module">
+        <h3>تحليلات ذكية</h3>
+        <div id="analytics-log"></div>
+    </div>
+    <div class="module" id="memory-module">
+        <h3>الذاكرة الذكية</h3>
+        <div id="memory-log"></div>
+    </div>
+    <div class="module" id="network-module">
+        <h3>شبكة العقد</h3>
+        <div id="network-log"></div>
+    </div>
+</div>
+
+<div id="log"></div>
+
+<script>
+let coreRunning = false;
+const logDiv = document.getElementById("log");
+const analyticsLog = document.getElementById("analytics-log");
+const memoryLog = document.getElementById("memory-log");
+const networkLog = document.getElementById("network-log");
+
+// سجل الأحداث
+function log(msg) {
+    const p = document.createElement("p");
+    p.textContent = new Date().toLocaleTimeString() + " - " + msg;
+    logDiv.appendChild(p);
+    logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+// تشغيل النظام الذكي
+function startCore() {
+    if(coreRunning) return;
+    coreRunning = true;
+    document.getElementById("status").innerText = "🔥 النظام الذكي يعمل";
+    log("CORE: تشغيل النظام بالكامل");
+    coreLoop();
+    integrateModules();
+    monitorSelfLearning();
+}
+
+// إيقاف النظام
+function stopCore() {
+    coreRunning = false;
+    document.getElementById("status").innerText = "⛔ النظام متوقف";
+    log("CORE: توقف النظام الذكي");
+}
+
+// حلقة التشغيل الأساسية
+function coreLoop() {
+    if(!coreRunning) return;
+    analyticsLog.innerHTML += "تحليل البيانات الجارية...<br>";
+    memoryLog.innerHTML += "تحديث ذاكرة قصيرة وطويلة المدى...<br>";
+    networkLog.innerHTML += "مزامنة الشبكة وربط العقد...<br>";
+    setTimeout(coreLoop, 2500);
+}
+
+// دمج وحدات AYHEM الذكية تلقائيًا
+function integrateModules() {
+    const modules = [
+        "ayhem-core.js",
+        "ayhem-fusion-core.js",
+        "ayhem-ai-interpreter.js",
+        "ayhem-auto-linker.js",
+        "ayhem-memory-map.js",
+        "ayhem-network.js",
+        "ayhem-market-gap-engine.js",
+        "ayhem-economic-predictor.js"
+    ];
+    modules.forEach(m => {
+        const script = document.createElement("script");
+        script.src = "./" + m;
+        script.onload = () => log("MODULE: " + m + " تم دمجه");
+        script.onerror = () => log("ERROR: فشل تحميل " + m);
+        document.body.appendChild(script);
+    });
+}
+
+// تفعيل الوضع الذاتي الذكي
+function enableSelfMode() {
+    if(!coreRunning) return;
+    log("SELF-MODE: تفعيل الوضع الذاتي الكامل");
+    setInterval(() => {
+        if(coreRunning) {
+            analyticsLog.innerHTML += "تحسين الذكاء، تحديث الروابط، مراجعة التنبؤات...<br>";
+            memoryLog.innerHTML += "تحديث ذاكرة طويلة المدى تلقائيًا...<br>";
+            networkLog.innerHTML += "فحص الشبكة وربط العقد الجديدة...<br>";
+        }
+    }, 3500);
+}
+
+// مراقبة التعلم الذاتي
+function monitorSelfLearning() {
+    if(!coreRunning) return;
+    setInterval(() => {
+        if(coreRunning) {
+            log("SELF-MONITOR: تقييم الأداء، ضبط القرارات، تحديث التنبؤات الاقتصادية");
+        }
+    }, 4000);
+}
+</script>
+
+</body>
+</html>
