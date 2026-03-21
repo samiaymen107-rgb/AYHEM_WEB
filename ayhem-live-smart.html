@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM Live Smart Platform</title>
+<style>
+body { margin:0; font-family: Arial; background:#000; color:#0ff; }
+header { padding:15px; text-align:center; font-size:22px; border-bottom:2px solid #0ff; }
+#dashboard { display:flex; flex-wrap:wrap; justify-content:space-around; padding:20px; }
+.module { background:#111; border:1px solid #0ff; border-radius:12px; padding:15px; margin:10px; width:320px; height:250px; overflow:auto;}
+button { padding:10px 18px; margin:5px; background:#111; color:#0ff; border:1px solid #0ff; border-radius:6px; cursor:pointer; }
+button:hover { background:#222; }
+#log { margin:20px; padding:12px; border:1px solid #0ff; max-height:300px; overflow:auto; background:#000; font-size:13px;}
+</style>
+</head>
+<body>
+
+<header>🧠 AYHEM Live Smart Platform</header>
+
+<div id="dashboard">
+    <div class="module" id="status-module">
+        <h3>حالة النظام</h3>
+        <p id="status">⛔ متوقف</p>
+        <button onclick="startSmartCore()">تشغيل النظام الذكي</button>
+        <button onclick="stopSmartCore()">إيقاف</button>
+        <button onclick="enableFullSelfMode()">الوضع الذاتي الكامل</button>
+    </div>
+    <div class="module" id="analytics-module">
+        <h3>تحليلات ذكية</h3>
+        <div id="analytics-log"></div>
+    </div>
+    <div class="module" id="memory-module">
+        <h3>الذاكرة الذكية</h3>
+        <div id="memory-log"></div>
+    </div>
+    <div class="module" id="network-module">
+        <h3>شبكة العقود الذكية</h3>
+        <div id="network-log"></div>
+    </div>
+    <div class="module" id="users-module">
+        <h3>إدارة المستخدمين الحية</h3>
+        <div id="users-log"></div>
+        <button onclick="addUser('مشرف')">أضف مشرف</button>
+        <button onclick="addUser('مطور')">أضف مطور</button>
+        <button onclick="addUser('مراقب')">أضف مراقب</button>
+    </div>
+</div>
+
+<div id="log"></div>
+
+<script>
+let smartCoreRunning=false;
+let socket;
+const logDiv=document.getElementById("log");
+const analyticsLog=document.getElementById("analytics-log");
+const memoryLog=document.getElementById("memory-log");
+const networkLog=document.getElementById("network-log");
+const usersLog=document.getElementById("users-log");
+let users=[];
+
+function log(msg){ const p=document.createElement("p"); p.textContent=new Date().toLocaleTimeString()+" - "+msg; logDiv.appendChild(p); logDiv.scrollTop=logDiv.scrollHeight; }
+
+function startSmartCore(){
+    if(smartCoreRunning) return;
+    smartCoreRunning=true;
+    document.getElementById("status").innerText="🔥 النظام الذكي يعمل";
+    log("SMART CORE: تشغيل النظام الذكي بالكامل");
+    connectWebSocket();
+    smartCoreLoop();
+    integrateSmartModules();
+    monitorSelfLearning();
+}
+
+function stopSmartCore(){ smartCoreRunning=false; document.getElementById("status").innerText="⛔ النظام متوقف"; log("SMART CORE: توقف النظام الذكي"); if(socket) socket.close(); }
+
+function smartCoreLoop(){ if(!smartCoreRunning) return;
+    analyticsLog.innerHTML+="تحليل بيانات لحظي وذكاء تنبؤي كامل...<br>";
+    memoryLog.innerHTML+="تحديث ذاكرة قصيرة وطويلة المدى ذكية...<br>";
+    networkLog.innerHTML+="فحص العقود الذكية وربط العقد الجديدة...<br>";
+    setTimeout(smartCoreLoop,2500);
+}
+
+function integrateSmartModules(){
+    const modules=["ayhem-core.js","ayhem-fusion-core.js","ayhem-ai-interpreter.js","ayhem-auto-linker.js","ayhem-memory-map.js","ayhem-network.js"];
+    modules.forEach(m=>{ const script=document.createElement("script"); script.src="./"+m; script.onload=()=>log("MODULE: "+m+" تم دمجه بنجاح"); script.onerror=()=>log("ERROR: فشل تحميل "+m); document.body.appendChild(script); });
+}
+
+function enableFullSelfMode(){
+    if(!smartCoreRunning) return;
+    log("SELF-MODE FULL: تفعيل الوضع الذاتي الكامل للنظام");
+    setInterval(()=>{ if(smartCoreRunning){
+        analyticsLog.innerHTML+="تحسين الذكاء التنبؤي، ضبط العقود، مراجعة الأداء...<br>";
+        memoryLog.innerHTML+="تحديث ذاكرة طويلة المدى تلقائيًا...<br>";
+        networkLog.innerHTML+="تحديث العقود الذكية ومزامنة العقد الجديدة...<br>";
+    }},3500);
+}
+
+function monitorSelfLearning(){ if(!smartCoreRunning) return;
+    setInterval(()=>{ if(smartCoreRunning){ log("SELF-MONITOR: تقييم الأداء، ضبط القرارات، تحديث التنبؤات الذكية"); } },4000);
+}
+
+function connectWebSocket(){
+    socket=new WebSocket("wss://ayhem-live-sync.example.com");
+    socket.onopen=()=>log("SOCKET: الاتصال الحي مع المنصة تم");
+    socket.onmessage=e=>log("SOCKET-IN: "+e.data);
+    socket.onclose=()=>log("SOCKET: تم قطع الاتصال");
+}
+
+function addUser(role){
+    const id=users.length+1;
+    users.push({id,role});
+    usersLog.innerHTML+="User #"+id+" - "+role+" تم إضافته<br>";
+    log("USER: إضافة مستخدم جديد "+role+" (#"+id+")");
+}
+</script>
+
+</body>
+</html>
