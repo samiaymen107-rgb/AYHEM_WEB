@@ -1,74 +1,188 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AYHEM Dashboard</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: monospace;
-      background: #0b0f14;
-      color: #e0e6ed;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
-      gap: 10px;
-      padding: 10px;
-    }
-    .box {
-      border: 1px solid #1f2a36;
-      padding: 10px;
-      background: #111823;
-      border-radius: 10px;
-    }
-    h3 {
-      margin-top: 0;
-      color: #4da3ff;
-    }
-    video {
-      width: 100%;
-      background: black;
-      border-radius: 8px;
-    }
-    pre {
-      white-space: pre-wrap;
-      font-size: 12px;
-      margin: 0;
-    }
-    @media (max-width: 700px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AYHEM Dashboard</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #0f111a; color: #f0f0f0; margin:0; padding:0; }
+  header { background: #1e3a8a; padding: 15px; text-align:center; font-size:1.4em; font-weight:bold; }
+  main { padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .card { background:#1b1d2b; padding:15px; border-radius:10px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+  h2 { margin-top:0; }
+  button { padding:8px 12px; border:none; border-radius:5px; cursor:pointer; margin-top:5px; }
+  .btn-stop { background:#e63946; color:white; }
+  .btn-start { background:#2a9d8f; color:white; }
+  pre { background:#111222; padding:10px; border-radius:5px; max-height:300px; overflow:auto; white-space: pre-wrap; }
+  ul { list-style:none; padding:0; margin:0; }
+  li { padding:5px 0; border-bottom:1px solid #333; }
+  .loaded { color:#2a9d8f; }
+  .pending { color:#f4a261; }
+  .error { color:#ff6b6b; }
+</style>
 </head>
 <body>
 
-<div class="grid">
-  <div class="box">
-    <h3>👁️ الرؤية</h3>
-    <video id="cam" autoplay muted playsinline controls aria-label="عرض الكاميرا"></video>
+<header>AYHEM Dashboard — الحالة الحية للعقل الرقمي</header>
+
+<main>
+  <div class="card">
+    <h2>وحدات المشروع</h2>
+    <ul id="unitsList"></ul>
+    <button id="btn-refresh" class="btn-start">تحديث يدوي للوحدات</button>
   </div>
 
-  <div class="box">
-    <h3>👂 السمع</h3>
-    <pre id="audio"></pre>
+  <div class="card">
+    <h2>السجل الذكي</h2>
+    <pre id="logArea"></pre>
+    <button id="btn-export" class="btn-start">تصدير السجل</button>
   </div>
 
-  <div class="box">
-    <h3>🧠 السياق</h3>
-    <pre id="context"></pre>
+  <div class="card">
+    <h2>التحكم بالتحديث التلقائي</h2>
+    <button id="btn-toggle" class="btn-stop">إيقاف التحديث التلقائي</button>
+    <div style="margin-top:10px;">
+      <label>سرعة المسح (مللي ثانية): </label>
+      <input type="number" id="scanInterval" value="5000" style="width:80px;">
+      <button id="btn-setInterval" class="btn-start">تطبيق</button>
+    </div>
   </div>
+</main>
 
-  <div class="box">
-    <h3>🧭 القرار / الرد</h3>
-    <pre id="decision"></pre>
-  </div>
-</div>
+<script>
+(function () {
+  const unitsListEl = document.getElementById("unitsList");
+  const logArea = document.getElementById("logArea");
+  const btnRefresh = document.getElementById("btn-refresh");
+  const btnExport = document.getElementById("btn-export");
+  const btnToggle = document.getElementById("btn-toggle");
+  const scanInput = document.getElementById("scanInterval");
+  const btnSetInterval = document.getElementById("btn-setInterval");
 
-<script type="module" src="ayhem-dashboard.js"></script>
+  const AYHEM = window.AYHEM_AI_CORE || null;
+
+  let autoRenderTimer = null;
+  let autoUpdateEnabled = true;
+
+  function safeText(value, fallback = "") {
+    return value === undefined || value === null ? fallback : String(value);
+  }
+
+  function renderUnits() {
+    unitsListEl.innerHTML = "";
+
+    if (!AYHEM) {
+      const li = document.createElement("li");
+      li.className = "error";
+      li.textContent = "النواة غير محمّلة بعد.";
+      unitsListEl.appendChild(li);
+      return;
+    }
+
+    const units = Array.isArray(AYHEM.units) ? AYHEM.units : [];
+    const registry = AYHEM.registry || {};
+
+    if (!units.length) {
+      const li = document.createElement("li");
+      li.className = "pending";
+      li.textContent = "لا توجد وحدات معرّفة.";
+      unitsListEl.appendChild(li);
+      return;
+    }
+
+    units.forEach(u => {
+      const li = document.createElement("li");
+      li.textContent = safeText(u?.path, "وحدة غير معروفة");
+      li.className = registry[u?.path]?.loaded ? "loaded" : "pending";
+      unitsListEl.appendChild(li);
+    });
+  }
+
+  function renderLog() {
+    if (!AYHEM || typeof AYHEM.exportLog !== "function") {
+      logArea.textContent = "السجل غير متاح: النواة غير جاهزة أو exportLog غير موجودة.";
+      return;
+    }
+
+    logArea.textContent = safeText(AYHEM.exportLog(), "لا يوجد سجل.");
+    logArea.scrollTop = logArea.scrollHeight;
+  }
+
+  btnRefresh.onclick = async () => {
+    if (!AYHEM || typeof AYHEM.scanUnits !== "function") {
+      logArea.textContent = "تعذر التحديث: النواة غير جاهزة أو scanUnits غير موجودة.";
+      return;
+    }
+
+    try {
+      await AYHEM.scanUnits();
+      renderUnits();
+      renderLog();
+    } catch (e) {
+      logArea.textContent = "خطأ أثناء فحص الوحدات: " + e.message;
+    }
+  };
+
+  btnExport.onclick = () => {
+    if (!AYHEM || typeof AYHEM.exportLog !== "function") {
+      logArea.textContent = "تعذر التصدير: السجل غير متاح.";
+      return;
+    }
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(AYHEM.exportLog());
+    const a = document.createElement("a");
+    a.setAttribute("href", dataStr);
+    a.setAttribute("download", "AYHEM_log.json");
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  btnToggle.onclick = () => {
+    autoUpdateEnabled = !autoUpdateEnabled;
+    btnToggle.textContent = autoUpdateEnabled ? "إيقاف التحديث التلقائي" : "تشغيل التحديث التلقائي";
+    btnToggle.className = autoUpdateEnabled ? "btn-stop" : "btn-start";
+
+    if (!autoUpdateEnabled && autoRenderTimer) {
+      clearInterval(autoRenderTimer);
+      autoRenderTimer = null;
+    }
+
+    if (autoUpdateEnabled && !autoRenderTimer) {
+      autoRenderTimer = setInterval(() => {
+        renderUnits();
+        renderLog();
+      }, 1000);
+    }
+  };
+
+  btnSetInterval.onclick = () => {
+    if (!AYHEM) {
+      logArea.textContent = "النواة غير محمّلة.";
+      return;
+    }
+
+    const val = parseInt(scanInput.value, 10);
+    if (!isNaN(val) && val > 0) {
+      AYHEM.scanInterval = val;
+      if (typeof AYHEM.logAction === "function") {
+        AYHEM.logAction(`تم تحديث سرعة المسح إلى ${val} مللي ثانية`);
+      }
+      renderLog();
+    }
+  };
+
+  renderUnits();
+  renderLog();
+
+  autoRenderTimer = setInterval(() => {
+    if (autoUpdateEnabled) {
+      renderUnits();
+      renderLog();
+    }
+  }, 1000);
+})();
+</script>
+
 </body>
 </html>
