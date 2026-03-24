@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM – النسخة النهائية الذكية المتكاملة</title>
+<style>
+body { font-family: Arial; padding: 20px; background: #f4f7f9; }
+h2 { color: #0a58ca; }
+pre { background: #fff; padding: 15px; border-radius: 6px; white-space: pre-wrap; overflow-x: auto; max-height: 60vh; }
+#status { color: #555; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<h2>AYHEM – المراجعة الذكية المتكاملة 24/24</h2>
+<div id="status">جارٍ التحميل…</div>
+<pre id="summary"></pre>
+
+<script>
+// 🔹 إعدادات المشروع
+const owner = "samiaymen107-rgb";
+const repo  = "AYHEM_WEB";
+const refreshTime = 60000; // تحديث كل دقيقة
+const GITHUB_TOKEN = ""; // ضع Token إذا المشروع Private
+const WEBHOOK_URL = "";   // ضع رابط Webhook إذا تريد إشعارات تلقائية
+
+// 🔹 جلب الملفات
+async function fetchRepoFiles() {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`);
+    const data = await res.json();
+    return data.tree.map(f => f.path);
+  } catch { return []; }
+}
+
+// 🔹 جلب محتوى الملفات
+async function fetchFileContent(path){
+  try {
+    const res = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`);
+    return res.ok ? await res.text() : "";
+  } catch { return ""; }
+}
+
+// 🔹 إنشاء Issue على GitHub
+async function createIssue(title, body){
+  if(!GITHUB_TOKEN) return;
+  try {
+    await fetch(`https://api.github.com/repos/${owner}/${repo}/issues`, {
+      method: 'POST',
+      headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github+json' },
+      body: JSON.stringify({ title, body })
+    });
+  } catch(e){ console.log("فشل إنشاء Issue:", e); }
+}
+
+// 🔹 إرسال تنبيه Webhook تلقائي
+async function sendWebhook(title, body){
+  if(!WEBHOOK_URL) return;
+  try {
+    await fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: `${title}\n${body}` }) });
+  } catch(e){ console.log("Webhook failed:", e); }
+}
+
+// 🔹 المراجعة الذكية الشاملة
+async function smartReview() {
+  document.getElementById("status").innerText = "يجلب الملفات…";
+  const files = await fetchRepoFiles();
+  let summary = "";
+  document.getElementById("status").innerText = `يتم تحليل ${files.length} ملف…`;
+
+  for(const file of files){
+    const content = await fetchFileContent(file);
+    let issues = [];
+
+    // قواعد ذكية حسب نوع الملف
+    if(file.endsWith(".js")){
+      if(!content.includes(";")) issues.push("يُفتقد الفواصل");
+      if(content.includes("var ")) issues.push("استخدام var، استخدم let/const");
+    }
+    if(file.endsWith(".html") && !content.includes("<!DOCTYPE")) issues.push("يُفتقد DOCTYPE");
+    if(file.endsWith(".css") && content.includes("!important")) issues.push("يحتوي على !important");
+    if(file.endsWith(".json")){
+      try { JSON.parse(content); } catch(e){ issues.push("JSON غير صالح"); }
+    }
+
+    // إنشاء Issues وتنبيهات لكل خطأ
+    for(const issue of issues){
+      const title = `${file} - ${issue}`;
+      const body = `تم اكتشاف مشكلة تلقائية في الملف ${file}:\n${issue}`;
+      createIssue(title, body);
+      sendWebhook(title, body);
+    }
+
+    if(issues.length) summary += `⚠️ ${file}: ${issues.join(" | ")}\n`;
+  }
+
+  document.getElementById("summary").innerText = summary || "✅ كل شيء صحيح";
+  document.getElementById("status").innerText = `تم التحديث تلقائيًا ${new Date().toLocaleTimeString()}`;
+
+  // حفظ التقرير اليومي في LocalStorage
+  localStorage.setItem("ayhem_report", summary);
+}
+
+// 🔹 تشغيل تلقائي 24/24
+smartReview();
+setInterval(smartReview, refreshTime);
+</script>
+</body>
+</html>
