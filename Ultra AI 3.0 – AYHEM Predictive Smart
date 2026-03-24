@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM Ultra AI 3.0 – التنبؤ الكامل</title>
+<style>
+body { font-family: Arial; background:#e6f0ff; padding:20px; }
+h2 { color:#0a3d62; }
+pre { background:#fff; padding:15px; border-radius:6px; overflow-x:auto; max-height:50vh; white-space:pre-wrap; }
+#status { margin-bottom:10px; color:#555; }
+button { padding:8px 15px; margin-top:10px; cursor:pointer; border-radius:5px; background:#0a3d62; color:white; border:none;}
+</style>
+</head>
+<body>
+<h2>AYHEM Ultra AI 3.0 – الذكاء التنبؤي الكامل</h2>
+<div id="status">جارٍ التحميل…</div>
+<pre id="summary"></pre>
+<button onclick="generatePDF()">📄 توليد تقرير PDF اليومي</button>
+
+<script>
+// إعدادات المشروع
+const owner="samiaymen107-rgb", repo="AYHEM_WEB";
+const refreshTime=20000; // تحديث كل 20 ثانية
+const ALERT_EMAIL="samiaymen107@gmail.com";
+const WA_NUMBER="21622689109";
+const FB_SHARE_URL="https://www.facebook.com/share/1DyPTag4Gf/";
+
+// جلب الملفات
+async function fetchRepoFiles(){try{const res=await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`);const data=await res.json();return data.tree.map(f=>f.path);}catch{return[];}}
+
+// جلب محتوى الملفات
+async function fetchFileContent(path){try{const res=await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`);return res.ok?await res.text():"";}catch{return"";}}
+
+// إرسال الإشعارات بالعربية
+function sendAlerts(title, body){
+  try{const msg=encodeURIComponent(title+"\n"+body);window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`,"_blank");}catch(e){console.log(e);}
+  try{const fbUrl=FB_SHARE_URL+"?u="+encodeURIComponent(title+"\n"+body);window.open(fbUrl,"_blank");}catch(e){console.log(e);}
+  try{const mailto=`mailto:${ALERT_EMAIL}?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;const a=document.createElement("a");a.href=mailto;a.click();}catch(e){console.log(e);}
+}
+
+// التنبؤ الذكي بالأخطاء
+async function predictiveReview(){
+  document.getElementById("status").innerText="جارٍ تحليل مستودع AYHEM…";
+  const files=await fetchRepoFiles();
+  let summary="";
+  document.getElementById("status").innerText=`تحليل ${files.length} ملف…`;
+
+  for(const file of files){
+    const content=await fetchFileContent(file);
+    let issues=[];
+
+    // 🔹 الذكاء التنبؤي: التوقع قبل الخطأ
+    if(file.endsWith(".js")){
+      if(!content.includes(";")) issues.push({msg:"احتمالية فقدان الفاصلة المنقوطة", severity:"مرتفع"});
+      if(content.includes("var ")) issues.push({msg:"احتمالية استخدام var بدلاً من let/const", severity:"مرتفع"});
+      if(content.includes("console.log")) issues.push({msg:"احتمالية وجود console.log في الإنتاج", severity:"متوسط"});
+    }
+    if(file.endsWith(".html")&&!content.includes("<!DOCTYPE")) issues.push({msg:"احتمالية فقد <!DOCTYPE> في HTML", severity:"مرتفع"});
+    if(file.endsWith(".css")&&content.includes("!important")) issues.push({msg:"احتمالية استخدام !important في CSS", severity:"متوسط"});
+    if(file.endsWith(".json")){try{JSON.parse(content);}catch(e){issues.push({msg:"JSON غير صالح محتمل", severity:"مرتفع"});}}
+
+    // حفظ التنبؤات للتعلم المستقبلي
+    const saved=JSON.parse(localStorage.getItem("ayhem_ultra3_issues")||"{}");
+    saved[file]=issues;
+    localStorage.setItem("ayhem_ultra3_issues",JSON.stringify(saved));
+
+    for(const issue of issues){
+      const title=`⚠️ ${file} - ${issue.msg} [الأولوية: ${issue.severity}]`;
+      const body=`تم التنبؤ بمشكلة محتملة في الملف ${file}:\n${issue.msg}\nدرجة الأولوية: ${issue.severity}\nتاريخ التنبؤ: ${new Date().toLocaleString("ar-EG")}`;
+      sendAlerts(title, body);
+    }
+
+    if(issues.length) summary+=`⚠️ ${file}: ${issues.map(i=>i.msg+" ("+i.severity+")").join(" | ")}\n`;
+  }
+
+  document.getElementById("summary").innerText=summary||"✅ كل شيء صحيح";
+  document.getElementById("status").innerText=`تم التحديث تلقائيًا ${new Date().toLocaleTimeString("ar-EG")}`;
+  localStorage.setItem("ayhem_ultra3_report", summary);
+}
+
+// توليد PDF التقرير اليومي
+function generatePDF(){
+  const content=localStorage.getItem("ayhem_ultra3_report")||"لا توجد مشاكل مسجلة اليوم";
+  const pdfWindow=window.open("");
+  pdfWindow.document.write("<pre>"+content+"</pre>");
+  pdfWindow.print();
+}
+
+// التشغيل الذاتي 24/24 + التعلم الذاتي + التنبؤ
+predictiveReview();
+setInterval(predictiveReview, refreshTime);
+</script>
+</body>
+</html>
