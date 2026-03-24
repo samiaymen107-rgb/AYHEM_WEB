@@ -124,7 +124,7 @@ function setBoxText(id, text) {
   if (el) el.textContent = text;
 }
 
-function initMockLiveText() {
+function initLiveBoxes() {
   setBoxText("audio", "لا توجد بيانات صوتية بعد.");
   setBoxText("context", "السياق سيظهر هنا عند ربط النظام.");
   const p = getPersona();
@@ -139,6 +139,6 @@ function initMockLiveText() {
 
 document.addEventListener("DOMContentLoaded", () => {
   renderDashboard();
-  initMockLiveText();
+  initLiveBoxes();
   startCamera();
 });
