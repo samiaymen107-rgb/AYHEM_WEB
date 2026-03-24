@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM Super Ultimate – النسخة النهائية فائقة الذكاء</title>
+<style>
+body { font-family: Arial; padding: 20px; background: #eef3f7; }
+h2 { color: #0a58ca; }
+pre { background: #fff; padding: 15px; border-radius: 6px; white-space: pre-wrap; overflow-x: auto; max-height: 50vh; }
+#status { color: #555; margin-bottom: 10px; }
+button { padding: 8px 15px; margin-top:10px; cursor:pointer; border-radius:5px; background:#0a58ca; color:white; border:none;}
+</style>
+</head>
+<body>
+<h2>AYHEM Super Ultimate – النسخة النهائية فائقة الذكاء</h2>
+<div id="status">جارٍ التحميل…</div>
+<pre id="summary"></pre>
+<button onclick="generatePDF()">📄 توليد PDF التقرير اليومي</button>
+
+<script>
+// 🔹 إعدادات المشروع – يمكن تعديلها مستقبلاً
+const owner = "samiaymen107-rgb";
+const repo  = "AYHEM_WEB";
+const refreshTime = 60000; // تحديث كل دقيقة
+const GITHUB_TOKEN = ""; 
+const WEBHOOK_URL = "";   
+const ALERT_EMAIL = "samiaymen107@gmail.com";
+const WA_NUMBER = "21622689109";
+const FB_SHARE_URL = "https://www.facebook.com/share/1DyPTag4Gf/";
+
+// 🔹 جلب الملفات
+async function fetchRepoFiles() {
+  try { const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`);
+        const data = await res.json(); return data.tree.map(f => f.path); } catch { return []; }
+}
+
+// 🔹 جلب محتوى الملفات
+async function fetchFileContent(path){ try { const res = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/${path}`);
+return res.ok ? await res.text() : ""; } catch { return ""; } }
+
+// 🔹 إنشاء GitHub Issue بالعربية
+async function createIssue(title, body){
+  if(!GITHUB_TOKEN) return;
+  try { await fetch(`https://api.github.com/repos/${owner}/${repo}/issues`, {
+    method: 'POST',
+    headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github+json' },
+    body: JSON.stringify({ title, body })
+  }); } catch(e){ console.log("فشل إنشاء Issue:", e); }
+}
+
+// 🔹 إرسال WhatsApp بالعربية
+function sendWhatsApp(title, body){
+    try { const msg = encodeURIComponent(title + "\n" + body); window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`, "_blank"); }
+    catch(e){ console.log("فشل إرسال WhatsApp:", e); }
+}
+
+// 🔹 مشاركة فيسبوك بالعربية
+function shareFacebook(title, body){
+    try { const msg = encodeURIComponent(title + "\n" + body); const fbUrl = `${FB_SHARE_URL}?u=${msg}`; window.open(fbUrl, "_blank"); }
+    catch(e){ console.log("فشل مشاركة Facebook:", e); }
+}
+
+// 🔹 إرسال التنبيهات الكاملة بالعربية
+async function sendAlert(title, body){
+  if(WEBHOOK_URL){ try { await fetch(WEBHOOK_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ content:`${title}\n${body}`}) }); } catch(e){console.log("Webhook failed:",e);} }
+  try { const mailtoLink = `mailto:${ALERT_EMAIL}?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`; const a = document.createElement("a"); a.href = mailtoLink; a.click(); } catch(e){ console.log("فشل إرسال البريد:", e);}
+  sendWhatsApp(title, body);
+  shareFacebook(title, body);
+}
+
+// 🔹 تحليل الملفات الذكي جدًا بالعربية
+async function smartReview() {
+  document.getElementById("status").innerText = "جارٍ فحص الملفات…";
+  const files = await fetchRepoFiles();
+  let summary = "";
+  document.getElementById("status").innerText = `تحليل ${files.length} ملف…`;
+
+  for(const file of files){
+    const content = await fetchFileContent(file);
+    let issues = [];
+
+    if(file.endsWith(".js")){
+      if(!content.includes(";")) issues.push({msg:"يُفتقد الفاصلة المنقوطة", severity:"متوسط"});
+      if(content.includes("var ")) issues.push({msg:"استخدام var بدلاً من let/const", severity:"مرتفع"});
+      if(content.includes("console.log")) issues.push({msg:"وجود console.log في بيئة الإنتاج", severity:"منخفض"});
+    }
+    if(file.endsWith(".html") && !content.includes("<!DOCTYPE")) issues.push({msg:"ملف HTML يفتقد <!DOCTYPE>", severity:"مرتفع"});
+    if(file.endsWith(".css") && content.includes("!important")) issues.push({msg:"استخدام !important في CSS", severity:"منخفض"});
+    if(file.endsWith(".json")){
+      try { JSON.parse(content); } catch(e){ issues.push({msg:"JSON غير صالح", severity:"مرتفع"}); }
+    }
+
+    for(const issue of issues){
+      const title = `تنبيه: ${file} - ${issue.msg} [الأولوية: ${issue.severity}]`;
+      const body = `تم اكتشاف مشكلة في الملف ${file}:\n${issue.msg}\nدرجة الأولوية: ${issue.severity}\nتاريخ الكشف: ${new Date().toLocaleString("ar-EG")}`;
+      createIssue(title, body);
+      sendAlert(title, body);
+    }
+
+    if(issues.length) summary += `⚠️ ${file}: ${issues.map(i=>i.msg+" ("+i.severity+")").join(" | ")}\n`;
+  }
+
+  document.getElementById("summary").innerText = summary || "✅ كل شيء صحيح";
+  document.getElementById("status").innerText = `تم التحديث تلقائيًا ${new Date().toLocaleTimeString("ar-EG")}`;
+  localStorage.setItem("ayhem_report", summary);
+}
+
+// 🔹 توليد PDF التقرير اليومي
+function generatePDF(){
+    const content = localStorage.getItem("ayhem_report") || "لا توجد مشاكل مسجلة اليوم";
+    const pdfWindow = window.open("");
+    pdfWindow.document.write("<pre>" + content + "</pre>");
+    pdfWindow.print();
+}
+
+// 🔹 التشغيل التلقائي 24/24
+smartReview();
+setInterval(smartReview, refreshTime);
+</script>
+</body>
+</html>
