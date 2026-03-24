@@ -1,0 +1,42 @@
+UltraAI-6.0-Cosmic-Full/
+│
+├── README.md
+│   # Ultra AI 6.0 – النسخة الكونية المتكيفة
+│   تعمل 24/7 على Android وLinux مع إشعارات بالعربية.
+│
+├── LICENSE
+│   MIT License
+│
+├── setup/
+│   ├── install.sh
+│   │   #!/bin/bash
+│   │   echo "Ultra AI 6.0 – بدء التثبيت..."
+│   │   pkg update -y || sudo apt update -y
+│   │   pkg install nodejs -y || sudo apt install nodejs -y
+│   │   npm install
+│   │   nohup node ../core/ai_engine.js > ../reports/ultraai.log 2>&1 &
+│   │   echo "✅ Ultra AI 6.0 يعمل الآن في الخلفية 24/7"
+│   └── config.json
+│       {
+│         "owner": "samiaymen107-rgb",
+│         "repo": "AYHEM_WEB",
+│         "email_alert": "samiaymen107@gmail.com",
+│         "wa_number": "+21622689109",
+│         "fb_share_url": "https://www.facebook.com/share/1DyPTag4Gf/",
+│         "refresh_interval_ms": 10000
+│       }
+│
+├── core/
+│   ├── ai_engine.js
+│   │   console.log("Ultra AI Engine Started");
+│   ├── notifier.js
+│   │   console.log("Notifications Active");
+│   └── updater.js
+│       console.log("Updater Active");
+│
+├── reports/
+│   └── sample_report.html
+│       <html><body><h1>Sample Report</h1></body></html>
+│
+└── assets/icons/
+    └── logo.png (فارغ مؤقت، يمكن وضع أي أيقونة لاحقًا)
