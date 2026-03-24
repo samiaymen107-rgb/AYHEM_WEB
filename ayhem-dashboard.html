@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AYHEM Dashboard</title>
   <style>
     body {
@@ -41,7 +42,7 @@
 <div class="grid">
   <div class="box">
     <h3>👁️ الرؤية</h3>
-    <video id="cam" autoplay muted></video>
+    <video id="cam" autoplay muted playsinline></video>
   </div>
 
   <div class="box">
@@ -60,6 +61,6 @@
   </div>
 </div>
 
-<script src="ayhem-dashboard.js"></script>
+<script src="ayhem-dashboard.js" defer></script>
 </body>
 </html>
