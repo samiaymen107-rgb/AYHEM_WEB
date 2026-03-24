@@ -14,6 +14,7 @@
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
       gap: 10px;
       padding: 10px;
     }
@@ -21,6 +22,7 @@
       border: 1px solid #1f2a36;
       padding: 10px;
       background: #111823;
+      border-radius: 10px;
     }
     h3 {
       margin-top: 0;
@@ -29,10 +31,12 @@
     video {
       width: 100%;
       background: black;
+      border-radius: 8px;
     }
     pre {
       white-space: pre-wrap;
       font-size: 12px;
+      margin: 0;
     }
     @media (max-width: 700px) {
       .grid {
@@ -65,6 +69,6 @@
   </div>
 </div>
 
-<script src="ayhem-dashboard.js" defer></script>
+<script type="module" src="ayhem-dashboard.js"></script>
 </body>
 </html>
