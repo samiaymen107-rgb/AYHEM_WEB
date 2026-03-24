@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AYHEM WEB</title>
+  <meta name="description" content="موقع مشروع أيهم — أول عقل رقمي حي" />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a33;
+      --text: #e8ecff;
+      --muted: #9aa7d6;
+      --accent: #6ea8fe;
+      --border: rgba(255,255,255,.12);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+      background: radial-gradient(circle at top, #182447 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: min(920px, 100%);
+      background: rgba(18,26,51,.92);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0 0 10px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 20px;
+      padding: 24px;
+    }
+
+    .panel {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    button, a.button {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .15s ease, opacity .15s ease, background .15s ease;
+    }
+
+    button:hover, a.button:hover { transform: translateY(-1px); }
+
+    .primary {
+      background: var(--accent);
+      color: #081022;
+    }
+
+    .secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    #view {
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.8;
+      padding: 20px;
+    }
+
+    .footer {
+      padding: 18px 24px 24px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    @media (max-width: 768px) {
+      .content { grid-template-columns: 1fr; }
+      .hero, .content, .footer { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <h1 class="brand">مشروع أيهم — أول عقل رقمي حي</h1>
+      <p class="subtitle">
+        نقطة دخول واحدة موحّدة لإدارة النظام، عرض اللوحات، وربط الوحدات الأساسية بطريقة منظمة.
+      </p>
+
+      <div class="actions">
+        <button class="primary" id="startBtn">بدء النظام</button>
+        <button class="secondary" id="dashboardBtn">فتح لوحة التحكم</button>
+      </div>
+    </section>
+
+    <section class="content">
+      <div class="panel">
+        <h2>الواجهة الرئيسية</h2>
+        <div id="view">
+          اضغط على "بدء النظام" لعرض محتوى البداية، أو "فتح لوحة التحكم" للانتقال إلى لوحة الإدارة.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>وحدات البداية</h2>
+        <ul>
+          <li>CORE: النواة الأساسية.</li>
+          <li>MEMORY: الذاكرة.</li>
+          <li>AI: الذكاء والتحليل.</li>
+          <li>UI: الواجهة والتحكم.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="footer">
+      AYHEM WEB — نسخة موحّدة كبداية تنظيمية للمشروع.
+    </div>
+  </main>
+
+  <script>
+    const view = document.getElementById('view');
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+      view.innerHTML = `
+        <div>
+          <strong>تم تشغيل نقطة الدخول الرئيسية.</strong><br>
+          من هنا يمكن تحميل النواة ثم الذاكرة ثم الواجهة بشكل تدريجي.
+        </div>
+      `;
+    });
+
+    document.getElementById('dashboardBtn').addEventListener('click', () => {
+      window.location.href = 'AYHEM_DASHBOARD.html';
+    });
+  </script>
+</body>
+</html>
