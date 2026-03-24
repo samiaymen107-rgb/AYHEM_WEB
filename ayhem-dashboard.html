@@ -14,7 +14,6 @@
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
       gap: 10px;
       padding: 10px;
     }
@@ -35,6 +34,11 @@
       white-space: pre-wrap;
       font-size: 12px;
     }
+    @media (max-width: 700px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -42,7 +46,7 @@
 <div class="grid">
   <div class="box">
     <h3>👁️ الرؤية</h3>
-    <video id="cam" autoplay muted playsinline></video>
+    <video id="cam" autoplay muted playsinline controls aria-label="عرض الكاميرا"></video>
   </div>
 
   <div class="box">
