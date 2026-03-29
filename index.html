@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AYHEM WEB</title>
+  <title>AYHEM WEB — العقل الرقمي الحي</title>
   <meta name="description" content="موقع مشروع أيهم — أول عقل رقمي حي" />
   <style>
     :root {
@@ -96,16 +96,8 @@
 
     button:hover, a.button:hover { transform: translateY(-1px); }
 
-    .primary {
-      background: var(--accent);
-      color: #081022;
-    }
-
-    .secondary {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
+    .primary { background: var(--accent); color: #081022; }
+    .secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
 
     #view {
       min-height: 280px;
@@ -135,38 +127,43 @@
     <section class="hero">
       <h1 class="brand">مشروع أيهم — أول عقل رقمي حي</h1>
       <p class="subtitle">
-        نقطة دخول واحدة موحّدة لإدارة النظام، عرض اللوحات، وربط الوحدات الأساسية بطريقة منظمة.
+        نقطة دخول موحدة لإدارة النظام، عرض اللوحات، وربط الوحدات الأساسية بطريقة منظمة.  
+        <br>Unified entry point for system management, dashboard view, and module linking.
       </p>
 
       <div class="actions">
-        <button class="primary" id="startBtn">بدء النظام</button>
-        <button class="secondary" id="dashboardBtn">فتح لوحة التحكم</button>
+        <button class="primary" id="startBtn">بدء النظام / Start System</button>
+        <button class="secondary" id="dashboardBtn">فتح لوحة التحكم / Dashboard</button>
       </div>
     </section>
 
     <section class="content">
       <div class="panel">
-        <h2>الواجهة الرئيسية</h2>
+        <h2>الواجهة الرئيسية / Main View</h2>
         <div id="view">
           اضغط على "بدء النظام" لعرض محتوى البداية، أو "فتح لوحة التحكم" للانتقال إلى لوحة الإدارة.
+          <br>Press "Start System" to load main content, or "Dashboard" to open admin panel.
         </div>
       </div>
 
       <div class="panel">
-        <h2>وحدات البداية</h2>
+        <h2>وحدات البداية / Initial Modules</h2>
         <ul>
-          <li>CORE: النواة الأساسية.</li>
-          <li>MEMORY: الذاكرة.</li>
-          <li>AI: الذكاء والتحليل.</li>
-          <li>UI: الواجهة والتحكم.</li>
+          <li>CORE: النواة الأساسية / Core engine</li>
+          <li>MEMORY: الذاكرة / Memory system</li>
+          <li>AI: الذكاء والتحليل / AI & Analytics</li>
+          <li>UI: الواجهة والتحكم / Interface & Controls</li>
         </ul>
       </div>
     </section>
 
     <div class="footer">
-      AYHEM WEB — نسخة موحّدة كبداية تنظيمية للمشروع.
+      AYHEM WEB — نسخة موحّدة ذكية للمشروع / Unified Smart Version
     </div>
   </main>
+
+  <!-- سكربت ذكي متطور لتشغيل المشروع -->
+  <script src="AYHEM_MASTER_ORCHESTRATOR.js"></script>
 
   <script>
     const view = document.getElementById('view');
@@ -174,8 +171,9 @@
     document.getElementById('startBtn').addEventListener('click', () => {
       view.innerHTML = `
         <div>
-          <strong>تم تشغيل نقطة الدخول الرئيسية.</strong><br>
-          من هنا يمكن تحميل النواة ثم الذاكرة ثم الواجهة بشكل تدريجي.
+          <strong>تم تشغيل نقطة الدخول الرئيسية / Main Entry Activated.</strong><br>
+          تحميل النواة ثم الذاكرة ثم الواجهة بشكل تدريجي...<br>
+          Loading core, memory, and interface progressively...
         </div>
       `;
     });
@@ -186,4 +184,3 @@
   </script>
 </body>
 </html>
-<script src="AYHEM_MASTER_ORCHESTRATOR.js"></script>
