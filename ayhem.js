@@ -1,5 +1,5 @@
-// ضع مفتاح OpenAI API الخاص بك هنا
-const OPENAI_API_KEY = "هنا_المفتاح_الخاص_بك"; // استبدل هذا بالمفتاح الفعلي
+// مفتاح OpenAI الخاص بك
+const OPENAI_API_KEY = "cfut_Eaox4I6Au4P6cDEAVvk1oZozkNvKfxF9j6roCZlY0e25dc38";
 
 // الوحدات الذكية
 const modules=[
