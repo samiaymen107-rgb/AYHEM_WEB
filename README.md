@@ -1,122 +1,182 @@
-import React from 'react';
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM — العقل الرقمي الحي</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f4f4f4;color:#222}
+header{background:#111;color:#00bfff;text-align:center;padding:25px}
+nav{display:flex;justify-content:center;gap:20px;background:#222;padding:10px}
+nav a{color:#fff;text-decoration:none;font-weight:bold}
+main{max-width:1200px;margin:auto;padding:20px}
+section{background:#fff;margin:15px 0;padding:20px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,0.12)}
+button{padding:10px 15px;border:none;background:#00bfff;color:#fff;cursor:pointer;margin-top:5px;border-radius:6px}
+input,textarea,select{width:100%;padding:8px;margin-top:5px;margin-bottom:10px;border-radius:6px;border:1px solid #ccc}
+.card{background:#eee;padding:10px;margin:10px 0;border-radius:6px}
+.search-bar{margin-bottom:10px}
+pre{background:#111;color:#0f0;padding:10px;white-space:pre-wrap;word-wrap:break-word;border-radius:6px;overflow:auto}
+footer{text-align:center;padding:15px;background:#222;color:#aaa}
+</style>
+</head>
+<body>
 
-// Header ذكي
-const Header = () => (
-  <header style={{ background: '#111', color: '#00bfff', textAlign: 'center', padding: '25px' }}>
-    <h1>AYHEM_WEB – أول عقل رقمي حي</h1>
-    <p>واجهة ذكية متكاملة مع البيانات القديمة والحالية</p>
-  </header>
-);
+<header>
+<h1>AYHEM — العقل الرقمي الحي</h1>
+<p>واجهة ذكية متقدمة: عرض، بحث، تصفية، ومزامنة لكل مستودعات AYHEM</p>
+</header>
 
-// شريط تنقل ذكي
-const Nav = () => {
-  const links = [
-    {name:'التثبيت', href:'#installation'},
-    {name:'الميزات', href:'#features'},
-    {name:'المعمارية', href:'#architecture'},
-    {name:'المساهمة', href:'#contribute'},
-    {name:'استكشاف الأخطاء', href:'#errors'},
-    {name:'المزامنة الذكية', href:'#sync'}
-  ];
-  return (
-    <nav style={{ display: 'flex', justifyContent: 'center', gap: '20px', background: '#222', padding: '10px' }}>
-      {links.map(l => <a key={l.href} href={l.href} style={{ color:'#fff', textDecoration:'none', fontWeight:'bold' }}>{l.name}</a>)}
-    </nav>
-  );
-};
+<nav>
+<a href="#input-section">إدخال البيانات</a>
+<a href="#repos-section">المستودعات</a>
+<a href="#analysis-section">تحليل البيانات</a>
+<a href="#sync-section">مزامنة</a>
+</nav>
 
-// قسم عام
-const Section = ({ id, title, children }) => (
-  <section id={id} style={{ background:'#fff', borderRadius:'12px', margin:'15px 0', padding:'20px', boxShadow:'0 3px 8px rgba(0,0,0,0.12)' }}>
-    <h2>{title}</h2>
-    {children}
-  </section>
-);
+<main>
 
-// زر مزامنة ذكي
-const SyncButton = () => {
-  const [status, setStatus] = React.useState('');
-  const sync = async () => {
-    setStatus('جاري المزامنة الذكية...');
-    try {
-      await new Promise(res => setTimeout(res, 2000)); // محاكاة عملية المزامنة
-      setStatus('✅ تمت المزامنة مع جميع المستودعات والذاكرة الدائمة!');
-    } catch {
-      setStatus('❌ حدث خطأ أثناء المزامنة.');
-    }
-  };
-  return (
-    <div>
-      <button onClick={sync} style={{ padding:'12px 18px', border:'none', borderRadius:'6px', background:'#00bfff', color:'#fff', cursor:'pointer', fontWeight:'bold' }}>بدء المزامنة الذكية</button>
-      <p>{status}</p>
-    </div>
-  );
-};
+<section id="input-section">
+<h2>✍️ إدخال البيانات</h2>
+<textarea id="input" placeholder="اكتب هنا..."></textarea>
+<br>
+<button onclick="saveLocal()">💾 حفظ محلي</button>
+<button onclick="syncWorker()">🚀 مزامنة Worker</button>
+<p id="status"></p>
+</section>
 
-// Footer
-const Footer = () => (
-  <footer style={{ textAlign:'center', padding:'15px', background:'#222', color:'#aaa' }}>
-    &copy; 2026 AYHEM – أول عقل رقمي حي
-  </footer>
-);
+<section id="repos-section">
+<h2>📦 المستودعات والبيانات</h2>
+<input type="text" id="search" class="search-bar" placeholder="بحث في كل المستودعات..." oninput="renderRepos()"/>
+<select id="filterType" onchange="renderRepos()">
+<option value="">كل الأنواع</option>
+<option value="note">ملاحظة</option>
+<option value="task">مهمة</option>
+<option value="log">سجل</option>
+</select>
+<div id="repos"></div>
+</section>
 
-// التطبيق الرئيسي المدمج
-function App() {
-  return (
-    <div style={{ fontFamily:'Arial, sans-serif', margin:0, padding:0, background:'#f9f9f9', color:'#222' }}>
-      <Header />
-      <Nav />
-      <main style={{ maxWidth:'1200px', margin:'auto', padding:'20px' }}>
-        
-        <Section id="installation" title="تعليمات التثبيت">
-          <ol>
-            <li>تأكد من تثبيت Node.js على جهازك.</li>
-            <li>قم بتنزيل المشروع عبر <code>git clone https://github.com/samiaymen107-rgb/AYHEM_WEB.git</code></li>
-            <li>انتقل إلى مجلد المشروع عبر <code>cd AYHEM_WEB</code></li>
-            <li>قم بتثبيت الاعتماديات عبر <code>npm install</code></li>
-          </ol>
-        </Section>
+<section id="analysis-section">
+<h2>🧠 تحليل البيانات</h2>
+<pre id="analysis"></pre>
+</section>
 
-        <Section id="features" title="ميزات المشروع">
-          <ul>
-            <li>واجهة مستخدم تفاعلية وسهلة الاستخدام.</li>
-            <li>دعم للغات متعددة.</li>
-            <li>أداء عالي مع إمكانية التخصيص.</li>
-          </ul>
-        </Section>
+<section id="sync-section">
+<h2>🌐 GitHub & Worker</h2>
+<p>البيانات مرتبطة تلقائيًا بكل مستودعات <a href="https://github.com/samiaymen107-rgb" target="_blank">AYHEM</a> وآمنة عبر Worker</p>
+</section>
 
-        <Section id="architecture" title="تفاصيل المعمارية">
-          <p><strong>Frontend:</strong> React.js لواجهة المستخدم.</p>
-          <p><strong>Backend:</strong> Node.js + Express لتعزيز أداء الخادم.</p>
-        </Section>
+</main>
 
-        <Section id="contribute" title="إرشادات المساهمة">
-          <ol>
-            <li>قم بعمل Fork للمشروع.</li>
-            <li>أنشئ فرعًا جديدًا (<code>git checkout -b feature/اسم-الميزة</code>)</li>
-            <li>قم بتقديم تغييراتك (<code>git commit -m 'إضافة ميزة جديدة'</code>)</li>
-            <li>ادفع الفرع إلى مستودعك (<code>git push origin feature/اسم-الميزة</code>)</li>
-            <li>افتح طلب سحب.</li>
-          </ol>
-        </Section>
+<footer>
+&copy; 2026 AYHEM — العقل الرقمي الحي
+</footer>
 
-        <Section id="errors" title="قسم استكشاف الأخطاء">
-          <ul>
-            <li><strong>لم يتمكن من تثبيت الاعتماديات:</strong> تأكد من أن لديك الإصدارة الصحيحة من Node.js.</li>
-            <li><strong>الأخطاء عند تشغيل التطبيق:</strong> تحقق من تسجيلات الأخطاء في وحدة التحكم.</li>
-            <li><strong>التطبيق لا يستجيب:</strong> تحقق من اتصالك بالإنترنت أو جرب إعادة تشغيل التطبيق.</li>
-          </ul>
-          <p>إذا واجهت أي مشكلة، فلا تتردد في طرح الأسئلة في قسم المشكلات على GitHub.</p>
-        </Section>
+<script>
+// Worker URL
+const WORKER_URL = "https://your-worker.workers.dev";
 
-        <Section id="sync" title="المزامنة الذكية مع أيهم">
-          <SyncButton />
-        </Section>
+// كل المستودعات
+const REPOS = [
+{repo:"AYHEM_WEB", branch:"main", file:"ayhem_db.json"},
+{repo:"AYHEM_WEB_CLONE", branch:"main", file:"ayhem_db.json"},
+{repo:"ayhem_cells", branch:"main", file:"ayhem_db.json"},
+{repo:"AYHEM/Documentation", branch:"main", file:"ayhem_db.json"}
+];
 
-      </main>
-      <Footer />
-    </div>
-  );
+let db = { notes: [], repos: {} };
+
+// 🔹 تحميل البيانات المحلية
+function loadLocal(){
+const saved = localStorage.getItem("ayhem_db");
+if(saved) db = JSON.parse(saved);
 }
 
-export default App;
+// 🔹 حفظ البيانات محليًا
+function saveLocal(){
+const val=document.getElementById("input").value.trim();
+if(!val) return;
+db.notes.push({type:"note", content:val, date:new Date().toISOString()});
+localStorage.setItem("ayhem_db",JSON.stringify(db));
+document.getElementById("input").value="";
+renderRepos();
+analyze();
+}
+
+// 🔹 تحميل كل مستودعات GitHub
+async function loadAllRepos(){
+for(const r of REPOS){
+try{
+const url = `https://raw.githubusercontent.com/samiaymen107-rgb/${r.repo}/${r.branch}/${r.file}`;
+const res = await fetch(url);
+if(res.ok){
+const repoData = await res.json();
+db.notes = Array.from(new Set([...db.notes,...repoData.notes]));
+db.repos[r.repo] = repoData.notes || [];
+document.getElementById("status").textContent = `✅ تم تحميل البيانات من ${r.repo}`;
+renderRepos();
+analyze();
+}else{console.warn("فشل تحميل "+r.repo);}
+}catch(e){console.error(e);}
+}
+}
+
+// 🔹 عرض المستودعات والبحث والتصفية
+function renderRepos(){
+const container = document.getElementById("repos");
+container.innerHTML="";
+const query = document.getElementById("search").value.toLowerCase();
+const filterType = document.getElementById("filterType").value;
+
+for(const [repo, notes] of Object.entries(db.repos)){
+let filtered = notes;
+if(query) filtered = filtered.filter(n=>n.content.toLowerCase().includes(query));
+if(filterType) filtered = filtered.filter(n=>n.type===filterType);
+if(filtered.length){
+const title = document.createElement("h3");
+title.textContent=repo;
+container.appendChild(title);
+filtered.forEach(n=>{
+const div = document.createElement("div");
+div.className="card";
+div.textContent=`[${n.type || "note"}] ${n.content} (${n.date || "بدون تاريخ"})`;
+container.appendChild(div);
+});
+}
+}
+}
+
+// 🔹 تحليل البيانات
+function analyze(){
+const total=db.notes.length;
+let longest={content:""};
+db.notes.forEach(n=>{if(n.content.length>longest.content.length) longest=n;});
+const result={total_notes:total,longest_note:longest.content,last_note:db.notes[db.notes.length-1]?.content||""};
+document.getElementById("analysis").textContent=JSON.stringify(result,null,2);
+}
+
+// 🔹 مزامنة مع Worker
+async function syncWorker(){
+const status = document.getElementById("status");
+if(!WORKER_URL.includes("workers.dev")){status.textContent="⚠️ ضع رابط Worker";return;}
+status.textContent="⏳ جاري المزامنة...";
+try{
+await fetch(WORKER_URL,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(db)
+});
+status.textContent="✅ تمت المزامنة بنجاح!";
+}catch{
+status.textContent="❌ فشل الاتصال بالـ Worker";
+}
+}
+
+// بدء التشغيل
+loadLocal();
+loadAllRepos();
+renderRepos();
+analyze();
+</script>
+
+</body>
+</html>
