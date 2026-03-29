@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>مشروع أيهم — أول عقل رقمي حي (ذكي متكامل)</title>
+<title>مشروع أيهم — أول عقل رقمي حي (لوحة حية)</title>
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#0b1020;color:#e8ecff;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;}
 .app{background:#121a33;border-radius:20px;max-width:960px;width:100%;padding:25px;box-shadow:0 10px 30px rgba(0,0,0,0.35);}
 h1,h2{margin:0 0 10px;}
-button{padding:10px 20px;margin:5px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;}
+button{padding:10px 20px;margin:5px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;z-index:10;}
 .primary{background:#6ea8fe;color:#081022;}
 .secondary{background:transparent;color:#e8ecff;border:1px solid #e8ecff;}
-.panel{background:rgba(255,255,255,0.05);padding:15px;border-radius:15px;margin-top:20px;}
+.panel{background:rgba(255,255,255,0.05);padding:15px;border-radius:15px;margin-top:20px;position:relative;z-index:1;}
 .progress-bar-container{width:100%;background:rgba(255,255,255,0.1);border-radius:10px;margin-top:10px;}
 .progress-bar{height:20px;width:0%;background:#6ea8fe;border-radius:10px;transition:width 0.3s;}
 .log,.recs{margin-top:10px;font-size:0.95rem;color:#6efeb0;}
@@ -21,7 +21,7 @@ button{padding:10px 20px;margin:5px;border:none;border-radius:10px;font-weight:b
 <body>
 <div class="app">
   <h1>مشروع أيهم — أول عقل رقمي حي</h1>
-  <p>نقطة دخول موحدة لإدارة النظام، عرض اللوحات، وربط الوحدات الأساسية بطريقة ذكية متكاملة.</p>
+  <p>نقطة دخول موحدة لإدارة النظام، عرض اللوحات، وربط الوحدات الأساسية بطريقة ذكية حية.</p>
   
   <div>
     <button class="primary" id="startBtn">بدء النظام الذكي</button>
@@ -29,7 +29,7 @@ button{padding:10px 20px;margin:5px;border:none;border-radius:10px;font-weight:b
   </div>
 
   <div class="panel" id="view">
-    اضغط على "بدء النظام الذكي" لتشغيل الوحدات مع توصيات حية.
+    اضغط على "بدء النظام الذكي" لتشغيل الوحدات مع توصيات حية مباشرة.
   </div>
 
   <div class="panel">
@@ -48,15 +48,15 @@ button{padding:10px 20px;margin:5px;border:none;border-radius:10px;font-weight:b
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener('DOMContentLoaded', function(){
   const modules=[
-    {name:'CORE', desc:'تحميل النواة الأساسية وربط المستودعات...', recs:['التحقق من سلامة الوحدات','مزامنة GitHub وLoFAR']},
-    {name:'MEMORY', desc:'تحميل الذاكرة وربط الوركس...', recs:['تنظيف البيانات القديمة','تحديث قاعدة الذاكرة']},
-    {name:'AI', desc:'تنشيط الذكاء والتحليل وربطه بالتطبيقات...', recs:['تحليل البيانات الحالية','اقتراح تحسينات ذكية']},
-    {name:'UI', desc:'تهيئة الواجهة وربطها بالمستودعات...', recs:['تحسين تجربة المستخدم','مزامنة التحديثات']},
+    {name:'CORE', api:'/api/core', desc:'تحميل النواة الأساسية وربط المستودعات...'},
+    {name:'MEMORY', api:'/api/memory', desc:'تحميل الذاكرة وربط الوركس...'},
+    {name:'AI', api:'/api/ai', desc:'تنشيط الذكاء والتحليل وربطه بالتطبيقات...'},
+    {name:'UI', api:'/api/ui', desc:'تهيئة الواجهة وربطها بالمستودعات...'},
   ];
 
-  function loadModule(idx){
+  async function loadModule(idx){
     const view=document.getElementById('view');
     if(idx>=modules.length){
       view.innerHTML='<strong>تم تشغيل كل الوحدات الذكية بنجاح وربطها بالمستودعات والوركس!</strong>';
@@ -67,25 +67,34 @@ document.addEventListener("DOMContentLoaded", function(){
       <strong>جارٍ تحميل وحدة ${module.name}...</strong>
       <div class="progress-bar-container"><div class="progress-bar" id="bar${idx}"></div></div>
       <div class="log" id="log${idx}">${module.desc}</div>
-      <div class="recs" id="recs${idx}">${module.recs.map(r=>'• '+r).join('<br>')}</div>
+      <div class="recs" id="recs${idx}">جارٍ استدعاء البيانات الحية...</div>
     `;
     const bar=document.getElementById(`bar${idx}`);
     let progress=0;
-    const interval=setInterval(()=>{
-      progress+=Math.random()*12;
+
+    // محاكاة التحميل التدريجي + استدعاء API حي
+    const interval=setInterval(async ()=>{
+      progress+=Math.random()*15;
       if(progress>100) progress=100;
       bar.style.width=progress+'%';
       if(progress>=100){
         clearInterval(interval);
+        // جلب البيانات الحية من API
+        try{
+          const res=await fetch(module.api);
+          const data=await res.json();
+          document.getElementById(`recs${idx}`).innerHTML=data.recommendations.map(r=>'• '+r).join('<br>');
+        }catch(e){
+          document.getElementById(`recs${idx}`).innerHTML='خطأ في جلب البيانات الحية';
+        }
         setTimeout(()=>loadModule(idx+1),400);
       }
     },150);
   }
 
-  // ربط الأزرار
-  document.getElementById('startBtn').addEventListener('click', ()=>{loadModule(0);});
-  document.getElementById('dashboardBtn').addEventListener('click', ()=>{
-    alert('فتح لوحة التحكم الذكية (قيد الربط بالمستودعات)');
+  document.getElementById('startBtn').addEventListener('click',()=>{loadModule(0);});
+  document.getElementById('dashboardBtn').addEventListener('click',()=>{
+    window.location.href='/dashboard'; // لوحة التحكم الحية
   });
 });
 </script>
