@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AYHEM Dashboard — الحالة الحية للعقل الرقمي</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#0b1020;color:#e8ecff;padding:20px;}
+h1{margin:0 0 10px;}
+.panel{background:rgba(255,255,255,0.05);padding:15px;border-radius:15px;margin-top:20px;}
+button{padding:10px 15px;margin:5px;border:none;border-radius:10px;cursor:pointer;}
+.primary{background:#6ea8fe;color:#081022;}
+</style>
+</head>
+<body>
+<h1>AYHEM Dashboard — الحالة الحية للعقل الرقمي</h1>
+<div class="panel">
+  <button class="primary" id="updateBtn">تحديث يدوي للوحدات</button>
+  <button class="primary" id="exportBtn">تصدير السجل</button>
+  <button class="primary" id="autoBtn">تشغيل التحديث التلقائي</button>
+  <button class="primary" id="stopBtn">إيقاف التحديث التلقائي</button>
+</div>
+<div class="panel" id="logPanel">سجل التشغيل سيظهر هنا...</div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
