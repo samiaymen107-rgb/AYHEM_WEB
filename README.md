@@ -48,47 +48,45 @@ button{padding:10px 20px;margin:5px;border:none;border-radius:10px;font-weight:b
 </div>
 
 <script>
-// تعريف الوحدات ومحتواها الذكي
-const modules=[
-  {name:'CORE', desc:'تحميل النواة الأساسية وربط المستودعات...', recs:['التحقق من سلامة الوحدات','مزامنة GitHub وLoFAR']},
-  {name:'MEMORY', desc:'تحميل الذاكرة وربط الوركس...', recs:['تنظيف البيانات القديمة','تحديث قاعدة الذاكرة']},
-  {name:'AI', desc:'تنشيط الذكاء والتحليل وربطه بالتطبيقات...', recs:['تحليل البيانات الحالية','اقتراح تحسينات ذكية']},
-  {name:'UI', desc:'تهيئة الواجهة وربطها بالمستودعات...', recs:['تحسين تجربة المستخدم','مزامنة التحديثات']},
-];
+document.addEventListener("DOMContentLoaded", function(){
+  const modules=[
+    {name:'CORE', desc:'تحميل النواة الأساسية وربط المستودعات...', recs:['التحقق من سلامة الوحدات','مزامنة GitHub وLoFAR']},
+    {name:'MEMORY', desc:'تحميل الذاكرة وربط الوركس...', recs:['تنظيف البيانات القديمة','تحديث قاعدة الذاكرة']},
+    {name:'AI', desc:'تنشيط الذكاء والتحليل وربطه بالتطبيقات...', recs:['تحليل البيانات الحالية','اقتراح تحسينات ذكية']},
+    {name:'UI', desc:'تهيئة الواجهة وربطها بالمستودعات...', recs:['تحسين تجربة المستخدم','مزامنة التحديثات']},
+  ];
 
-// الوظيفة التي تحاكي التقدم لكل وحدة
-function loadModule(idx){
-  const view=document.getElementById('view');
-  if(idx>=modules.length){
-    view.innerHTML='<strong>تم تشغيل كل الوحدات الذكية بنجاح وربطها بالمستودعات والوركس!</strong>';
-    return;
-  }
-  const module=modules[idx];
-  view.innerHTML=`
-    <strong>جارٍ تحميل وحدة ${module.name}...</strong>
-    <div class="progress-bar-container"><div class="progress-bar" id="bar${idx}"></div></div>
-    <div class="log" id="log${idx}">${module.desc}</div>
-    <div class="recs" id="recs${idx}">${module.recs.map(r=>'• '+r).join('<br>')}</div>
-  `;
-  const bar=document.getElementById(`bar${idx}`);
-  let progress=0;
-  const interval=setInterval(()=>{
-    progress+=Math.random()*12;
-    if(progress>100) progress=100;
-    bar.style.width=progress+'%';
-    if(progress>=100){
-      clearInterval(interval);
-      // الانتقال للوحدة التالية بعد قليل
-      setTimeout(()=>loadModule(idx+1),400);
+  function loadModule(idx){
+    const view=document.getElementById('view');
+    if(idx>=modules.length){
+      view.innerHTML='<strong>تم تشغيل كل الوحدات الذكية بنجاح وربطها بالمستودعات والوركس!</strong>';
+      return;
     }
-  },150);
-}
+    const module=modules[idx];
+    view.innerHTML=`
+      <strong>جارٍ تحميل وحدة ${module.name}...</strong>
+      <div class="progress-bar-container"><div class="progress-bar" id="bar${idx}"></div></div>
+      <div class="log" id="log${idx}">${module.desc}</div>
+      <div class="recs" id="recs${idx}">${module.recs.map(r=>'• '+r).join('<br>')}</div>
+    `;
+    const bar=document.getElementById(`bar${idx}`);
+    let progress=0;
+    const interval=setInterval(()=>{
+      progress+=Math.random()*12;
+      if(progress>100) progress=100;
+      bar.style.width=progress+'%';
+      if(progress>=100){
+        clearInterval(interval);
+        setTimeout(()=>loadModule(idx+1),400);
+      }
+    },150);
+  }
 
-// ربط الأزرار
-document.getElementById('startBtn').addEventListener('click',()=>{loadModule(0);});
-document.getElementById('dashboardBtn').addEventListener('click',()=>{
-  // يمكن هنا ربط لوحة التحكم الحقيقية مع المستودعات
-  alert('فتح لوحة التحكم الذكية (قيد الربط بالمستودعات)');
+  // ربط الأزرار
+  document.getElementById('startBtn').addEventListener('click', ()=>{loadModule(0);});
+  document.getElementById('dashboardBtn').addEventListener('click', ()=>{
+    alert('فتح لوحة التحكم الذكية (قيد الربط بالمستودعات)');
+  });
 });
 </script>
 </body>
