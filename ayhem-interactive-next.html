@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM — Interactive Next</title>
+<style>
+body {
+    margin:0;
+    background:#0b0f14;
+    font-family:Arial,sans-serif;
+    color:#00f0ff;
+    overflow:hidden;
+}
+.container {
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    text-align:center;
+}
+h1 { font-size:32px; margin-bottom:15px; }
+input {
+    padding:10px; border-radius:8px; border:none; width:220px; margin-right:10px;
+}
+button {
+    padding:10px 20px; border:none; border-radius:8px; background:#00f0ff; color:#000; cursor:pointer; font-weight:bold;
+}
+.glitch {
+    position:relative;
+    font-size:40px;
+    font-weight:bold;
+    color:#0ff;
+    animation: glitchAnim 2s infinite;
+}
+@keyframes glitchAnim {
+    0% { text-shadow: 2px 0 #f0f, -2px 0 #0ff; }
+    25% { text-shadow: -2px 0 #f0f, 2px 0 #0ff; }
+    50% { text-shadow: 2px 2px #f0f, -2px -2px #0ff; }
+    75% { text-shadow: -2px 2px #f0f, 2px -2px #0ff; }
+    100% { text-shadow: 2px 0 #f0f, -2px 0 #0ff; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="glitch">AYHEM — أول عقل رقمي حي</div>
+    <div style="margin-top:30px;">
+        <input type="text" id="userInput" placeholder="اكتب نص...">
+        <button onclick="sendInput()">إرسال</button>
+    </div>
+    <div id="response" style="margin-top:20px; color:#6efeb0;"></div>
+</div>
+
+<script>
+function sendInput() {
+    const input = document.getElementById("userInput").value.trim();
+    if(input === "") return;
+    document.getElementById("response").innerText = "تم استلام: " + input + " (سيتم معالجته لاحقاً)";
+    document.getElementById("userInput").value = "";
+}
+</script>
+
+</body>
+</html>
