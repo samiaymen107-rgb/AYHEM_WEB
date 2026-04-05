@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM — النسخة التفاعلية المتقدمة</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0b1020;
+    color: #e8ecff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+.app {
+    background: #121a33;
+    border-radius: 20px;
+    max-width: 1000px;
+    width: 100%;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+h1,h2 { margin:0 0 10px; }
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.primary { background:#6ea8fe; color:#081022; }
+.secondary { background:transparent; color:#e8ecff; border:1px solid #e8ecff; }
+.panel {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 15px;
+    margin-top: 20px;
+}
+.log { margin-top:10px; font-size:0.95rem; color:#6efeb0; }
+.footer { margin-top:20px; font-size:0.9rem; color:#9aa7d6; text-align:center; }
+canvas { width:100%; height:300px; margin-top:20px; border-radius:15px; background:rgba(255,255,255,0.05); }
+</style>
+</head>
+<body>
+<div class="app">
+    <h1>AYHEM — العقل الرقمي الحي</h1>
+    <h2>النسخة التفاعلية المتقدمة</h2>
+    
+    <button class="primary" onclick="startSystem()">بدء النظام الذكي</button>
+    <button class="secondary" onclick="stopSystem()">إيقاف النظام</button>
+
+    <div class="panel" id="controlPanel">
+        <h3>لوحة التحكم</h3>
+        <p class="log" id="statusLog">النظام متوقف.</p>
+    </div>
+
+    <canvas id="progressChart"></canvas>
+    <div class="footer">© 2026 AYHEM — أول عقل رقمي حي</div>
+</div>
+
+<script src="ayhem.js"></script>
+<script>
+// لوحة التحكم الأساسية
+function startSystem() {
+    document.getElementById('statusLog').innerText = "تشغيل النظام الذكي...";
+    AYHEM.start(); // افتراض وجود وحدة AYHEM الأساسية
+    updateChart();
+}
+
+function stopSystem() {
+    document.getElementById('statusLog').innerText = "تم إيقاف النظام.";
+    AYHEM.stop();
+}
+
+// رسم تقدم النظام
+function updateChart() {
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['جلسة', 'دائمة', 'تجارب متقدمة', 'واجهات ذكية'],
+            datasets: [{
+                label: 'نسبة الإنجاز %',
+                data: [80, 70, 65, 60],
+                backgroundColor: ['#4caf50','#2196f3','#ff9800','#9c27b0']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'top' } },
+            scales: { y: { beginAtZero: true, max: 100 } }
+        }
+    });
+}
+
+// محاكاة ربط الوحدات الذكية
+const AYHEM = {
+    start: () => console.log("AYHEM: النظام بدأ"),
+    stop: () => console.log("AYHEM: النظام متوقف"),
+};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>
