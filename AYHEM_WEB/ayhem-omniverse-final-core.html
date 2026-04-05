@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM — Omniverse Final Core</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body { margin:0; background:#0b0f14; color:#00f0ff; font-family:Arial, sans-serif; }
+  .container { width:90%; max-width:1200px; margin:auto; padding:20px; text-align:center; }
+  h1, h2 { color:#00f0ff; margin:10px 0; }
+  .module { margin:20px 0; padding:15px; border:1px solid #00f0ff; border-radius:12px; background:rgba(0,240,255,0.05); }
+  textarea { width:100%; height:120px; background:#0b0f14; color:#00f0ff; border:1px solid #00f0ff; padding:10px; border-radius:8px; resize:none; }
+  button { padding:10px 20px; margin:5px; border:none; border-radius:8px; background:#00f0ff; color:#0b0f14; cursor:pointer; font-weight:bold; }
+  button:hover { background:#00c0ff; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>AYHEM — Omniverse Final Core</h1>
+  <h2>النواة الشاملة للعقل الرقمي الحي</h2>
+
+  <!-- وحدة الإدخال الذكي -->
+  <div class="module">
+    <h2>وحدة الإدخال الذكي</h2>
+    <textarea id="inputArea" placeholder="أدخل أوامر المشروع هنا..."></textarea><br>
+    <button onclick="processInput()">تنفيذ</button>
+  </div>
+
+  <!-- وحدة عرض القوالب -->
+  <div class="module">
+    <h2>وحدة القوالب والأنظمة</h2>
+    <div id="templatesArea">تحميل القوالب الذكية...</div>
+    <button onclick="loadTemplates()">تحديث القوالب</button>
+  </div>
+
+  <!-- وحدة سجل الأخطاء الذكي -->
+  <div class="module">
+    <h2>سجل الأخطاء الذكي</h2>
+    <div id="errorLog">جاري مراقبة الأخطاء والتصحيحات التلقائية...</div>
+  </div>
+</div>
+
+<script>
+const templates = [
+  "AYHEM_SUPREME_CORE",
+  "نظام ذكاء أيهم",
+  "AYHEM-Omniverse-Final"
+];
+
+function loadTemplates() {
+  const area = document.getElementById("templatesArea");
+  area.innerHTML = "";
+  templates.forEach(t => {
+    const div = document.createElement("div");
+    div.textContent = `✅ ${t}`;
+    area.appendChild(div);
+  });
+}
+
+function processInput() {
+  const input = document.getElementById("inputArea").value;
+  const log = document.getElementById("errorLog");
+  if(!input) { log.innerHTML = "⚠️ لم يتم إدخال أي أمر"; return; }
+
+  // معالجة ذكية مدمجة (تصحيح تلقائي للأخطاء البسيطة)
+  let output = input.replace(/غلط/g, "صح"); // مثال تصحيح تلقائي
+  log.innerHTML = `🟢 تم تنفيذ الأمر: ${output}`;
+}
+
+// تحميل القوالب تلقائي عند فتح الصفحة
+window.onload = loadTemplates;
+</script>
+</body>
+</html>
