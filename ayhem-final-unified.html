@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>أيهم — أول عقل رقمي حي (النسخة النهائية)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* --- CSS موحد لكل واجهات أيهم --- */
+body {
+    margin:0; font-family:Arial,sans-serif; background:#0b1020; color:#e8ecff;
+    display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px;
+}
+.app {
+    background:#121a33; border-radius:20px; max-width:960px; width:100%; padding:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+}
+h1,h2,h3 { margin:0 0 10px; }
+button { padding:10px 20px; margin:5px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; }
+.primary { background:#6ea8fe; color:#081022; }
+.secondary { background:transparent; color:#e8ecff; border:1px solid #e8ecff; }
+.panel { background:rgba(255,255,255,0.05); padding:15px; border-radius:15px; margin-top:20px; }
+.log { margin-top:10px; font-size:0.95rem; color:#6efeb0; }
+.footer { margin-top:20px; font-size:0.9rem; color:#9aa7d6; text-align:center; }
+/* إضافات للقوائم التفاعلية */
+.nav { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:20px; }
+.nav button { flex:1 1 120px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+<h1>أيهم — أول عقل رقمي حي</h1>
+<h2>النسخة النهائية الموحدة</h2>
+
+<div class="nav">
+<button class="primary" onclick="launchModule('dashboard')">لوحة التحكم</button>
+<button class="primary" onclick="launchModule('hyperlive')">HyperLive</button>
+<button class="primary" onclick="launchModule('memory')">خريطة الذاكرة</button>
+<button class="primary" onclick="launchModule('investment')">تقارير الاستثمار</button>
+<button class="secondary" onclick="launchModule('ai')">وحدة الذكاء الاصطناعي</button>
+</div>
+
+<div class="panel" id="modulePanel">
+<p>اضغط على أي زر لتشغيل الوحدة المحددة...</p>
+</div>
+
+<div class="log" id="systemLog">سجل النظام: جاهز للتشغيل.</div>
+<div class="footer">© 2026 مشروع أيهم — العقل الرقمي الحي</div>
+</div>
+
+<script>
+/* --- JavaScript موحد لكل وحدات أيهم --- */
+function log(msg) {
+    document.getElementById('systemLog').innerText = "سجل النظام: " + msg;
+}
+
+// محاكاة تشغيل الوحدات
+function launchModule(name) {
+    const panel = document.getElementById('modulePanel');
+    switch(name) {
+        case 'dashboard':
+            panel.innerHTML = "<h3>لوحة التحكم الرئيسية</h3><p>تشغيل كل الوظائف الأساسية...</p>";
+            log("لوحة التحكم نشطة.");
+            break;
+        case 'hyperlive':
+            panel.innerHTML = "<h3>HyperLive AI</h3><p>الذكاء التنبؤي والتحليل اللحظي...</p>";
+            log("وحدة HyperLive نشطة.");
+            break;
+        case 'memory':
+            panel.innerHTML = "<h3>خريطة الذاكرة</h3><p>عرض وحدات الذاكرة وخلايا البيانات...</p>";
+            log("خريطة الذاكرة مفتوحة.");
+            break;
+        case 'investment':
+            panel.innerHTML = "<h3>تقارير الاستثمار</h3><p>تحليل الأسواق واتخاذ القرارات الذكية...</p>";
+            log("وحدة الاستثمار نشطة.");
+            break;
+        case 'ai':
+            panel.innerHTML = "<h3>وحدة الذكاء الاصطناعي</h3><p>دمج كل أنظمة AI، التنبؤ، التعلم الذاتي...</p>";
+            log("وحدة الذكاء الاصطناعي مفعلة.");
+            break;
+        default:
+            panel.innerHTML = "<p>الوحدة غير متوفرة.</p>";
+            log("خطأ: وحدة غير معروفة.");
+    }
+}
+
+// --- Placeholder دمج الذكاء الاصطناعي ووحدات المشروع ---
+// أيهم الذكاء الاصطناعي الأساسي
+class AYHEM_AI_Core {
+    constructor() { this.status="جاهز"; }
+    run() { log("AYHEM AI: تشغيل النظام الذكي."); }
+    selfUpdate() { log("AYHEM AI: تحديث تلقائي."); }
+    restoreMemory() { log("AYHEM AI: استرجاع البيانات."); }
+}
+const ayhemAI = new AYHEM_AI_Core();
+ayhemAI.run();
+
+// Placeholder لوحدات التفاعل المستقبلية
+function interactiveModule() { log("الوحدة التفاعلية جاهزة."); }
+
+</script>
+</body>
+</html>
