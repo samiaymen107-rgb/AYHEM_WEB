@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AYHEM — العقل الرقمي الحي | النسخة النهائية</title>
+<style>
+/* ===========================
+   AYHEM Omniverse Final v1
+   النسخة النهائية الموحدة
+   =========================== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: #0b0f14;
+    color: #00f0ff;
+    overflow-x: hidden;
+}
+.container {
+    width: 90%;
+    max-width: 1400px;
+    margin: auto;
+    padding: 20px;
+}
+header {
+    text-align: center;
+    padding: 40px 20px;
+}
+h1 {
+    font-size: 2.5rem;
+    color: #00f0ff;
+    margin-bottom: 10px;
+}
+h2 {
+    font-size: 1.8rem;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+p {
+    line-height: 1.6;
+    font-size: 1rem;
+}
+a {
+    color: #00f0ff;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+section {
+    margin-bottom: 40px;
+}
+footer {
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid #00f0ff33;
+    font-size: 0.9rem;
+}
+/* ===========================
+   Dynamic AI & Interactive UI
+   =========================== */
+#ai-console {
+    background: #0b0f14;
+    border: 1px solid #00f0ff44;
+    padding: 15px;
+    margin-top: 20px;
+    font-family: monospace;
+    height: 250px;
+    overflow-y: auto;
+}
+button {
+    background: #00f0ff22;
+    border: 1px solid #00f0ff;
+    color: #00f0ff;
+    padding: 10px 20px;
+    margin: 5px 0;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+button:hover {
+    background: #00f0ff44;
+}
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: auto;
+}
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+/* ===========================
+   Media Queries & Responsiveness
+   =========================== */
+@media (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; }
+    .container { padding: 10px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+    <h1>أيهم — العقل الرقمي الحي</h1>
+    <p>النسخة النهائية الذكية للنسخة المدمجة والمتطورة</p>
+</header>
+
+<section>
+    <h2>الوحدة الرقمية الموحدة</h2>
+    <p>تم دمج كل القوالب السابقة وإنشاء القالب النهائي الذكي مع ربط تلقائي لكل الوظائف، الصور، والوسائط.</p>
+    <div class="grid">
+        <img src="media/ayhem-core.png" alt="AYHEM Core">
+        <img src="media/ayhem-grid.png" alt="AYHEM Grid">
+        <img src="media/ayhem-layer.png" alt="AYHEM Layers">
+    </div>
+</section>
+
+<section>
+    <h2>واجهة التحكم الذكية</h2>
+    <p>يمكن التحكم في الطبقات الذكية والذاكرة الرقمية والتحليلات عبر وحدة التحكم التفاعلية.</p>
+    <div id="ai-console"></div>
+    <button onclick="runAICommand('analyze')">تشغيل التحليل الذكي</button>
+    <button onclick="runAICommand('report')">توليد تقرير تلقائي</button>
+</section>
+
+<section>
+    <h2>الربط بالذكاء الاصطناعي</h2>
+    <p>كل البيانات والميديا مترابطة مع وحدة الذكاء الاصطناعي للتحديث والتطوير التلقائي.</p>
+</section>
+
+<footer>
+    &copy; 2026 مشروع أيهم | أول عقل رقمي حي
+</footer>
+</div>
+
+<script>
+/* ===========================
+   AI Console Simulation
+   =========================== */
+function logAI(message) {
+    const consoleDiv = document.getElementById('ai-console');
+    const p = document.createElement('p');
+    p.textContent = '> ' + message;
+    consoleDiv.appendChild(p);
+    consoleDiv.scrollTop = consoleDiv.scrollHeight;
+}
+
+function runAICommand(cmd) {
+    switch(cmd) {
+        case 'analyze':
+            logAI('بدء تحليل الذكاء الرقمي...');
+            setTimeout(()=>logAI('تم اكتشاف كل الأخطاء وتصحيحها تلقائياً.'), 1500);
+            break;
+        case 'report':
+            logAI('توليد التقرير الذكي...');
+            setTimeout(()=>logAI('تم إنشاء تقرير كامل جاهز للعرض والتحميل.'), 1500);
+            break;
+        default:
+            logAI('أمر غير معروف.');
+    }
+}
+
+/* ===========================
+   Auto-load AI analysis
+   =========================== */
+document.addEventListener('DOMContentLoaded', () => {
+    logAI('تحميل النسخة النهائية للقالب الذكي...');
+    setTimeout(()=>logAI('القالب جاهز للتثبيت والتشغيل.'), 1000);
+});
+</script>
+</body>
+</html>
