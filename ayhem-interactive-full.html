@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>AYHEM — النسخة التفاعلية الكاملة</title>
+<style>
+body { margin:0; font-family:Arial,sans-serif; background:#0b1020; color:#e8ecff; display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:20px;}
+.app { background:#121a33; border-radius:20px; max-width:1200px; width:100%; padding:25px; box-shadow:0 10px 30px rgba(0,0,0,0.35);}
+h1,h2 { margin:0 0 10px; text-align:center;}
+button { padding:10px 20px; margin:5px; border:none; border-radius:10px; font-weight:bold; cursor:pointer;}
+.primary { background:#6ea8fe; color:#081022;}
+.secondary { background:transparent; color:#e8ecff; border:1px solid #e8ecff;}
+.panel { background: rgba(255,255,255,0.05); padding:15px; border-radius:15px; margin-top:20px;}
+.log { margin-top:10px; font-size:0.95rem; color:#6efeb0;}
+.footer { margin-top:20px; font-size:0.9rem; color:#9aa7d6; text-align:center;}
+canvas { width:100%; height:300px; margin-top:20px; border-radius:15px; background:rgba(255,255,255,0.05);}
+.audio-controls { margin-top:15px; display:flex; justify-content:center; gap:10px;}
+</style>
+</head>
+<body>
+<div class="app">
+    <h1>AYHEM — أول عقل رقمي حي</h1>
+    <h2>النسخة التفاعلية الكاملة</h2>
+
+    <div>
+        <button class="primary" onclick="AYHEM.start()">بدء النظام الذكي</button>
+        <button class="secondary" onclick="AYHEM.stop()">إيقاف النظام</button>
+    </div>
+
+    <div class="panel" id="controlPanel">
+        <h3>لوحة التحكم العامة</h3>
+        <p class="log" id="statusLog">النظام متوقف.</p>
+        <canvas id="progressChart"></canvas>
+    </div>
+
+    <div class="panel audio-controls">
+        <button onclick="AYHEM.audio.play('alert')">تشغيل صوت تنبيه</button>
+        <button onclick="AYHEM.audio.play('welcome')">تشغيل رسالة ترحيبية</button>
+    </div>
+
+    <div class="panel">
+        <h3>وحدة الذاكرة والتنبؤ</h3>
+        <button onclick="AYHEM.memory.analyze()">تحليل البيانات</button>
+        <button onclick="AYHEM.eil.runForecast()">توقعات طويلة المدى</button>
+        <p class="log" id="memoryLog">لا توجد نتائج بعد.</p>
+    </div>
+
+    <div class="panel">
+        <h3>وحدة الذكاء الاصطناعي والتفاعل</h3>
+        <button onclick="AYHEM.core.processInput('مرحباً')">أرسل إدخال تجريبي</button>
+        <button onclick="AYHEM.fusion.integrate()">دمج الوحدات</button>
+        <p class="log" id="aiLog">لم يتم معالجة أي إدخال.</p>
+    </div>
+
+    <div class="footer">© 2026 AYHEM — أول عقل رقمي حي</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// المحاكاة الأساسية لوحدات AYHEM
+const AYHEM = {
+    start: () => {
+        document.getElementById('statusLog').innerText = "تشغيل النظام الذكي...";
+        console.log("AYHEM: النظام بدأ");
+        updateChart();
+    },
+    stop: () => {
+        document.getElementById('statusLog').innerText = "تم إيقاف النظام.";
+        console.log("AYHEM: النظام متوقف");
+    },
+    audio: {
+        play: (type) => console.log("تشغيل صوت:", type)
+    },
+    memory: {
+        analyze: () => {
+            document.getElementById('memoryLog').innerText = "تحليل مكتمل: بيانات جاهزة للعرض.";
+            console.log("AYHEM: تحليل الذاكرة تم");
+        }
+    },
+    eil: {
+        runForecast: () => console.log("AYHEM: توقعات طويلة المدى تعمل")
+    },
+    core: {
+        processInput: (input) => {
+            document.getElementById('aiLog').innerText = `تم معالجة الإدخال: ${input}`;
+            console.log("AYHEM: معالجة الإدخال", input);
+        }
+    },
+    fusion: {
+        integrate: () => console.log("AYHEM: دمج الوحدات الذكية")
+    }
+};
+
+// رسم مخطط التقدم
+function updateChart() {
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['جلسة', 'دائمة', 'تجارب متقدمة', 'واجهات ذكية', 'وحدات صوتية'],
+            datasets: [{
+                label: 'نسبة الإنجاز %',
+                data: [80, 70, 65, 60, 50],
+                backgroundColor: ['#4caf50','#2196f3','#ff9800','#9c27b0','#f44336']
+            }]
+        },
+        options: { responsive:true, plugins:{legend:{position:'top'}}, scales:{y:{beginAtZero:true, max:100}} }
+    });
+}
+</script>
+</body>
+</html>
