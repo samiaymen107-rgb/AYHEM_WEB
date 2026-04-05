@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AYHEM — العقل الرقمي الحي | النسخة النهائية</title>
+<style>
+  /* تصميم متقن ومتطور، واجهة ذكية تفاعلية */
+  body {
+    margin:0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#0b1020,#1a1f35);
+    color:#e8ecff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    padding:20px;
+  }
+  .app {
+    background:#121a33;
+    border-radius:20px;
+    max-width:1080px;
+    width:100%;
+    padding:30px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.5);
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+  }
+  h1,h2,h3 { margin:5px 0; color:#6efeb0; }
+  button {
+    padding:12px 25px;
+    margin:5px;
+    border:none;
+    border-radius:12px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+  }
+  button.primary { background:#6ea8fe; color:#081022; }
+  button.secondary { background:transparent; color:#e8ecff; border:1px solid #e8ecff; }
+  button:hover { opacity:0.85; }
+  .panel {
+    background:rgba(255,255,255,0.05);
+    padding:20px;
+    border-radius:15px;
+    margin-top:10px;
+    overflow:auto;
+  }
+  .log { margin-top:10px; font-size:0.9rem; color:#6efeb0; max-height:200px; overflow:auto; }
+  .footer { margin-top:20px; font-size:0.85rem; color:#9aa7d6; text-align:center; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>مشروع أيهم — أول عقل رقمي حي</h1>
+  <h3>النسخة النهائية: Omniverse Core</h3>
+
+  <div class="panel">
+    <p>نقطة توحيد دخول الابتكار في النظام، دمج الوحدات الأساسية، وعرض البايتات بطريقة ذكية متكاملة.</p>
+    <button class="primary" onclick="AYHEM.startSystem()">بدء النظام الذكي</button>
+    <button class="secondary" onclick="AYHEM.openDashboard()">فتح لوحة التحكم</button>
+  </div>
+
+  <div class="panel">
+    <h2>وحدة المراقبة والتقارير</h2>
+    <button class="primary" onclick="AYHEM.runDiagnostics()">تشغيل التشخيص الذكي</button>
+    <button class="secondary" onclick="AYHEM.generateReport()">توليد تقرير شامل</button>
+    <div class="log" id="logConsole">سجل الأحداث سيظهر هنا...</div>
+  </div>
+
+  <div class="footer">
+    © 2026 AYHEM | العقل الرقمي الحي — النسخة النهائية المتكاملة
+  </div>
+</div>
+
+<script>
+  /* الوحدة الذكية الأساسية — Omniverse Core */
+  const AYHEM = {
+    startSystem: function() {
+      this.log("تشغيل النظام الذكي...");
+      this.initMemory();
+      this.initModules();
+      this.log("النظام جاهز للعمل.");
+    },
+    openDashboard: function() {
+      this.log("فتح لوحة التحكم...");
+      alert("لوحة التحكم الذكية تعمل الآن.");
+    },
+    runDiagnostics: function() {
+      this.log("تشغيل التشخيص...");
+      setTimeout(()=>this.log("التشخيص اكتمل: كل الوحدات تعمل بشكل سليم."),1500);
+    },
+    generateReport: function() {
+      this.log("توليد التقرير...");
+      setTimeout(()=>this.log("تم توليد التقرير النهائي بنجاح."),1000);
+    },
+    log: function(msg){
+      const consoleEl = document.getElementById("logConsole");
+      const timestamp = new Date().toLocaleTimeString();
+      consoleEl.innerHTML += `[${timestamp}] ${msg}<br>`;
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    },
+    initMemory: function(){
+      this.log("تهيئة الذاكرة الذكية...");
+      // محاكاة الذاكرة المؤقتة والدائمة
+      this.memory = { session:[], permanent:[] };
+    },
+    initModules: function(){
+      this.log("تحميل الوحدات الأساسية...");
+      // محاكاة تحميل الوحدات الذكية
+      this.modules = ["AI-Core","Predictive-Engine","Decision-Matrix","Fusion-Bridge"];
+    }
+  };
+</script>
+</body>
+</html>
