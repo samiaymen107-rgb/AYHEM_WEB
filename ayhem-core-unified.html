@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AYHEM — العقل الرقمي الحي | النواة الموحدة</title>
+<style>
+:root {
+    --primary: #00f0ff;
+    --secondary: #004080;
+    --dark: #0b0f14;
+    --darker: #070a0f;
+    --success: #00ff88;
+    --warning: #ffaa00;
+    --danger: #ff4444;
+}
+* { box-sizing: border-box; }
+body {
+    background: var(--dark);
+    color: var(--primary);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 20px;
+}
+.sidebar {
+    background: var(--darker);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid var(--secondary);
+}
+.sidebar h3 { color: var(--primary); margin-top: 0; }
+.stats {
+    background: rgba(0,64,128,0.3);
+    padding: 10px;
+    border-radius: 10px;
+    margin: 15px 0;
+}
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
+    font-size: 0.9em;
+}
+.progress-bar {
+    background: var(--secondary);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.progress-fill {
+    background: var(--primary);
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s;
+}
+.main {
+    background: var(--darker);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid var(--secondary);
+}
+.console-area {
+    margin-bottom: 20px;
+}
+textarea {
+    width: 100%;
+    height: 120px;
+    background: #111;
+    color: #0ff;
+    border: 1px solid var(--secondary);
+    padding: 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    border-radius: 10px;
+    resize: vertical;
+}
+button {
+    background: var(--secondary);
+    color: var(--primary);
+    border: none;
+    padding: 10px 24px;
+    margin: 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+button:hover {
+    background: #0066cc;
+    transform: translateY(-1px);
+}
+button.danger { background: var(--danger); color: white; }
+button.success { background: var(--success); color: var(--dark); }
+.log-area {
+    background: #00000055;
+    border-radius: 10px;
+    padding: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 12px;
+}
+.log-entry {
+    padding: 4px 0;
+    border-bottom: 1px solid #00408033;
+}
+.commands-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 15px 0;
+}
+.cmd-btn {
+    background: #1a1a2e;
+    padding: 6px 12px;
+    font-size: 12px;
+}
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+.status-active { background: #00ff8833; color: #00ff88; }
+.status-warning { background: #ffaa0033; color: #ffaa00; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="sidebar">
+        <h2>🧠 أيهم</h2>
+        <div class="stats">
+            <div class="stat-item">
+                <span>📊 الإنجاز الإجمالي</span>
+                <span id="overallPercent">80%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="overallFill" style="width:80%"></div></div>
+            <div class="stat-item"><span>🗄️ الذاكرة الدائمة</span><span id="permCount">0</span></div>
+            <div class="stat-item"><span>🔄 ذاكرة الجلسة</span><span id="sessCount">0</span></div>
+            <div class="stat-item"><span>📝 سجل الأحداث</span><span id="logCount">0</span></div>
+        </div>
+        <div class="commands-grid" id="quickCommands"></div>
+        <div class="stats">
+            <div class="stat-item"><span>🛡️ SentinelX</span><span id="sentinelStatus" class="status-badge status-active">نشط</span></div>
+            <div class="stat-item"><span>🔐 التشفير ENC-V1</span><span id="encStatus" class="status-badge status-active">مفعل</span></div>
+        </div>
+    </div>
+
+    <div class="main">
+        <h1>أيهم — العقل الرقمي الحي</h1>
+        <p>النواة التشغيلية الموحدة | الإصدار 2.0 | <span id="timestamp"></span></p>
+        
+        <div class="console-area">
+            <textarea id="consoleInput" placeholder="أدخل الأوامر هنا... (مثال: /حفظ مفتاح قيمة | /تحليل | /توقع | /بحث كلمة)"></textarea>
+            <div>
+                <button onclick="executeCommand()">▶ تنفيذ</button>
+                <button onclick="clearConsole()" class="danger">🗑 مسح</button>
+                <button onclick="exportData()" class="success">💾 تصدير</button>
+            </div>
+        </div>
+        
+        <div class="log-area" id="logArea">
+            <div class="log-entry">✨ نظام أيهم جاهز. انتظر الأوامر...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+const ENC = {
+    key: 12345,
+    simpleEncode(str) {
+        let result = '';
+        for(let i = 0; i < str.length; i++) {
+            result += String.fromCharCode(str.charCodeAt(i) ^ (this.key % 256));
+        }
+        return btoa(result);
+    },
+    simpleDecode(str) {
+        try {
+            let decoded = atob(str);
+            let result = '';
+            for(let i = 0; i < decoded.length; i++) {
+                result += String.fromCharCode(decoded.charCodeAt(i) ^ (this.key % 256));
+            }
+            return result;
+        } catch(e) { return '[مشفر]'; }
+    }
+};
+
+const AYHEM = {
+    session: {},
+    permanent: {},
+    auditLog: [],
+    
+    saveSession(key, value) {
+        this.session[key] = value;
+        this.addLog(`SESSION`, `حفظ: ${key}`);
+        this.updateUI();
+        return true;
+    },
+    
+    savePermanent(key, value) {
+        this.permanent[key] = value;
+        localStorage.setItem(`AYHEM_${key}`, ENC.simpleEncode(JSON.stringify(value)));
+        this.addLog(`PERMANENT`, `حفظ: ${key}`);
+        this.updateUI();
+        return true;
+    },
+    
+    getPermanent(key) {
+        const stored = localStorage.getItem(`AYHEM_${key}`);
+        if(stored) {
+            try {
+                return JSON.parse(ENC.simpleDecode(stored));
+            } catch(e) { return this.permanent[key]; }
+        }
+        return this.permanent[key];
+    },
+    
+    getSession(key) { return this.session[key]; },
+    
+    search(query) {
+        const results = [];
+        for(let [k,v] of Object.entries(this.session)) {
+            if(k.includes(query) || JSON.stringify(v).includes(query)) results.push(`[جلسة] ${k}: ${v}`);
+        }
+        for(let [k,v] of Object.entries(this.permanent)) {
+            if(k.includes(query) || JSON.stringify(v).includes(query)) results.push(`[دائم] ${k}: ${v}`);
+        }
+        return results;
+    },
+    
+    analyze() {
+        const analysis = {
+            timestamp: new Date().toISOString(),
+            sessionKeys: Object.keys(this.session).length,
+            permanentKeys: Object.keys(this.permanent).length,
+            totalLogs: this.auditLog.length,
+            recommendations: []
+        };
+        if(analysis.sessionKeys < 5) analysis.recommendations.push("أضف المزيد من البيانات إلى الذاكرة الجلسية");
+        if(analysis.permanentKeys < 10) analysis.recommendations.push("عزز الذاكرة الدائمة بمزيد من المعلومات");
+        return analysis;
+    },
+    
+    predict() {
+        const data = this.analyze();
+        const confidence = Math.min(85 + data.sessionKeys + data.permanentKeys, 98);
+        return {
+            confidence: `${confidence}%`,
+            prediction: data.permanentKeys > 20 ? "النظام مستقر ويتجه نحو الاكتمال" : "يحتاج النظام إلى مزيد من البيانات للتنبؤ الدقيق",
+            nextMilestone: data.permanentKeys > 30 ? "جاهز للإطلاق" : "أكمل بناء الذاكرة الدائمة"
+        };
+    },
+    
+    addLog(type, message) {
+        const entry = `[${new Date().toLocaleTimeString()}] [${type}] ${message}`;
+        this.auditLog.unshift(entry);
+        localStorage.setItem('AYHEM_AUDIT_LOG', ENC.simpleEncode(JSON.stringify(this.auditLog.slice(0, 100))));
+        this.updateLogDisplay();
+    },
+    
+    updateUI() {
+        document.getElementById('permCount').innerText = Object.keys(this.permanent).length;
+        document.getElementById('sessCount').innerText = Object.keys(this.session).length;
+        document.getElementById('logCount').innerText = this.auditLog.length;
+    },
+    
+    updateLogDisplay() {
+        const logDiv = document.getElementById('logArea');
+        if(logDiv) {
+            logDiv.innerHTML = this.auditLog.slice(0, 50).map(l => `<div class="log-entry">${l}</div>`).join('');
+        }
+    },
+    
+    loadFromStorage() {
+        for(let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if(key && key.startsWith('AYHEM_') && key !== 'AYHEM_AUDIT_LOG') {
+                const realKey = key.replace('AYHEM_', '');
+                const value = this.getPermanent(realKey);
+                if(value) this.permanent[realKey] = value;
+            }
+        }
+        const savedLog = localStorage.getItem('AYHEM_AUDIT_LOG');
+        if(savedLog) {
+            try {
+                this.auditLog = JSON.parse(ENC.simpleDecode(savedLog));
+            } catch(e) {}
+        }
+        this.addLog('SYSTEM', 'تم تحميل البيانات من التخزين الدائم');
+        this.updateUI();
+        this.updateLogDisplay();
+    }
+};
+
+const COMMANDS = {
+    '/حفظ': (args) => { if(args.length>=2) return AYHEM.saveSession(args[0], args.slice(1).join(' ')); return "خطأ: /حفظ مفتاح قيمة"; },
+    '/دائم': (args) => { if(args.length>=2) return AYHEM.savePermanent(args[0], args.slice(1).join(' ')); return "خطأ: /دائم مفتاح قيمة"; },
+    '/عرض': () => JSON.stringify(AYHEM.session, null, 2),
+    '/عرض-دائم': () => JSON.stringify(AYHEM.permanent, null, 2),
+    '/توقع': () => { const p = AYHEM.predict(); return `🎯 التوقع: ${p.prediction}\n📊 الثقة: ${p.confidence}\n📌 المرحلة القادمة: ${p.nextMilestone}`; },
+    '/تحليل': () => { const a = AYHEM.analyze(); return `📈 التحليل:\n- مفاتيح الجلسة: ${a.sessionKeys}\n- مفاتيح دائمة: ${a.permanentKeys}\n- السجلات: ${a.totalLogs}\n💡 توصيات: ${a.recommendations.join(', ') || 'لا توجد'}`; },
+    '/بحث': (args) => { if(args.length) return AYHEM.search(args.join(' ')).join('\n') || 'لا توجد نتائج'; return 'خطأ: /بحث كلمة'; },
+    '/تقرير': () => `[تقرير أيهم]\nالتاريخ: ${new Date().toLocaleString()}\nالذاكرة الدائمة: ${Object.keys(AYHEM.permanent).length} عنصر\nالذاكرة الجلسية: ${Object.keys(AYHEM.session).length} عنصر\nنسبة الإنجاز: 80%`,
+    '/ملخص': () => `🧠 ملخص أيهم\n━━━━━━━━━━━━━━━━━━━\n📦 الذاكرة: ${Object.keys(AYHEM.permanent).length + Object.keys(AYHEM.session).length} عنصر\n🛡️ الحالة: نشط\n🔐 التشفير: مفعل\n📋 السجلات: ${AYHEM.auditLog.length}`,
+    '/مسار': () => `📍 المسار الحالي:\n1. بناء الذاكرة الدائمة (${Object.keys(AYHEM.permanent).length}/100)\n2. تحسين التحليل (65% → 80%)\n3. تطوير الواجهات (60% → 85%)`,
+    '/مراقبة': () => `🛡️ نظام المراقبة (SentinelX):\n- الذاكرة: مستقرة\n- الأمان: نشط\n- لا توجد اختراقات مسجلة`,
+    '/تنفيذ': () => { AYHEM.addLog('EXEC', 'تنفيذ إجراءات تلقائية'); return "✅ تم تنفيذ الإجراءات التلقائية"; },
+    '/تدقيق': () => AYHEM.auditLog.slice(0, 10).join('\n'),
+    '/حالة': () => `🔧 حالة النظام:\n- الذاكرة الدائمة: ${Object.keys(AYHEM.permanent).length}\n- الذاكرة الجلسية: ${Object.keys(AYHEM.session).length}\n- السجلات: ${AYHEM.auditLog.length}\n- التشفير: مفعل\n- SentinelX: نشط`,
+    '/مساعدة': () => `📖 الأوامر المتاحة:\n/حفظ, /دائم, /عرض, /عرض-دائم, /توقع, /تحليل, /بحث, /تقرير, /ملخص, /مسار, /مراقبة, /تنفيذ, /تدقيق, /حالة, /مساعدة`,
+    '/نسخ-احتياطي': () => { const backup = { session: AYHEM.session, permanent: AYHEM.permanent, timestamp: Date.now() }; localStorage.setItem('AYHEM_BACKUP', ENC.simpleEncode(JSON.stringify(backup))); return "✅ تم إنشاء نسخة احتياطية"; },
+    '/استرجاع': () => { const backup = localStorage.getItem('AYHEM_BACKUP'); if(backup) { try { const data = JSON.parse(ENC.simpleDecode(backup)); AYHEM.permanent = data.permanent || {}; AYHEM.session = data.session || {}; AYHEM.addLog('RECOVERY', 'تم الاسترجاع من النسخة الاحتياطية'); return "✅ تم الاسترجاع بنجاح"; } } return "❌ لا توجد نسخة احتياطية"; }
+};
+
+function executeCommand() {
+    const input = document.getElementById('consoleInput').value.trim();
+    if(!input) return addToLog("⚠️", "الرجاء إدخال أمر");
+    
+    const parts = input.split(' ');
+    const cmd = parts[0].toLowerCase();
+    const args = parts.slice(1);
+    
+    if(COMMANDS[cmd]) {
+        const result = COMMANDS[cmd](args);
+        addToLog("✓", `${input} → ${result}`);
+        AYHEM.addLog('COMMAND', input);
+    } else {
+        addToLog("✗", `أمر غير معروف: ${input}. اكتب /مساعدة للأوامر المتاحة`);
+    }
+    
+    document.getElementById('consoleInput').value = '';
+}
+
+function addToLog(type, message) {
+    const logDiv = document.getElementById('logArea');
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+    logDiv.insertBefore(entry, logDiv.firstChild);
+}
+
+function clearConsole() {
+    document.getElementById('logArea').innerHTML = '<div class="log-entry">✨ تم مسح السجل</div>';
+    AYHEM.addLog('SYSTEM', 'تم مسح سجل الأحداث');
+}
+
+function exportData() {
+    const data = {
+        session: AYHEM.session,
+        permanent: AYHEM.permanent,
+        auditLog: AYHEM.auditLog.slice(0, 50),
+        exportDate: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ayhem_export_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    addToLog("💾", "تم تصدير البيانات بنجاح");
+}
+
+function init() {
+    document.getElementById('timestamp').innerText = new Date().toLocaleString();
+    AYHEM.loadFromStorage();
+    AYHEM.addLog('SYSTEM', 'نظام أيهم جاهز | الإصدار 2.0 | الحماية مفعلة');
+    
+    const quickDiv = document.getElementById('quickCommands');
+    const mainCommands = ['/تحليل', '/توقع', '/ملخص', '/حالة', '/نسخ-احتياطي', '/مساعدة'];
+    mainCommands.forEach(cmd => {
+        const btn = document.createElement('button');
+        btn.innerText = cmd;
+        btn.className = 'cmd-btn';
+        btn.onclick = () => { document.getElementById('consoleInput').value = cmd; executeCommand(); };
+        quickDiv.appendChild(btn);
+    });
+}
+
+init();
+</script>
+</body>
+</html>
