@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>أيهم - المشغل الموحد</title>
+<style>
+body {
+    background: #0b0f14;
+    color: #00f0ff;
+    font-family: monospace;
+    padding: 20px;
+}
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+.card {
+    background: #070a0f;
+    border: 1px solid #004080;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+h1 {
+    text-align: center;
+    color: #00f0ff;
+    text-shadow: 0 0 10px #00f0ff55;
+}
+button {
+    background: #004080;
+    color: #00f0ff;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+button:hover {
+    background: #0066cc;
+}
+.status {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 10px;
+}
+.status-active { background: #00ff8833; color: #00ff88; }
+.status-warning { background: #ffaa0033; color: #ffaa00; }
+.log {
+    background: #000;
+    padding: 10px;
+    border-radius: 8px;
+    height: 200px;
+    overflow-y: auto;
+    font-size: 11px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🧠 أيهم — المشغل الموحد</h1>
+    
+    <div class="card">
+        <h3>📊 حالة المكونات</h3>
+        <div id="componentsStatus"></div>
+    </div>
+    
+    <div class="card">
+        <h3>🎮 لوحة التحكم</h3>
+        <button onclick="runQuickAnalysis()">🔍 تحليل سريع</button>
+        <button onclick="runFullReport()">📋 تقرير كامل</button>
+        <button onclick="runSecurityCheck()">🛡️ فحص أمني</button>
+        <button onclick="runEmergencyBackup()">💾 نسخة طارئة</button>
+        <button onclick="clearLogs()">🗑 مسح السجل</button>
+    </div>
+    
+    <div class="card">
+        <h3>📝 سجل الأحداث</h3>
+        <div class="log" id="logArea">
+            <div>✨ المشغل الموحد جاهز</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// تحميل المكونات
+const COMPONENTS = [
+    { name: "AYHEM_BRIDGE", file: "ayhem-bridge-layer.js", loaded: false },
+    { name: "AYHEM_UI", file: "ayhem-ui-enhancer.js", loaded: false },
+    { name: "AYHEM_AI", file: "ayhem-ai-analyzer.js", loaded: false },
+    { name: "AYHEM_ARCHIVE", file: "ayhem-archive-manager.js", loaded: false },
+    { name: "SENTINELX", file: "ayhem-sentinelx.js", loaded: false },
+    { name: "ESI", file: "ayhem-esi.js", loaded: false }
+];
+
+function addLog(message) {
+    const logDiv = document.getElementById('logArea');
+    const entry = document.createElement('div');
+    entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+    logDiv.insertBefore(entry, logDiv.firstChild);
+}
+
+function updateStatus() {
+    const statusDiv = document.getElementById('componentsStatus');
+    const statusHtml = COMPONENTS.map(c => {
+        const exists = window[c.name];
+        return `<div>${exists ? '✅' : '⏳'} ${c.name}: ${exists ? 'نشط' : 'جاري التحميل...'}</div>`;
+    }).join('');
+    statusDiv.innerHTML = statusHtml;
+}
+
+function loadComponent(component) {
+    return new Promise((resolve) => {
+        if(window[component.name]) {
+            component.loaded = true;
+            addLog(`✅ ${component.name} موجود مسبقًا`);
+            resolve(true);
+            return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = component.file;
+        script.onload = () => {
+            component.loaded = !!window[component.name];
+            addLog(`${component.loaded ? '✅' : '❌'} تحميل ${component.name}`);
+            resolve(component.loaded);
+        };
+        script.onerror = () => {
+            addLog(`❌ فشل تحميل ${component.name}`);
+            resolve(false);
+        };
+        document.head.appendChild(script);
+    });
+}
+
+async function loadAll() {
+    addLog("🚀 بدء تحميل مكونات أيهم...");
+    for(const component of COMPONENTS) {
+        await loadComponent(component);
+        updateStatus();
+    }
+    addLog("🎉 تم تحميل جميع المكونات");
+}
+
+function runQuickAnalysis() {
+    addLog("🔍 تنفيذ تحليل سريع...");
+    if(window.ESI) {
+        const result = window.ESI.quickAnalysis();
+        addLog(`📊 النتيجة: ${JSON.stringify(result)}`);
+    } else {
+        addLog("⚠️ ESI غير متاح");
+    }
+}
+
+function runFullReport() {
+    addLog("📋 تنفيذ تقرير كامل...");
+    if(window.AYHEM_BRIDGE) {
+        const report = window.AYHEM_BRIDGE.fullReport();
+        addLog(`📊 الإنجاز الإجمالي: ${report.overallProgress}%`);
+        addLog(`💡 توصيات: ${report.suggestions.length}`);
+    } else {
+        addLog("⚠️ AYHEM_BRIDGE غير متاح");
+    }
+}
+
+function runSecurityCheck() {
+    addLog("🛡️ تنفيذ فحص أمني...");
+    if(window.SENTINELX) {
+        const report = window.SENTINELX.report();
+        addLog(`🛡️ الحالة: ${report.status}`);
+        addLog(`⚠️ التهديدات: ${report.threatsDetected}`);
+    } else {
+        addLog("⚠️ SENTINELX غير متاح");
+    }
+}
+
+function runEmergencyBackup() {
+    addLog("💾 إنشاء نسخة طارئة...");
+    if(window.SENTINELX) {
+        const backup = window.SENTINELX.emergencyBackup();
+        addLog(`✅ تم حفظ ${backup.keys} مفتاح`);
+    } else {
+        addLog("⚠️ SENTINELX غير متاح");
+    }
+}
+
+function clearLogs() {
+    document.getElementById('logArea').innerHTML = '<div>✨ تم مسح السجل</div>';
+    addLog("🗑 تم مسح سجل الأحداث");
+}
+
+// بدء التشغيل
+loadAll();
+</script>
+</body>
+</html>
