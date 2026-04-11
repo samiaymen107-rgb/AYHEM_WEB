@@ -1,0 +1,85 @@
+{
+  "project": "AYHEM_WEB",
+  "version": "3.0",
+  "smart_linking": {
+    "enabled": true,
+    "auto_sync": true,
+    "cross_reference": "dynamic"
+  },
+  "layers": {
+    "core": {
+      "path": "00_ACTIVE/core/",
+      "files": ["ayhem-unified-core.js", "ayhem-master-loader.js", "ayhem-self-heal.js"],
+      "exports": ["AI_Engine", "Memory_System", "Self_Healing"],
+      "links_to": ["connectors", "memory", "ui"]
+    },
+    "connectors": {
+      "path": "00_ACTIVE/connectors/",
+      "files": ["AYHEM_MASTER_ORCHESTRATOR.js", "mcp-config.json"],
+      "exports": ["GitHub_Bridge", "MCP_Server", "API_Gateway"],
+      "links_to": ["core", "memory"]
+    },
+    "memory": {
+      "path": "00_ACTIVE/memory/",
+      "files": ["ayhem-memory-map.js", "ayhem-long-memory.js", "persistent-memory.js"],
+      "exports": ["ShortTerm", "LongTerm", "Persistent"],
+      "links_to": ["core", "archive"]
+    },
+    "ui": {
+      "path": "00_ACTIVE/ui/",
+      "files": ["index.html", "dashboard.html", "dashboard.js"],
+      "exports": ["Main_UI", "Dashboard", "Controls"],
+      "links_to": ["core", "connectors", "visuals"]
+    },
+    "archive": {
+      "path": "01_ARCHIVE/",
+      "exports": ["versions", "experiments", "history"],
+      "links_to": ["memory", "docs"]
+    },
+    "resources": {
+      "path": "02_RESOURCES/",
+      "exports": ["images", "diagrams", "assets"],
+      "links_to": ["ui", "docs"]
+    },
+    "docs": {
+      "path": "03_DOCS/",
+      "exports": ["guides", "history", "references"],
+      "links_to": ["archive", "resources"]
+    },
+    "tools": {
+      "path": "04_TOOLS/",
+      "exports": ["migration", "analysis", "recovery"],
+      "links_to": ["core", "archive"]
+    }
+  },
+  "auto_routing": {
+    "on_start": "core → connectors → memory → ui",
+    "on_error": "self-heal → recovery → archive",
+    "on_update": "sync_all_layers"
+  },
+  "cross_links": {
+    "ayhem-unified-core.js": {
+      "imports": ["ayhem-memory-map.js", "ayhem-self-heal.js"],
+      "exports_to": ["dashboard.js", "AYHEM_MASTER_ORCHESTRATOR.js"]
+    },
+    "index.html": {
+      "imports": ["style.css", "dashboard.js"],
+      "exports_to": ["ayhem-unified-core.js"]
+    },
+    "mcp-config.json": {
+      "imports": [],
+      "exports_to": ["github_actions", "copilot_agent"]
+    }
+  },
+  "sync_rules": {
+    "auto_update_links": true,
+    "detect_broken_links": true,
+    "repair_broken_links": true,
+    "log_all_changes": true
+  },
+  "dynamic_binding": {
+    "method": "symbolic_reference",
+    "resolution": "runtime",
+    "fallback": "archive_lookup"
+  }
+}
