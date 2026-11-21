@@ -207,3 +207,46 @@ test("validates the entire batch before writing any derived record", async () =>
   await assert.rejects(cognition.persistInsights([valid, invalid]), /provenance_mismatch/);
   assert.equal(store.records.length, 4);
 });
+
+
+test("does not infer contradictions or numeric tension from content without substantive words", () => {
+  assert.equal(
+    classifyMemoryPair(record("a", "لا"), record("b", "ليس")).relation,
+    "unknown",
+  );
+  assert.equal(
+    classifyMemoryPair(record("c", "200"), record("d", "300")).relation,
+    "unknown",
+  );
+});
+
+test("sparse cognition scans classify all omitted pairs as unknown without pairwise comparisons", async () => {
+  const records = Array.from({ length: 1000 }, (_, index) =>
+    record(`sparse-${String(index).padStart(4, "0")}`, `claim${index}`),
+  );
+  const cognition = createMemoryCognition({ store: memoryStore(records), maxRecords: 1000 });
+  const result = await cognition.analyze();
+  assert.equal(result.pairCount, 499500);
+  assert.equal(result.candidatePairCount, 0);
+  assert.equal(result.counts.unknown, 499500);
+  assert.equal(result.insights.length, 0);
+});
+
+test("indexed candidate scan preserves exhaustive classifications and deterministic insight order", async () => {
+  const records = [
+    record("a", "the water pump is active"),
+    record("b", "the water pump is not active"),
+    record("c", "tank capacity is 200 liters"),
+    record("d", "tank capacity is 300 liters"),
+    record("e", "olive orchard soil moisture monitoring"),
+    record("f", "mountain bird migration"),
+  ];
+  const store = memoryStore(records);
+  const cognition = createMemoryCognition({ store });
+  const indexed = await cognition.analyze();
+  const exhaustive = await cognition.analyze({ includeUnknown: true });
+  const knownFromExhaustive = exhaustive.insights.filter(item => item.relation !== "unknown");
+  assert.deepEqual(indexed.insights, knownFromExhaustive);
+  assert.deepEqual(indexed.counts, exhaustive.counts);
+  assert.ok(indexed.candidatePairCount <= indexed.pairCount);
+});
