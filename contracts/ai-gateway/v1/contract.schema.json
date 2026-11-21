@@ -10,7 +10,11 @@
       "additionalProperties": false,
       "required": ["input"],
       "properties": {
-        "input": { "type": "string", "minLength": 1, "maxLength": 8000 }
+        "input": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8000
+        }
       }
     },
     "AIResponse": {
@@ -26,7 +30,15 @@
     "HealthResponse": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["service", "status", "mode", "aiConfigured", "rateLimitConfigured", "originConfigured", "ready"],
+      "required": [
+        "service",
+        "status",
+        "mode",
+        "aiConfigured",
+        "rateLimitConfigured",
+        "originConfigured",
+        "ready"
+      ],
       "properties": {
         "service": { "const": "AYHEM" },
         "status": { "const": "online" },
