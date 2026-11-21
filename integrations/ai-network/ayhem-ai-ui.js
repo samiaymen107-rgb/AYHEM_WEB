@@ -31,8 +31,8 @@ export async function mountAyhemAIUI({
   try {
     client = clientFactory({ endpoint });
     const health = await client.health();
-    if (health.aiConfigured !== true) {
-      status.textContent = "البوابة متاحة، لكن مزوّد الذكاء الاصطناعي غير مهيأ.";
+    if (health.ready !== true || health.aiConfigured !== true || health.rateLimitConfigured !== true) {
+      status.textContent = "البوابة غير جاهزة: يلزم تهيئة المزود والمصادقة وحدود الاستخدام.";
       send.disabled = true;
       return Object.freeze({ state: "provider-not-configured" });
     }
