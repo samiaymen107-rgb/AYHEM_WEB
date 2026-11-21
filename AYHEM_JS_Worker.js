@@ -92,13 +92,15 @@ export default {
     if (isHealth) {
       const aiConfigured = Boolean(env.OPENAI_API_KEY);
       const rateLimitConfigured = Boolean(env.AI_RATE_LIMITER && typeof env.AI_RATE_LIMITER.limit === "function");
+      const originConfigured = (env.ALLOWED_ORIGINS || "").split(",").some(value => value.trim());
       return json({
         service: "AYHEM",
         status: "online",
         mode: "authenticated-gateway",
         aiConfigured,
         rateLimitConfigured,
-        ready: aiConfigured && rateLimitConfigured,
+        originConfigured,
+        ready: aiConfigured && rateLimitConfigured && originConfigured,
       }, 200, cors);
     }
 
