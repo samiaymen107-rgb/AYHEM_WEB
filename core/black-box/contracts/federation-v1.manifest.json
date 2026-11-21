@@ -3,20 +3,27 @@
   "manifest_version": "1.0.0",
   "validation_scope": "pinned-schema-inventory-and-memory-event-shape",
   "full_json_schema_validation": false,
+  "service_relationship": {
+    "first_service": "AYHEM-MEMORY",
+    "last_service": "AYHEM-LINK",
+    "relationship": "memory-is-a-domain-service-extension-over-link-federation-contracts",
+    "integration_direction": "AYHEM-MEMORY -> AYHEM-LINK event envelope",
+    "dependency_rule": "MEMORY consumes LINK contracts; LINK does not import MEMORY implementation; no circular dependency"
+  },
   "contracts": [
     {
       "service": "AYHEM-LINK",
       "path": "schemas/event-envelope.v1.schema.json",
       "schema_id": "https://ayhem.invalid/schemas/event-envelope.v1.schema.json",
       "source_blob_sha": "f78463c78265fd9e243c1e19c1e516e6aec32c80",
-      "role": "memory-event-envelope"
+      "role": "shared-federation-envelope"
     },
     {
       "service": "AYHEM-MEMORY",
       "path": "schemas/memory-record.v1.schema.json",
       "schema_id": "https://ayhem.local/schemas/memory-record.v1.schema.json",
       "source_blob_sha": "b42b86b51b1ee86a0ce7dc0f222ae28eb11ca790",
-      "role": "memory-event-payload"
+      "role": "first-domain-service-using-link-envelope"
     },
     {
       "service": "AYHEM-COGNITION",
