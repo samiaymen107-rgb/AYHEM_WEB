@@ -44,11 +44,12 @@
 ## الفهرس
 
 - [الفهرس الموضوعي والعناوين الرسمية لجميع التقارير](./REPORT_CATALOG.md): يضم العناوين العربية المصنفة والروابط الثابتة وتدقيق الترقيم.
-- آخر تحقق: PR #20 merged؛ Black Box run 44921001011 وGovernance run 44921001064 نجحا. Pages post-merge لم يُتحقق منه بعد.
+- آخر تحقق: PR #21 merged؛ Black Box run 44921359091 وGovernance run 44921359108 نجحا. Pages post-merge لم يُتحقق منه بعد.
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-033-indexed-cognition-scan.md](./2026-11-21-033-indexed-cognition-scan.md) | تسريع تحليل الذاكرة بفهرس الرموز مع المحافظة على نتائج التصنيف الدقيقة | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-034-dense-cognition-benchmark.md](./2026-11-21-034-dense-cognition-benchmark.md) | قياس سلوك محرك الإدراك في الذاكرة المتناثرة والكثيفة وإضافة benchmark إلى CI | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-033-indexed-cognition-scan.md](./2026-11-21-033-indexed-cognition-scan.md) | تسريع تحليل الذاكرة بفهرس الرموز مع المحافظة على نتائج التصنيف الدقيقة | MERGED / NODE + CHROMIUM CI VERIFIED / PAGES NOT RECONFIRMED |
 | [2026-11-21-032-atomic-cognition-idempotency.md](./2026-11-21-032-atomic-cognition-idempotency.md) | منع حفظ الاستنتاج الإدراكي نفسه مرتين عند تنافس النوافذ والاتصالات عبر معاملة IndexedDB ذرية | MERGED / NODE + CHROMIUM CI VERIFIED / PAGES NOT RECONFIRMED |
 | [2026-11-21-031-post-merge-030-reconciliation.md](./2026-11-21-031-post-merge-030-reconciliation.md) | مطابقة حالة العملية 030 بعد الدمج وتحديث الفهرس وبطاقة التقدم بالأدلة | MERGED / GOVERNANCE CI VERIFIED / PAGES NOT RECONFIRMED |
 | [2026-11-21-030-speed-precision-adaptive-correction.md](./2026-11-21-030-speed-precision-adaptive-correction.md) | تثبيت توجيهات المؤسس للسرعة والدقة وكشف الأخطاء والتصحيح السريع وتعديل المسار | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
