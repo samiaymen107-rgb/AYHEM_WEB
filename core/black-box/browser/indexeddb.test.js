@@ -359,3 +359,67 @@ test("real Chromium IndexedDB: concurrent cognition persistence stores one deriv
     await page.close();
   }
 });
+
+
+test("real Chromium IndexedDB: cognition persistence checks existing fingerprints through the tag index", async () => {
+  const page = await browser.newPage();
+  try {
+    await page.goto(origin);
+    const result = await page.evaluate(async () => {
+      const { createIndexedDBMemoryAdapter } = await import("/core/black-box/indexeddb-memory-adapter.js");
+      const { createMemoryStore } = await import("/core/black-box/memory-store.js");
+      const { createMemoryCognition } = await import("/core/black-box/memory-cognition.js");
+      const dbName = `AYHEM_043_INDEXED_TAG_LOOKUP_${crypto.randomUUID()}`;
+      const adapter = createIndexedDBMemoryAdapter({ dbName });
+      const store = createMemoryStore({ adapter });
+      await store.append({
+        id: "source-active", type: "fact", content: "the water pump is active",
+        status: "documented", source: "operation-043-browser-test", confidence: 0.9,
+      });
+      await store.append({
+        id: "source-inactive", type: "fact", content: "the water pump is not active",
+        status: "documented", source: "operation-043-browser-test", confidence: 0.9,
+      });
+
+      const cognition = createMemoryCognition({ store });
+      const { insights } = await cognition.analyze();
+      let listCalls = 0;
+      const originalList = store.list;
+      store.list = async (...args) => {
+        listCalls++;
+        return originalList(...args);
+      };
+      const existingBefore = await store.findExistingTags(["cognition:v1:missing"]);
+      const first = await cognition.persistInsights(insights);
+      const second = await cognition.persistInsights(insights);
+      const allRecords = await originalList();
+      const derived = allRecords.filter(record => record.source === "ayhem-cognition:v1");
+
+      await adapter.close();
+      await new Promise((resolveDelete, rejectDelete) => {
+        const request = indexedDB.deleteDatabase(dbName);
+        request.onsuccess = resolveDelete;
+        request.onerror = () => rejectDelete(request.error || new Error("database_cleanup_failed"));
+        request.onblocked = () => rejectDelete(new Error("database_cleanup_blocked"));
+      });
+
+      return {
+        existingBefore,
+        firstPersisted: first.persisted.length,
+        secondPersisted: second.persisted.length,
+        secondSkipped: second.skippedFingerprints.length,
+        derivedCount: derived.length,
+        listCalls,
+      };
+    });
+
+    assert.deepEqual(result.existingBefore, []);
+    assert.equal(result.firstPersisted, 1);
+    assert.equal(result.secondPersisted, 0);
+    assert.equal(result.secondSkipped, 1);
+    assert.equal(result.derivedCount, 1);
+    assert.equal(result.listCalls, 0, "persistence must not call list/getAll to check known fingerprints");
+  } finally {
+    await page.close();
+  }
+});
