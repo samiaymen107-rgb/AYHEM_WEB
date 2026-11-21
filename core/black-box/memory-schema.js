@@ -58,8 +58,8 @@ export function createMemoryRecord(input) {
     createdAt: input.createdAt,
     source: input.source,
     confidence: input.confidence,
-    supersedes: [...(input.supersedes ?? [])],
-    tags: [...(input.tags ?? [])],
+    supersedes: input.supersedes ?? [],
+    tags: input.tags ?? [],
   };
   const result = validateMemoryRecord(record);
   if (!result.valid) {
@@ -67,7 +67,7 @@ export function createMemoryRecord(input) {
     error.validationErrors = result.errors;
     throw error;
   }
-  Object.freeze(record.supersedes);
-  Object.freeze(record.tags);
+  record.supersedes = Object.freeze([...record.supersedes]);
+  record.tags = Object.freeze([...record.tags]);
   return Object.freeze(record);
 }
