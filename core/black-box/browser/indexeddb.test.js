@@ -134,10 +134,17 @@ test("real Chromium IndexedDB: concurrent adapter connections close on versionch
       let upgradeObserved = false;
       const upgraded = await new Promise((resolveUpgrade, rejectUpgrade) => {
         const request = indexedDB.open(dbName, 2);
+        const timeout = setTimeout(() => rejectUpgrade(new Error("version_upgrade_timed_out")), 5000);
         request.onblocked = () => { blocked = true; };
-        request.onerror = () => rejectUpgrade(request.error || new Error("version_upgrade_failed"));
+        request.onerror = () => {
+          clearTimeout(timeout);
+          rejectUpgrade(request.error || new Error("version_upgrade_failed"));
+        };
         request.onupgradeneeded = () => { upgradeObserved = true; };
-        request.onsuccess = () => resolveUpgrade(request.result);
+        request.onsuccess = () => {
+          clearTimeout(timeout);
+          resolveUpgrade(request.result);
+        };
       });
 
       const version = upgraded.version;
