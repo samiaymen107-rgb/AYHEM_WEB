@@ -82,7 +82,7 @@ export function createIndexedDBMemoryAdapter({
         resolve(value);
       };
       tx.onerror = () => fail(tx.error);
-      tx.onabort = () => fail(tx.error || request?.error);
+      tx.onabort = () => fail(tx.error || requests.find(request => request.error)?.error);
     });
   }
 
