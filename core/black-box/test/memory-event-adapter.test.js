@@ -70,7 +70,7 @@ test("rejects missing trace IDs, invalid source kinds, and non-canonical dates",
   }, {
     sourceKind: "user_input",
     traceId: "trace-id-0000000004",
-  }), /record_created_at_invalid/);
+  }), error => error.validationErrors?.includes("createdAt_must_be_canonical_utc"));
 });
 
 test("rejects record types and statuses outside the canonical AYHEM_WEB schema", async () => {
@@ -81,14 +81,14 @@ test("rejects record types and statuses outside the canonical AYHEM_WEB schema",
   }, {
     sourceKind: "user_input",
     traceId: "trace-id-0000000005",
-  }), /record_type_invalid/);
+  }), error => error.validationErrors?.includes("type_invalid"));
   await assert.rejects(adapter.toEvent({
     ...record,
     status: "unreviewed",
   }, {
     sourceKind: "user_input",
     traceId: "trace-id-0000000006",
-  }), /record_status_invalid/);
+  }), error => error.validationErrors?.includes("status_invalid"));
 });
 
 test("uses the canonical memory validator and rejects invalid lineage and trace syntax", async () => {
