@@ -20,7 +20,7 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 - Snapshot restore validates every record, duplicate IDs, conflicts and supersedes references before a single atomic adapter batch is written.
 - Each record requires a source, status, canonical UTC timestamp and confidence from 0 to 1.
 - Retrieval returns original records with source, status, type, timestamp, confidence and supersedes provenance. Its lexical score is a relevance heuristic, not a truth score.
-- The lineage inspector reports structural links and malformed references. It does not determine whether two natural-language claims contradict each other.
+- The lineage inspector reports structural links and malformed references. It does not determine whether two natural-language claims contradict one another.
 - Legacy MemoryLink remains synchronous. The compatibility facade preserves that API and exposes separate asynchronous canonical operations. Callers explicitly choose the write path; there is no automatic dual-write.
 - IndexedDB provides browser-local persistence, not a remote backup or a guarantee against browser data clearing. Remote replication and tested backup/restore remain separate work.
 - The new store is not yet connected to the live AI gateway. No existing memory is migrated or removed.
@@ -35,6 +35,8 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 ## Run tests
 From this directory with Node.js 20+:
 `npm test`
+
+The snapshot restore contract tests verify that invalid snapshots do not reach the batch writer, valid multi-record snapshots use one batch call, and repeated imports remain idempotent. These adapter-contract tests do not replace real-browser IndexedDB transaction/rollback tests.
 
 ## Legacy memory audit
 The preview scans `AYHEM_MEMORY`, `AYHEM_LONG_MEMORY`, `ayhemPersistentMemory`, `AYHEM_ARCHIVE`, `AYHEM_ARCHIVE_BACKUP`, and `AYHEM_ARCHIVE_ADVANCED`. It is a read-only inventory only; volatile in-page globals are outside this scan. Review its report before designing any migration.
