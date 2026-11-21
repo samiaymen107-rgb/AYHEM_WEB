@@ -55,8 +55,24 @@ export function createAyhemAIClient({
   return Object.freeze({
     async health() {
       const result = await request("/health", { method: "GET" });
-      if (result.service !== "AYHEM" || typeof result.status !== "string") {
-        throw new Error("Unexpected AYHEM health response.");
+      const healthFields = [
+        "aiConfigured",
+        "rateLimitConfigured",
+        "originConfigured",
+        "ready",
+      ];
+      const validHealth =
+        result.service === "AYHEM" &&
+        result.status === "online" &&
+        result.mode === "authenticated-gateway" &&
+        healthFields.every(field => typeof result[field] === "boolean") &&
+        result.ready === (
+          result.aiConfigured &&
+          result.rateLimitConfigured &&
+          result.originConfigured
+        );
+      if (!validHealth) {
+        throw new Error("Unexpected or inconsistent AYHEM health response.");
       }
       return result;
     },
@@ -75,13 +91,21 @@ export function createAyhemAIClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input: normalized }),
       });
-      if (result.unit !== "U01-Σ" || typeof result.output !== "string" || !result.output.trim()) {
+      const validRequestId =
+        typeof result.requestId === "string" &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(result.requestId);
+      if (
+        result.unit !== "U01-Σ" ||
+        typeof result.output !== "string" ||
+        !result.output.trim() ||
+        !validRequestId
+      ) {
         throw new Error("Invalid AYHEM AI response.");
       }
       return Object.freeze({
         output: result.output,
         unit: result.unit,
-        requestId: result.requestId || null,
+        requestId: result.requestId,
       });
     },
   });
