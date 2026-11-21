@@ -5,13 +5,14 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 ## Modules
 - `policy.js`: deterministic action classification and approval gates.
 - `memory-schema.js`: validates sourced, confidence-labelled, immutable memory records.
-- `memory-store.js`: append-only memory repository with search, filters and versioned export.
+- `memory-store.js`: append-only memory repository with search, filters, versioned export, snapshot inspection and idempotent restore.
 - `indexeddb-memory-adapter.js`: browser IndexedDB persistence adapter; it does not silently fall back to localStorage.
 - `ledger.js`: append-only hash-chained audit events using Web Crypto.
 
 ## Memory rules
 - Existing records are never overwritten or deleted through the memory-store API.
-- A correction is a new record that references earlier record IDs through `supersedes`.
+- A correction is a new record that references earlier record IDs through `supersedes`; references must point to older records.
+- Snapshot restore validates every record, duplicate IDs, conflicts and supersedes references before a single atomic adapter batch is written.
 - Each record requires a source, status, canonical UTC timestamp and confidence from 0 to 1.
 - IndexedDB provides browser-local persistence, not a remote backup or a guarantee against browser data clearing. Remote replication and tested backup/restore remain separate work.
 - The new store is not yet connected to legacy memory modules or the live AI gateway. No existing memory is migrated or removed.
