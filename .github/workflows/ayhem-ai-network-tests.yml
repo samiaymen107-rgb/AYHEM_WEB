@@ -6,6 +6,7 @@ on:
       - "integrations/ai-network/**"
       - "index.html"
       - "ayhem-fix-send.js"
+      - "AYHEM_JS_Worker.js"
       - ".github/workflows/ayhem-ai-network-tests.yml"
   push:
     branches: [main]
