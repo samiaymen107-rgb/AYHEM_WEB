@@ -84,13 +84,14 @@ export function classifyMemoryPair(leftRecord, rightRecord, { similarityThreshol
   let relation = "unknown";
   let reason = "no_deterministic_relationship_signal";
 
-  if (sameSet(left.substantive, right.substantive) &&
+  if (left.substantive.length > 0 &&
+      sameSet(left.substantive, right.substantive) &&
       left.negated !== right.negated && left.numbers.length === right.numbers.length &&
       sameSet(left.numbers, right.numbers)) {
     relation = "explicit_contradiction";
     reason = "same_lexical_claim_with_opposite_explicit_negation";
-  } else if (sameSet(left.words, right.words) && left.numbers.length &&
-      right.numbers.length && !sameSet(left.numbers, right.numbers)) {
+  } else if (left.words.length > 0 && sameSet(left.words, right.words) &&
+      left.numbers.length && right.numbers.length && !sameSet(left.numbers, right.numbers)) {
     relation = "possible_tension";
     reason = "same_lexical_frame_with_different_numeric_values_requires_time_unit_and_context_review";
   } else if (overlap >= similarityThreshold) {
@@ -152,17 +153,60 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
         semantic_similarity: 0,
         unknown: 0,
       };
-      for (let i = 0; i < records.length; i++) {
-        for (let j = i + 1; j < records.length; j++) {
+      const pairCount = records.length * (records.length - 1) / 2;
+
+      if (includeUnknown) {
+        // The exhaustive mode intentionally materializes every pair.
+        for (let i = 0; i < records.length; i++) {
+          for (let j = i + 1; j < records.length; j++) {
+            const insight = classifyMemoryPair(records[i], records[j], { similarityThreshold });
+            counts[insight.relation]++;
+            insights.push(insight);
+          }
+        }
+      } else {
+        // Every non-unknown relation requires at least one shared substantive
+        // token. Inverted postings avoid comparing unrelated sparse records.
+        const postings = new Map();
+        for (let index = 0; index < records.length; index++) {
+          const uniqueTokens = new Set(prepare(records[index]).substantive);
+          for (const token of uniqueTokens) {
+            if (!postings.has(token)) postings.set(token, []);
+            postings.get(token).push(index);
+          }
+        }
+
+        const candidateKeys = new Set();
+        const candidates = [];
+        for (const indexes of postings.values()) {
+          for (let left = 0; left < indexes.length; left++) {
+            for (let right = left + 1; right < indexes.length; right++) {
+              const i = indexes[left];
+              const j = indexes[right];
+              const key = i * records.length + j;
+              if (!candidateKeys.has(key)) {
+                candidateKeys.add(key);
+                candidates.push([i, j]);
+              }
+            }
+          }
+        }
+        candidates.sort((left, right) => left[0] - right[0] || left[1] - right[1]);
+
+        for (const [i, j] of candidates) {
           const insight = classifyMemoryPair(records[i], records[j], { similarityThreshold });
           counts[insight.relation]++;
-          if (includeUnknown || insight.relation !== "unknown") insights.push(insight);
+          if (insight.relation !== "unknown") insights.push(insight);
         }
+        counts.unknown = pairCount - counts.explicit_contradiction -
+          counts.possible_tension - counts.semantic_similarity;
       }
+
       return Object.freeze({
         method: VERSION,
         sourceRecordCount: records.length,
-        pairCount: records.length * (records.length - 1) / 2,
+        pairCount,
+        candidatePairCount: includeUnknown ? pairCount : undefined,
         counts: Object.freeze(counts),
         insights: Object.freeze(insights),
         limitations: Object.freeze([
