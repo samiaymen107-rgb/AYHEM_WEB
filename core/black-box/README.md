@@ -8,6 +8,7 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 - `memory-store.js`: append-only memory repository with search, filters, versioned export, snapshot inspection and idempotent restore.
 - `indexeddb-memory-adapter.js`: browser IndexedDB persistence adapter; it does not silently fall back to localStorage.
 - `legacy-memory-preview.js`: read-only inventory of known legacy localStorage keys; reports counts and shapes without exposing stored content or changing source data.
+- `../../tools/legacy-memory-audit.html`: local browser page to run the preview and export a metadata-only report.
 - `ledger.js`: append-only hash-chained audit events using Web Crypto.
 
 ## Memory rules
