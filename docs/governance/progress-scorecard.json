@@ -3,13 +3,13 @@
   "project": "AYHEM",
   "scope": "تقدير النضج الهندسي للوحدات الثماني وفق الأدلة التي تمت مراجعتها في مستودع AYHEM_WEB حتى تاريخ القياس؛ وليس قياساً لجاهزية الإنتاج.",
   "evidence_date": "2026-11-21",
-  "overall_progress_percent": 41,
+  "overall_progress_percent": 44.75,
   "progress_status": "provisional",
   "production_readiness": "not_yet_rated",
   "weights_total_percent": 100,
-  "last_documented_operation": 23,
-  "last_merged_pull_request": 12,
-  "last_merged_commit": "e56b8f62f9428fc616ad8351f63a306f393f4328",
+  "last_documented_operation": 26,
+  "last_merged_pull_request": 13,
+  "last_merged_commit": "04108836b39d0040ddad946eb34654c3d0d9ff91",
   "workstreams": [
     {
       "name": "MEMORY",
@@ -31,9 +31,9 @@
       "name": "AUTONOMY",
       "label": "الاستقلالية",
       "weight_percent": 15,
-      "completion_percent": 0,
-      "weighted_contribution": 0,
-      "evidence": "لا يوجد حتى الآن محرك تنسيق مهام ذاتي موثق ومتحقق."
+      "completion_percent": 25,
+      "weighted_contribution": 3.75,
+      "evidence": "Merged AYHEM_WEB PR #4 provides deterministic action policy, append-only audit ledger, memory schema, adversarial boundary tests, and an autonomy charter; no continuously running task orchestration engine is verified."
     },
     {
       "name": "GUARD",
