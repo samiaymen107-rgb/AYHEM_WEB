@@ -154,8 +154,10 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
         unknown: 0,
       };
       const pairCount = records.length * (records.length - 1) / 2;
+      let candidatePairCount = 0;
 
       if (includeUnknown) {
+        candidatePairCount = pairCount;
         // The exhaustive mode intentionally materializes every pair.
         for (let i = 0; i < records.length; i++) {
           for (let j = i + 1; j < records.length; j++) {
@@ -192,6 +194,7 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
           }
         }
         candidates.sort((left, right) => left[0] - right[0] || left[1] - right[1]);
+        candidatePairCount = candidates.length;
 
         for (const [i, j] of candidates) {
           const insight = classifyMemoryPair(records[i], records[j], { similarityThreshold });
@@ -206,7 +209,7 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
         method: VERSION,
         sourceRecordCount: records.length,
         pairCount,
-        candidatePairCount: includeUnknown ? pairCount : undefined,
+        candidatePairCount,
         counts: Object.freeze(counts),
         insights: Object.freeze(insights),
         limitations: Object.freeze([
