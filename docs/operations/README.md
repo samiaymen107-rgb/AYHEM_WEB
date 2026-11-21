@@ -44,10 +44,12 @@
 ## الفهرس
 
 - [الفهرس الموضوعي والعناوين الرسمية لجميع التقارير](./REPORT_CATALOG.md): يضم العناوين العربية المصنفة والروابط الثابتة وتدقيق الترقيم.
-- آخر تحقق مدمج: PR #27؛ Governance run 44923878719 وPages run 44923844590 نجحت جميعها بعد الدمج، كما نجحت اختبارات PR #26 السابقة.
+- آخر تحقق مدمج: PR #28؛ Governance run 44926947075 وPages run 44926946428 (build/report-build-status/deploy) نجحت جميعها بعد الدمج.
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
+| [2026-11-21-041-cache-cognition-provenance-lookups.md](./2026-11-21-041-cache-cognition-provenance-lookups.md) | تقليل قراءات مصدر الاستنتاجات المتكررة داخل دفعة الحفظ | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-040-correct-operation-039-status.md](./2026-11-21-040-correct-operation-039-status.md) | تصحيح حالة العملية 039 والتحقق بعد الدمج | MERGED / GOVERNANCE VERIFIED / PAGES CHECK SEPARATE |
 | [2026-11-21-039-post-merge-038-verification.md](./2026-11-21-039-post-merge-038-verification.md) | التحقق بعد دمج العملية 038 وتوثيق اختبارات CI ونشر Pages | MERGED / POST-MERGE GOVERNANCE + PAGES VERIFIED |
 | [2026-11-21-038-indexed-tag-deduplication.md](./2026-11-21-038-indexed-tag-deduplication.md) | تسريع منع تكرار الاستنتاجات بفهرس الوسوم مع ترقية آمنة لقاعدة البيانات | MERGED / NODE + CHROMIUM + GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-037-operation-036-reconciliation.md](./2026-11-21-037-operation-036-reconciliation.md) | تسوية أدلة العملية 036 وفهرسة التقرير | MERGED / DOCUMENTATION RECONCILED |

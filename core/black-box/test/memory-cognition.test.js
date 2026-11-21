@@ -150,6 +150,26 @@ test("rejects analysis above the configured record ceiling", async () => {
   await assert.rejects(cognition.analyze(), /record_limit_exceeded/);
 });
 
+test("caches provenance reads for source records shared across insight batches", async () => {
+  const store = memoryStore([
+    record("a", "the water pump is active"),
+    record("b", "the water pump is not active"),
+    record("c", "the water pump is never active"),
+  ]);
+  let getCalls = 0;
+  const originalGet = store.get;
+  store.get = async id => {
+    getCalls++;
+    return originalGet(id);
+  };
+  const cognition = createMemoryCognition({ store });
+  const { insights } = await cognition.analyze();
+  assert.equal(insights.length, 3);
+  const result = await cognition.persistInsights(insights);
+  assert.equal(result.persisted.length, 3);
+  assert.equal(getCalls, 3, "each unique source record should be read once per persistence batch");
+});
+
 test("rejects forged provenance and missing source records before persistence", async () => {
   const store = memoryStore([
     record("a", "the water pump is active"),

@@ -231,6 +231,9 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
       if (!Array.isArray(insights)) throw new TypeError("cognition_insights_must_be_array");
       const existing = await store.list();
       const known = new Set(existing.flatMap(record => record.tags ?? []));
+      // Source records are immutable. Cache provenance reads for this batch so
+      // insights sharing a source record do not issue duplicate storage reads.
+      const sourceRecords = new Map();
       const persisted = [];
       const skipped = [];
       const pending = [];
@@ -264,7 +267,11 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
         }
 
         for (let index = 0; index < insight.recordIds.length; index++) {
-          const sourceRecord = await store.get(insight.recordIds[index]);
+          const sourceId = insight.recordIds[index];
+          if (!sourceRecords.has(sourceId)) {
+            sourceRecords.set(sourceId, await store.get(sourceId));
+          }
+          const sourceRecord = sourceRecords.get(sourceId);
           const claimed = insight.provenance[index];
           if (!sourceRecord || sourceRecord.source === DERIVED_SOURCE ||
               claimed.recordId !== sourceRecord.id ||
