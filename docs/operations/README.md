@@ -43,12 +43,15 @@
 
 ## الفهرس
 
+- [2026-11-21-043-indexed-existing-cognition-tags.md](./2026-11-21-043-indexed-existing-cognition-tags.md) — إزالة مسح الذاكرة الكامل عند حفظ الاستنتاجات (CI pending).
+
 - [الفهرس الموضوعي والعناوين الرسمية لجميع التقارير](./REPORT_CATALOG.md): يضم العناوين العربية المصنفة والروابط الثابتة وتدقيق الترقيم.
-- آخر تحقق مدمج: PR #29؛ Black Box run 44927404897 وGovernance run 44927404980 وPages run 44927404603 (build/report-build-status/deploy) نجحت جميعها بعد الدمج.
+- آخر تحقق مدمج: PR #30؛ Black Box run 44927404897 وGovernance run 44927404980 وPages run 44927404603 (build/report-build-status/deploy) نجحت جميعها بعد الدمج.
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-042-post-merge-041-verification.md](./2026-11-21-042-post-merge-041-verification.md) | التحقق بعد دمج العملية 041: Black Box وGovernance وPages | MERGED / POST-MERGE BLACK BOX + GOVERNANCE + PAGES VERIFIED |\n| [2026-11-21-041-cache-cognition-provenance-lookups.md](./2026-11-21-041-cache-cognition-provenance-lookups.md) | تقليل قراءات مصدر الاستنتاجات المتكررة داخل دفعة الحفظ | MERGED / POST-MERGE CI VERIFIED (SEE REPORT 042) |
+| [2026-11-21-042-post-merge-041-verification.md](./2026-11-21-042-post-merge-041-verification.md) | التحقق بعد دمج العملية 041: Black Box وGovernance وPages | MERGED / POST-MERGE BLACK BOX + GOVERNANCE + PAGES VERIFIED |
+| [2026-11-21-041-cache-cognition-provenance-lookups.md](./2026-11-21-041-cache-cognition-provenance-lookups.md) | تقليل قراءات مصدر الاستنتاجات المتكررة داخل دفعة الحفظ | MERGED / POST-MERGE CI VERIFIED (SEE REPORT 042) |
 | [2026-11-21-040-correct-operation-039-status.md](./2026-11-21-040-correct-operation-039-status.md) | تصحيح حالة العملية 039 والتحقق بعد الدمج | MERGED / GOVERNANCE VERIFIED / PAGES CHECK SEPARATE |
 | [2026-11-21-039-post-merge-038-verification.md](./2026-11-21-039-post-merge-038-verification.md) | التحقق بعد دمج العملية 038 وتوثيق اختبارات CI ونشر Pages | MERGED / POST-MERGE GOVERNANCE + PAGES VERIFIED |
 | [2026-11-21-038-indexed-tag-deduplication.md](./2026-11-21-038-indexed-tag-deduplication.md) | تسريع منع تكرار الاستنتاجات بفهرس الوسوم مع ترقية آمنة لقاعدة البيانات | MERGED / NODE + CHROMIUM + GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
