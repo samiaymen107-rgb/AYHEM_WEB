@@ -138,7 +138,11 @@ export function createMemoryStore({
         if (target.createdAt >= record.createdAt) throw new Error("memory_supersedes_target_not_older");
       }
 
-      await adapter.addRecord(record);
+      if (typeof adapter.addRecordAndEnqueueSyncEvent === "function") {
+        await adapter.addRecordAndEnqueueSyncEvent(record);
+      } else {
+        await adapter.addRecord(record);
+      }
       return record;
     },
 
@@ -162,7 +166,9 @@ export function createMemoryStore({
         if (!target) throw new Error("memory_supersedes_target_missing");
         if (target.createdAt >= record.createdAt) throw new Error("memory_supersedes_target_not_older");
       }
-      const inserted = await adapter.addRecordIfTagAbsent(record, tag);
+      const inserted = typeof adapter.addRecordIfTagAbsentAndEnqueueSyncEvent === "function"
+        ? await adapter.addRecordIfTagAbsentAndEnqueueSyncEvent(record, tag)
+        : await adapter.addRecordIfTagAbsent(record, tag);
       return inserted ? record : null;
     },
 
