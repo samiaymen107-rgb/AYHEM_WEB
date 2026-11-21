@@ -45,6 +45,7 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
+| [2026-11-21-027-cloudflare-access-cors-session.md](./2026-11-21-027-cloudflare-access-cors-session.md) | إصلاح إرسال Cookie جلسة Access وتوافق CORS preflight بين المتصفح والبوابة | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
 | [2026-11-21-026-cross-repository-score-recalibration.md](./2026-11-21-026-cross-repository-score-recalibration.md) | مراجعة الأدلة عبر المستودعات وتصحيح نسبة المشروع من 41% إلى 44.75% وتحديث لوحة القياس | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
 | [2026-11-21-024-authoritative-progress-dashboard.md](./2026-11-21-024-authoritative-progress-dashboard.md) | لوحة تقدم حية تقرأ scorecard موحداً وتتحقق من النسبة الموزونة وتفصلها عن الجاهزية الإنتاجية | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-023-founder-directives-progress-reporting.md](./2026-11-21-023-founder-directives-progress-reporting.md) | تثبيت تعليمات المؤسس الدائمة ومنهجية قياس التقدم الموزون والتقارير المرحلية | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
