@@ -37,9 +37,7 @@ test("late success after blocked open closes the abandoned database connection",
   const store = { get: () => readRequest };
   const transaction = {
     objectStore: () => store,
-    set oncomplete(callback) { this.complete = callback; },
-    set onerror(callback) { this.error = callback; },
-    set onabort(callback) { this.abort = callback; },
+    abort() {},
   };
   requests[1].result = {
     objectStoreNames: { contains: () => true },
@@ -49,7 +47,7 @@ test("late success after blocked open closes the abandoned database connection",
   requests[1].onsuccess();
   readRequest.result = null;
   readRequest.onsuccess?.();
-  transaction.complete();
+  transaction.oncomplete();
   assert.equal(await second, undefined);
   await adapter.close();
   assert.equal(secondCloseCount, 1);
