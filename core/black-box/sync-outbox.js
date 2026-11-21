@@ -4,7 +4,6 @@ import { validateMemoryRecord } from "./memory-schema.js";
 export function createSyncOutbox({
   adapter,
   now = () => new Date().toISOString(),
-  idFactory = () => globalThis.crypto.randomUUID(),
   maxErrorLength = 500,
 } = {}) {
   if (!adapter || ["enqueueSyncEvent", "listSyncEvents", "updateSyncEvent"].some(name => typeof adapter[name] !== "function")) {
@@ -20,7 +19,7 @@ export function createSyncOutbox({
     }
     const createdAt = now();
     const event = Object.freeze({
-      eventId: idFactory(), recordId: record.id, payload: record,
+      eventId: "memory-record:" + record.id, recordId: record.id, payload: record,
       status: "pending", attempts: 0, createdAt, updatedAt: createdAt,
       deliveredAt: null, lastError: null,
     });
