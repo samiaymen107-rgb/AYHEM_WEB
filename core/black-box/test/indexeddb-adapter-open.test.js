@@ -45,6 +45,10 @@ test("late success after blocked open closes the abandoned database connection",
     transaction: () => transaction,
   };
   requests[1].onsuccess();
+
+  // IndexedDB request success resolves openDatabase(); transact() resumes in a
+  // microtask and only then installs the request and transaction event handlers.
+  await new Promise(resolveTick => setImmediate(resolveTick));
   readRequest.result = null;
   readRequest.onsuccess?.();
   transaction.oncomplete();
