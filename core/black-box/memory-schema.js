@@ -1,9 +1,16 @@
 /**
- * Canonical memory record validation. Validation does not rewrite or silently
- * correct user-provided facts.
+ * Canonical AYHEM memory record validation.
+ * Records are immutable facts about what was captured; corrections append a
+ * new record that references the earlier record through "supersedes".
  */
 const TYPES = new Set(["event", "fact", "observation", "hypothesis", "inference", "decision", "correction"]);
 const STATUSES = new Set(["confirmed", "context", "documented", "to_verify", "inference"]);
+
+function validStringArray(value) {
+  return Array.isArray(value) &&
+    value.every(item => typeof item === "string" && item.trim().length > 0) &&
+    new Set(value).size === value.length;
+}
 
 export function validateMemoryRecord(record) {
   const errors = [];
@@ -14,15 +21,36 @@ export function validateMemoryRecord(record) {
   if (!TYPES.has(record.type)) errors.push("type_invalid");
   if (typeof record.content !== "string" || !record.content.trim()) errors.push("content_required");
   if (!STATUSES.has(record.status)) errors.push("status_invalid");
-  if (typeof record.createdAt !== "string" || Number.isNaN(Date.parse(record.createdAt))) errors.push("createdAt_invalid");
+
+  if (typeof record.createdAt !== "string") {
+    errors.push("createdAt_invalid");
+  } else {
+    const parsed = new Date(record.createdAt);
+    if (Number.isNaN(parsed.getTime()) || parsed.toISOString() !== record.createdAt) {
+      errors.push("createdAt_must_be_canonical_utc");
+    }
+  }
+
   if (typeof record.source !== "string" || !record.source.trim()) errors.push("source_required");
-  if (typeof record.confidence !== "number" || record.confidence < 0 || record.confidence > 1) errors.push("confidence_out_of_range");
-  if (record.supersedes !== undefined && !Array.isArray(record.supersedes)) errors.push("supersedes_must_be_array");
+  if (typeof record.confidence !== "number" || !Number.isFinite(record.confidence) ||
+      record.confidence < 0 || record.confidence > 1) {
+    errors.push("confidence_out_of_range");
+  }
+
+  if (record.supersedes !== undefined) {
+    if (!validStringArray(record.supersedes)) errors.push("supersedes_invalid");
+    else if (record.supersedes.includes(record.id)) errors.push("record_cannot_supersede_itself");
+  }
+  if (record.tags !== undefined && !validStringArray(record.tags)) errors.push("tags_invalid");
+
   return { valid: errors.length === 0, errors };
 }
 
 export function createMemoryRecord(input) {
-  const record = Object.freeze({
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    throw new TypeError("Invalid AYHEM memory record");
+  }
+  const record = {
     id: input.id,
     type: input.type,
     content: input.content,
@@ -30,14 +58,16 @@ export function createMemoryRecord(input) {
     createdAt: input.createdAt,
     source: input.source,
     confidence: input.confidence,
-    supersedes: input.supersedes ?? [],
-    tags: input.tags ?? [],
-  });
+    supersedes: [...(input.supersedes ?? [])],
+    tags: [...(input.tags ?? [])],
+  };
   const result = validateMemoryRecord(record);
   if (!result.valid) {
     const error = new TypeError("Invalid AYHEM memory record");
     error.validationErrors = result.errors;
     throw error;
   }
-  return record;
+  Object.freeze(record.supersedes);
+  Object.freeze(record.tags);
+  return Object.freeze(record);
 }
