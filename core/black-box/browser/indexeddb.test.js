@@ -227,3 +227,66 @@ test("real Chromium IndexedDB: concurrent duplicate batches preserve atomic appe
     await page.close();
   }
 });
+
+
+
+test("real Chromium IndexedDB: concurrent cognition persistence stores one derived insight", async () => {
+  const page = await browser.newPage();
+  try {
+    await page.goto(origin);
+    const result = await page.evaluate(async () => {
+      const { createIndexedDBMemoryAdapter } = await import("/core/black-box/indexeddb-memory-adapter.js");
+      const { createMemoryStore } = await import("/core/black-box/memory-store.js");
+      const { createMemoryCognition } = await import("/core/black-box/memory-cognition.js");
+      const dbName = `AYHEM_032_COGNITION_DEDUPE_${crypto.randomUUID()}`;
+      const adapterA = createIndexedDBMemoryAdapter({ dbName });
+      const adapterB = createIndexedDBMemoryAdapter({ dbName });
+      const storeA = createMemoryStore({ adapter: adapterA });
+      const storeB = createMemoryStore({ adapter: adapterB });
+
+      await storeA.append({
+        id: "source-active", type: "fact", content: "the water pump is active",
+        status: "documented", source: "operation-032-browser-test", confidence: 0.9,
+      });
+      await storeA.append({
+        id: "source-inactive", type: "fact", content: "the water pump is not active",
+        status: "documented", source: "operation-032-browser-test", confidence: 0.9,
+      });
+
+      const cognitionA = createMemoryCognition({ store: storeA });
+      const cognitionB = createMemoryCognition({ store: storeB });
+      const [analysisA, analysisB] = await Promise.all([
+        cognitionA.analyze(), cognitionB.analyze(),
+      ]);
+      const [writeA, writeB] = await Promise.all([
+        cognitionA.persistInsights(analysisA.insights),
+        cognitionB.persistInsights(analysisB.insights),
+      ]);
+      const allRecords = await storeA.list();
+      const derived = allRecords.filter(record => record.source === "ayhem-cognition:v1");
+
+      await adapterA.close();
+      await adapterB.close();
+      await new Promise((resolveDelete, rejectDelete) => {
+        const request = indexedDB.deleteDatabase(dbName);
+        request.onsuccess = resolveDelete;
+        request.onerror = () => rejectDelete(request.error || new Error("database_cleanup_failed"));
+        request.onblocked = () => rejectDelete(new Error("database_cleanup_blocked"));
+      });
+
+      return {
+        writes: [writeA, writeB].map(write => write.persisted.length),
+        skipped: [writeA, writeB].reduce((sum, write) => sum + write.skippedFingerprints.length, 0),
+        derivedCount: derived.length,
+        sourceCount: allRecords.filter(record => record.source !== "ayhem-cognition:v1").length,
+      };
+    });
+
+    assert.deepEqual(result.writes.sort(), [0, 1], "exactly one concurrent writer may persist the insight");
+    assert.equal(result.skipped, 1, "the losing writer must report the existing fingerprint");
+    assert.equal(result.derivedCount, 1, "the database must contain one derived insight only");
+    assert.equal(result.sourceCount, 2, "both immutable source records must remain intact");
+  } finally {
+    await page.close();
+  }
+});

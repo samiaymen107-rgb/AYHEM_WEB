@@ -142,6 +142,30 @@ export function createMemoryStore({
       return record;
     },
 
+    appendIfTagAbsent: async (input, tag) => {
+      if (typeof adapter.addRecordIfTagAbsent !== "function") {
+        throw new TypeError("memory_adapter_atomic_tag_append_required");
+      }
+      if (!input || typeof input !== "object" || Array.isArray(input) ||
+          typeof tag !== "string" || !tag) {
+        throw new TypeError("memory_input_and_tag_required");
+      }
+      const tags = Array.isArray(input.tags) ? input.tags : [];
+      if (!tags.includes(tag)) throw new TypeError("memory_deduplication_tag_missing");
+      const record = createMemoryRecord({
+        ...input,
+        id: input.id ?? idFactory(),
+        createdAt: input.createdAt ?? now(),
+      });
+      for (const targetId of record.supersedes) {
+        const target = await adapter.getRecord(targetId);
+        if (!target) throw new Error("memory_supersedes_target_missing");
+        if (target.createdAt >= record.createdAt) throw new Error("memory_supersedes_target_not_older");
+      }
+      const inserted = await adapter.addRecordIfTagAbsent(record, tag);
+      return inserted ? record : null;
+    },
+
     get: async id => {
       if (typeof id !== "string" || !id) throw new TypeError("memory_id_required");
       const record = await adapter.getRecord(id);

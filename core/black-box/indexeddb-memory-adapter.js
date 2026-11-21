@@ -115,6 +115,38 @@ export function createIndexedDBMemoryAdapter({
       if (!Array.isArray(records)) return Promise.reject(new TypeError("records_must_be_array"));
       return transact("readwrite", store => records.map(record => store.add(record)));
     },
+    addRecordIfTagAbsent(record, tag) {
+      if (!record || typeof record !== "object" || typeof tag !== "string" || !tag) {
+        return Promise.reject(new TypeError("record_and_tag_required"));
+      }
+      return openDatabase().then(db => new Promise((resolve, reject) => {
+        let settled = false;
+        let inserted = false;
+        const tx = db.transaction(storeName, "readwrite");
+        const fail = error => {
+          if (settled) return;
+          settled = true;
+          reject(error || new Error("indexeddb_transaction_failed"));
+        };
+        const scan = tx.objectStore(storeName).getAll();
+        scan.onsuccess = () => {
+          if (scan.result.some(item => Array.isArray(item.tags) && item.tags.includes(tag))) {
+            return;
+          }
+          const add = tx.objectStore(storeName).add(record);
+          add.onsuccess = () => { inserted = true; };
+          add.onerror = () => fail(add.error);
+        };
+        scan.onerror = () => fail(scan.error);
+        tx.oncomplete = () => {
+          if (settled) return;
+          settled = true;
+          resolve(inserted);
+        };
+        tx.onerror = () => fail(tx.error);
+        tx.onabort = () => fail(tx.error || scan.error);
+      }));
+    },
     async close() {
       if (!databasePromise) return;
       const pending = databasePromise;
