@@ -13,6 +13,7 @@ function memoryStore(records) {
   const data = [...records];
   return {
     async list() { return [...data]; },
+    async get(id) { return data.find(item => item.id === id) ?? null; },
     async append(input) {
       const item = Object.freeze({ ...input, id: `derived-${data.length + 1}`,
         createdAt: "2026-11-21T12:00:00.000Z", supersedes: [] });
@@ -147,4 +148,48 @@ test("rejects analysis above the configured record ceiling", async () => {
     maxRecords: 2,
   });
   await assert.rejects(cognition.analyze(), /record_limit_exceeded/);
+});
+
+test("rejects forged provenance and missing source records before persistence", async () => {
+  const store = memoryStore([
+    record("a", "the water pump is active"),
+    record("b", "the water pump is not active"),
+  ]);
+  const cognition = createMemoryCognition({ store });
+  const { insights } = await cognition.analyze();
+  const forged = {
+    ...insights[0],
+    provenance: insights[0].provenance.map((item, index) =>
+      index === 0 ? { ...item, source: "forged-source" } : item),
+  };
+  await assert.rejects(cognition.persistInsights([forged]), /provenance_mismatch/);
+  const missing = {
+    ...insights[0],
+    recordIds: ["a", "z"],
+    provenance: [
+      insights[0].provenance[0],
+      { ...insights[0].provenance[1], recordId: "z" },
+    ],
+  };
+  missing.fingerprint = "00000000";
+  await assert.rejects(cognition.persistInsights([missing]), /insight_invalid/);
+  assert.equal(store.records.length, 2);
+});
+
+test("rejects malformed provenance arrays and invalid confidence", async () => {
+  const store = memoryStore([
+    record("a", "the water pump is active"),
+    record("b", "the water pump is not active"),
+  ]);
+  const cognition = createMemoryCognition({ store });
+  const { insights } = await cognition.analyze();
+  await assert.rejects(cognition.persistInsights([{
+    ...insights[0],
+    provenance: [],
+  }]), /insight_invalid/);
+  await assert.rejects(cognition.persistInsights([{
+    ...insights[0],
+    confidence: Number.NaN,
+  }]), /insight_invalid/);
+  assert.equal(store.records.length, 2);
 });
