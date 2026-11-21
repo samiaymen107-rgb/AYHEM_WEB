@@ -41,11 +41,11 @@ async function measure(name, items, expectedCandidates) {
 }
 
 const sparse = records(1000, index => `claim${index}`);
-const dense = records(500, index => `shared common topic${index}`);
+const dense = records(1000, index => `shared common topic${index}`);
 const denseCandidates = dense.length * (dense.length - 1) / 2;
 const results = [
   await measure("sparse-1000", sparse, 0),
-  await measure("dense-500", dense, denseCandidates),
+  await measure("dense-1000", dense, denseCandidates),
 ];
 process.stdout.write(JSON.stringify({
   benchmark: "ayhem-cognition-scan-v1",
