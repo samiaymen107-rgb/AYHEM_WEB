@@ -163,16 +163,11 @@ test("rejects forged provenance and missing source records before persistence", 
       index === 0 ? { ...item, source: "forged-source" } : item),
   };
   await assert.rejects(cognition.persistInsights([forged]), /provenance_mismatch/);
-  const missing = {
-    ...insights[0],
-    recordIds: ["a", "z"],
-    provenance: [
-      insights[0].provenance[0],
-      { ...insights[0].provenance[1], recordId: "z" },
-    ],
-  };
-  missing.fingerprint = "00000000";
-  await assert.rejects(cognition.persistInsights([missing]), /insight_invalid/);
+  const missingSource = classifyMemoryPair(
+    record("a", "the water pump is active"),
+    record("z", "the water pump is not active"),
+  );
+  await assert.rejects(cognition.persistInsights([missingSource]), /provenance_mismatch/);
   assert.equal(store.records.length, 2);
 });
 
