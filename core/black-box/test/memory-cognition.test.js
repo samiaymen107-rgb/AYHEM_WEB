@@ -13,6 +13,7 @@ function memoryStore(records) {
   const data = [...records];
   return {
     async list() { return [...data]; },
+    async get(id) { return data.find(item => item.id === id) ?? null; },
     async append(input) {
       const item = Object.freeze({ ...input, id: `derived-${data.length + 1}`,
         createdAt: "2026-11-21T12:00:00.000Z", supersedes: [] });
@@ -147,4 +148,62 @@ test("rejects analysis above the configured record ceiling", async () => {
     maxRecords: 2,
   });
   await assert.rejects(cognition.analyze(), /record_limit_exceeded/);
+});
+
+test("rejects forged provenance and missing source records before persistence", async () => {
+  const store = memoryStore([
+    record("a", "the water pump is active"),
+    record("b", "the water pump is not active"),
+  ]);
+  const cognition = createMemoryCognition({ store });
+  const { insights } = await cognition.analyze();
+  const forged = {
+    ...insights[0],
+    provenance: insights[0].provenance.map((item, index) =>
+      index === 0 ? { ...item, source: "forged-source" } : item),
+  };
+  await assert.rejects(cognition.persistInsights([forged]), /provenance_mismatch/);
+  const missingSource = classifyMemoryPair(
+    record("a", "the water pump is active"),
+    record("z", "the water pump is not active"),
+  );
+  await assert.rejects(cognition.persistInsights([missingSource]), /provenance_mismatch/);
+  assert.equal(store.records.length, 2);
+});
+
+test("rejects malformed provenance arrays and invalid confidence", async () => {
+  const store = memoryStore([
+    record("a", "the water pump is active"),
+    record("b", "the water pump is not active"),
+  ]);
+  const cognition = createMemoryCognition({ store });
+  const { insights } = await cognition.analyze();
+  await assert.rejects(cognition.persistInsights([{
+    ...insights[0],
+    provenance: [],
+  }]), /insight_invalid/);
+  await assert.rejects(cognition.persistInsights([{
+    ...insights[0],
+    confidence: Number.NaN,
+  }]), /insight_invalid/);
+  assert.equal(store.records.length, 2);
+});
+
+test("validates the entire batch before writing any derived record", async () => {
+  const store = memoryStore([
+    record("a", "the water pump is active"),
+    record("b", "the water pump is not active"),
+    record("c", "the solar inverter is active"),
+    record("d", "the solar inverter is not active"),
+  ]);
+  const cognition = createMemoryCognition({ store });
+  const valid = classifyMemoryPair(store.records[0], store.records[1]);
+  const invalidBase = classifyMemoryPair(store.records[2], store.records[3]);
+  const invalid = {
+    ...invalidBase,
+    provenance: invalidBase.provenance.map((item, index) =>
+      index === 0 ? { ...item, source: "tampered-source" } : item),
+  };
+  await assert.rejects(cognition.persistInsights([valid, invalid]), /provenance_mismatch/);
+  assert.equal(store.records.length, 4);
 });

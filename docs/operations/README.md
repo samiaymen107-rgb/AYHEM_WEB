@@ -41,7 +41,7 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-017-cognition-engine.md](./2026-11-21-017-cognition-engine.md) | محرك إدراك أولي محافظ مع provenance وتصنيف إشارات العلاقات دون تعديل الذاكرة الأصلية | IMPLEMENTED / CI VERIFIED #84 / HUMAN REVIEW REQUIRED |\n| [2026-11-21-016-memory-restore-contract.md](./2026-11-21-016-memory-restore-contract.md) | عقد استعادة snapshots على دفعات ومنع الكتابة عند وجود تعارض | COMMITTED / CI VERIFIED ON d5cd290 / REAL-BROWSER INDEXEDDB PENDING |
+| [2026-11-21-018-cognition-provenance-validation.md](./2026-11-21-018-cognition-provenance-validation.md) | التحقق من مصدر الاستنتاجات وصحة provenance قبل الحفظ ومنع الكتابة الجزئية بسبب مدخلات غير صالحة | IMPLEMENTED / CI PENDING / REVIEW REQUIRED |\n| [2026-11-21-017-cognition-engine.md](./2026-11-21-017-cognition-engine.md) | محرك إدراك أولي محافظ مع provenance وتصنيف إشارات العلاقات دون تعديل الذاكرة الأصلية | IMPLEMENTED / CI VERIFIED #84 / HUMAN REVIEW REQUIRED |\n| [2026-11-21-016-memory-restore-contract.md](./2026-11-21-016-memory-restore-contract.md) | عقد استعادة snapshots على دفعات ومنع الكتابة عند وجود تعارض | COMMITTED / CI VERIFIED ON d5cd290 / REAL-BROWSER INDEXEDDB PENDING |
 | [2026-11-21-015-memory-lineage-integrity.md](./2026-11-21-015-memory-lineage-integrity.md) | فحص بنية سلسلة التصحيحات والإحالات والدورات في الذاكرة | IMPLEMENTED / CI VERIFIED |
 | [2026-11-21-014-memory-retrieval-ci-fix.md](./2026-11-21-014-memory-retrieval-ci-fix.md) | إصلاح بيانات اختبار ترتيب الاسترجاع بعد فشل CI | FIX COMMITTED / CI VERIFIED |
 | [2026-11-21-013-memory-link-compat.md](./2026-11-21-013-memory-link-compat.md) | توافق صريح بين MemoryLink المتزامن ومخزن الذاكرة غير المتزامن | IMPLEMENTED / CI PENDING |
