@@ -45,6 +45,7 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
+| [2026-11-21-024-authoritative-progress-dashboard.md](./2026-11-21-024-authoritative-progress-dashboard.md) | لوحة تقدم حية تقرأ scorecard موحداً وتتحقق من النسبة الموزونة وتفصلها عن الجاهزية الإنتاجية | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
 | [2026-11-21-023-founder-directives-progress-reporting.md](./2026-11-21-023-founder-directives-progress-reporting.md) | تثبيت تعليمات المؤسس الدائمة ومنهجية قياس التقدم الموزون والتقارير المرحلية | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
 | [2026-11-21-022-indexeddb-concurrent-write-atomicity.md](./2026-11-21-022-indexeddb-concurrent-write-atomicity.md) | اختبار ذرية الكتابة المتزامنة ومنع الكتابة الجزئية بين اتصالات IndexedDB | MERGED / CI VERIFIED / POST-MERGE CI VERIFIED |
 | [2026-11-21-021-indexeddb-versionchange-contention.md](./2026-11-21-021-indexeddb-versionchange-contention.md) | اختبار اتصالات IndexedDB المتزامنة وإغلاقها عند versionchange قبل ترقية المخطط | MERGED / CI VERIFIED / POST-MERGE CI VERIFIED |

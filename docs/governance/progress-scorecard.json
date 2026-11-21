@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "project": "AYHEM",
+  "scope": "تقدير النضج الهندسي للوحدات الثماني وفق الأدلة التي تمت مراجعتها في مستودع AYHEM_WEB حتى تاريخ القياس؛ وليس قياساً لجاهزية الإنتاج.",
+  "evidence_date": "2026-11-21",
+  "overall_progress_percent": 41,
+  "progress_status": "provisional",
+  "production_readiness": "not_yet_rated",
+  "weights_total_percent": 100,
+  "last_documented_operation": 23,
+  "last_merged_pull_request": 12,
+  "last_merged_commit": "e56b8f62f9428fc616ad8351f63a306f393f4328",
+  "workstreams": [
+    {
+      "name": "MEMORY",
+      "label": "الذاكرة",
+      "weight_percent": 25,
+      "completion_percent": 70,
+      "weighted_contribution": 17.5,
+      "evidence": "مخزن تراكمي، IndexedDB، استرجاع، سلامة الإحالات، استعادة snapshots، واختبارات Chromium؛ ترحيل بيانات المستخدم ما زال معلقاً."
+    },
+    {
+      "name": "COGNITION",
+      "label": "الإدراك والتحليل",
+      "weight_percent": 15,
+      "completion_percent": 25,
+      "weighted_contribution": 3.75,
+      "evidence": "تحليل علاقات معجمي حتمي والتحقق من provenance؛ لا يوجد استدلال دلالي معاير أو حلقة تعلم مثبتة."
+    },
+    {
+      "name": "AUTONOMY",
+      "label": "الاستقلالية",
+      "weight_percent": 15,
+      "completion_percent": 0,
+      "weighted_contribution": 0,
+      "evidence": "لا يوجد حتى الآن محرك تنسيق مهام ذاتي موثق ومتحقق."
+    },
+    {
+      "name": "GUARD",
+      "label": "الحماية والحوكمة الأمنية",
+      "weight_percent": 10,
+      "completion_percent": 25,
+      "weighted_contribution": 2.5,
+      "evidence": "بعض ضوابط التحقق وحدود الأمان موجودة؛ التحقق التشغيلي الكامل من الهوية والسياسات المنشورة ما زال مطلوباً."
+    },
+    {
+      "name": "LINK",
+      "label": "الربط والتكامل",
+      "weight_percent": 10,
+      "completion_percent": 35,
+      "weighted_contribution": 3.5,
+      "evidence": "عميل AI وعقد API وكود Worker موجودة؛ الاتصال الحي من طرف إلى طرف غير مثبت."
+    },
+    {
+      "name": "INTERFACE",
+      "label": "الواجهة",
+      "weight_percent": 10,
+      "completion_percent": 40,
+      "weighted_contribution": 4,
+      "evidence": "واجهة ويب وأداة محلية لمعاينة الذاكرة موجودتان؛ مسار AI الحي الكامل غير مثبت."
+    },
+    {
+      "name": "OPERATIONS",
+      "label": "التشغيل والتوثيق",
+      "weight_percent": 10,
+      "completion_percent": 75,
+      "weighted_contribution": 7.5,
+      "evidence": "تقارير مرقمة، فروع وطلبات سحب، CI للذاكرة والمتصفح والحوكمة، ودليل نشر Pages."
+    },
+    {
+      "name": "VALIDATION & RELEASE",
+      "label": "التحقق والإصدارات",
+      "weight_percent": 5,
+      "completion_percent": 45,
+      "weighted_contribution": 2.25,
+      "evidence": "اختبارات Node وChromium ناجحة؛ فحوص Worker الحية وترحيل بيانات الإنتاج والتحقق الشامل للإصدار لم تكتمل."
+    }
+  ]
+}
