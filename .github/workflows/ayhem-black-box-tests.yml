@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "core/black-box/**"
+      - "tools/legacy-memory-audit.html"
       - ".github/workflows/ayhem-black-box-tests.yml"
   push:
     branches: [main]
