@@ -5,7 +5,7 @@
 - الفرع: `integration/ai-network-mesh-v1`
 - commit الواجهة: `ec68d76188d4b7356a81cbb863fcc4dc176e4895`
 - طلب المراجعة: [PR #5](https://github.com/samiaymen107-rgb/AYHEM_WEB/pull/5)
-- الحالة: UI IMPLEMENTED / CI TRIGGER CONFIGURED / USER-DATA PREVIEW NOT RUN
+- الحالة: UI IMPLEMENTED / CI VERIFIED / USER-DATA PREVIEW NOT RUN
 
 ## 1. الهدف
 
@@ -34,4 +34,7 @@
 
 ## 5. الخطوة التالية
 
-انتظار نتيجة CI لهذه الإضافة. بعد نشر الصفحة بموافقة المؤسس، يمكن تشغيل المعاينة محلياً ومراجعة تقريرها قبل تصميم أي عملية ترحيل.
+- [AYHEM Black Box Tests — نجاح](https://github.com/samiaymen107-rgb/AYHEM_WEB/actions/runs/44909598039).
+- [AYHEM AI Network Client Tests — نجاح](https://github.com/samiaymen107-rgb/AYHEM_WEB/actions/runs/44909598037).
+
+الخطوة التالية: بعد نشر الصفحة بموافقة المؤسس، يمكن تشغيل المعاينة محلياً ومراجعة تقريرها قبل تصميم أي عملية ترحيل.
