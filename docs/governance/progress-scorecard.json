@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "project": "AYHEM",
-  "scope": "تقدير النضج الهندسي للوحدات الثماني وفق الأدلة التي تمت مراجعتها في مستودع AYHEM_WEB حتى تاريخ القياس؛ وليس قياساً لجاهزية الإنتاج.",
+  "scope": "تقدير النضج الهندسي للوحدات الثماني وفق أدلة مستودعي AYHEM وAYHEM_WEB التي تمت مراجعتها حتى تاريخ القياس؛ وليس قياساً لجاهزية الإنتاج أو اكتمال موقع العرض.",
   "evidence_date": "2026-11-21",
   "overall_progress_percent": 44.75,
-  "progress_status": "provisional",
+  "progress_status": "recalibrated_provisional",
   "production_readiness": "not_yet_rated",
   "weights_total_percent": 100,
   "last_documented_operation": 26,
@@ -75,5 +75,10 @@
       "weighted_contribution": 2.25,
       "evidence": "اختبارات Node وChromium ناجحة؛ فحوص Worker الحية وترحيل بيانات الإنتاج والتحقق الشامل للإصدار لم تكتمل."
     }
+  ],
+  "recalibration_reason": "تم تصحيح التقدير الأولي 41% بعد مراجعة AYHEM_WEB PR #4 المدموج الذي أضاف أساس سياسة الاستقلالية وسجل التدقيق ومخطط الذاكرة واختبارات الحدود؛ AUTONOMY أصبح 25% بدلاً من 0%.",
+  "audit_repositories": [
+    "samiaymen107-rgb/AYHEM",
+    "samiaymen107-rgb/AYHEM_WEB"
   ]
 }
