@@ -2,7 +2,7 @@
 
 - تاريخ الفهرسة: 2026-11-21
 - المستودع: `samiaymen107-rgb/AYHEM_WEB`
-- العدد: **33 تقريراً موجوداً**.
+- العدد: **34 تقريراً موجوداً**.
 - يثبت عمود «العنوان الأصلي» نص عنوان H1 كما ظهر في أول أسطر الملف؛ وعمود «عنوان الفهرسة» ترجمة/وصف عربي لتسهيل التصفح. الروابط تستخدم أسماء الملفات الأصلية دون إعادة تسمية.
 
 ## شبكة AI والربط
@@ -80,3 +80,4 @@
 | 032 | AYHEM 032 — Atomic cross-tab cognition insight persistence | منع التكرار الذري للاستنتاجات بين النوافذ | [فتح التقرير](./2026-11-21-032-atomic-cognition-idempotency.md) |
 | 033 | AYHEM 033 — Indexed cognition scans and sparse-pair optimization | تسريع تحليل الذاكرة بفهرس الرموز | [فتح التقرير](./2026-11-21-033-indexed-cognition-scan.md) |
 | 034 | AYHEM 034 — Dense and sparse cognition scan benchmarks | قياس أداء الإدراك في الذاكرة المتناثرة والكثيفة | [فتح التقرير](./2026-11-21-034-dense-cognition-benchmark.md) |
+| 035 | AYHEM 035 — Full-ceiling dense cognition benchmark | اختبار الحد الأقصى للذاكرة الكثيفة | [فتح التقرير](./2026-11-21-035-full-ceiling-dense-benchmark.md) |
