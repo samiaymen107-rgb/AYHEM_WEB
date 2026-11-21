@@ -464,3 +464,48 @@ test("real Chromium IndexedDB: sync outbox survives reopen and keeps delivery hi
     await page.close();
   }
 });
+
+
+test("real Chromium: memory append and outbox enqueue commit or abort together", async () => {
+  const page = await browser.newPage();
+  try {
+    await page.goto(origin);
+    const result = await page.evaluate(async () => {
+      const { createIndexedDBMemoryAdapter } = await import("/core/black-box/indexeddb-memory-adapter.js");
+      const { createMemoryStore } = await import("/core/black-box/memory-store.js");
+      const dbName = `AYHEM_ATOMIC_OUTBOX_${crypto.randomUUID()}`;
+      const adapter = createIndexedDBMemoryAdapter({ dbName });
+      const store = createMemoryStore({ adapter, now: () => "2026-11-21T15:00:00.000Z", idFactory: () => "memory-atomic-1" });
+      const record = { type: "fact", content: "Atomic memory and outbox commit.", status: "documented", source: "browser-atomic-test", confidence: 1, tags: ["atomic-sync"] };
+      await store.append(record);
+      const firstRecord = await store.get("memory-atomic-1");
+      const firstEvents = await adapter.listSyncEvents();
+      const duplicate = await store.appendIfTagAbsent({ ...record, id: "memory-atomic-2", content: "Must not be appended twice." }, "atomic-sync");
+      const afterDuplicate = await adapter.listSyncEvents();
+      const conflictRecord = { id: "memory-atomic-conflict", type: "fact", content: "conflict", status: "documented", createdAt: "2026-11-21T15:01:00.000Z", source: "browser-atomic-test", confidence: 1, supersedes: [], tags: ["atomic-sync"] };
+      await adapter.enqueueSyncEvent({ eventId: "memory-record:memory-atomic-conflict", recordId: "other-record", payload: { conflict: true }, status: "pending", attempts: 0, createdAt: conflictRecord.createdAt, updatedAt: conflictRecord.createdAt, deliveredAt: null, lastError: null });
+      const conflictStore = createMemoryStore({ adapter, now: () => "2026-11-21T15:01:00.000Z", idFactory: () => "memory-atomic-conflict" });
+      let conflictRejected = false;
+      try { await conflictStore.append({ ...record, id: "memory-atomic-conflict", createdAt: conflictRecord.createdAt }); } catch { conflictRejected = true; }
+      const afterConflictRecord = await adapter.getRecord("memory-atomic-conflict");
+      const allEvents = await adapter.listSyncEvents();
+      await adapter.close();
+      await new Promise((resolveDelete, rejectDelete) => {
+        const request = indexedDB.deleteDatabase(dbName);
+        request.onsuccess = resolveDelete;
+        request.onerror = () => rejectDelete(request.error || new Error("database_cleanup_failed"));
+        request.onblocked = () => rejectDelete(new Error("database_cleanup_blocked"));
+      });
+      return { firstRecordId: firstRecord?.id, firstEvents: firstEvents.map(event => ({ eventId: event.eventId, recordId: event.recordId, status: event.status })), duplicateWasNull: duplicate === null, eventCountAfterDuplicate: afterDuplicate.length, conflictRejected, conflictRecordAbsent: afterConflictRecord == null, conflictEventPreserved: allEvents.some(event => event.eventId === "memory-record:memory-atomic-conflict" && event.recordId === "other-record") };
+    });
+    assert.equal(result.firstRecordId, "memory-atomic-1");
+    assert.deepEqual(result.firstEvents, [{ eventId: "memory-record:memory-atomic-1", recordId: "memory-atomic-1", status: "pending" }]);
+    assert.equal(result.duplicateWasNull, true);
+    assert.equal(result.eventCountAfterDuplicate, 1, "deduplicated append must not create an outbox event");
+    assert.equal(result.conflictRejected, true);
+    assert.equal(result.conflictRecordAbsent, true, "record write must roll back when outbox write fails");
+    assert.equal(result.conflictEventPreserved, true, "existing conflicting outbox event must remain unchanged");
+  } finally {
+    await page.close();
+  }
+});
