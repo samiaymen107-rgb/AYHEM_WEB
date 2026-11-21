@@ -41,9 +41,9 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-014-memory-retrieval-ci-fix.md](./2026-11-21-014-memory-retrieval-ci-fix.md) | إصلاح بيانات اختبار ترتيب الاسترجاع بعد فشل CI | FIX COMMITTED / CI PENDING |
+| [2026-11-21-014-memory-retrieval-ci-fix.md](./2026-11-21-014-memory-retrieval-ci-fix.md) | إصلاح بيانات اختبار ترتيب الاسترجاع بعد فشل CI | FIX COMMITTED / CI VERIFIED |
 | [2026-11-21-013-memory-link-compat.md](./2026-11-21-013-memory-link-compat.md) | توافق صريح بين MemoryLink المتزامن ومخزن الذاكرة غير المتزامن | IMPLEMENTED / CI PENDING |
-| [2026-11-21-012-memory-retrieval.md](./2026-11-21-012-memory-retrieval.md) | استرجاع معجمي مع provenance ومرشحات موثقة | IMPLEMENTED / CI PENDING |
+| [2026-11-21-012-memory-retrieval.md](./2026-11-21-012-memory-retrieval.md) | استرجاع معجمي مع provenance ومرشحات موثقة | IMPLEMENTED / CI VERIFIED ON HEAD |
 | [2026-11-21-011-local-memory-audit-ui.md](./2026-11-21-011-local-memory-audit-ui.md) | واجهة تشغيل معاينة الذاكرة محلياً | UI IMPLEMENTED / CI VERIFIED |
 | [2026-11-21-010-legacy-memory-audit.md](./2026-11-21-010-legacy-memory-audit.md) | جرد الذاكرة القديمة دون تعديلها | READ-ONLY PREVIEW / CI VERIFIED |
 | [2026-11-21-009-memory-snapshot-restore.md](./2026-11-21-009-memory-snapshot-restore.md) | معاينة واستعادة نسخ الذاكرة بأمان | IMPLEMENTED / CI VERIFIED |
