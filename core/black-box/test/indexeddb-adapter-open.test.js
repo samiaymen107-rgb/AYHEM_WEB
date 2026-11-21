@@ -52,7 +52,7 @@ test("late success after blocked open closes the abandoned database connection",
   readRequest.result = null;
   readRequest.onsuccess?.();
   transaction.oncomplete();
-  assert.equal(await second, undefined);
+  assert.equal(await second, null, "a missing record is represented as null by IndexedDB");
   await adapter.close();
   assert.equal(secondCloseCount, 1);
 });
