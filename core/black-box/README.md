@@ -7,6 +7,7 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 - `memory-schema.js`: validates sourced, confidence-labelled, immutable memory records.
 - `memory-store.js`: append-only memory repository with search, filters, versioned export, snapshot inspection and idempotent restore.
 - `memory-retrieval.js`: deterministic lexical retrieval with explicit filters, ranking and provenance; not semantic reasoning.
+- `memory-cognition.js`: bounded, deterministic lexical relationship signals with provenance; not general semantic understanding or fact verification. Derived observations are explicitly marked as inference.
 - `memory-integrity.js`: deterministic structural inspection of supersedes lineage, current records, missing references, chronology violations and cycles; it does not infer semantic truth or contradictions.
 - `memory-link-compat.js`: explicit facade for legacy synchronous MemoryLink and the asynchronous canonical store; no implicit mirroring or migration.
 - `indexeddb-memory-adapter.js`: browser IndexedDB persistence adapter; it does not silently fall back to localStorage.
@@ -21,6 +22,8 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 - Each record requires a source, status, canonical UTC timestamp and confidence from 0 to 1.
 - Retrieval returns original records with source, status, type, timestamp, confidence and supersedes provenance. Its lexical score is a relevance heuristic, not a truth score.
 - The lineage inspector reports structural links and malformed references. It does not determine whether two natural-language claims contradict one another.
+- The cognition engine classifies only narrow lexical signals: opposite explicit negation over otherwise identical tokens, same lexical frame with different numbers (possible tension), high lexical overlap (similarity), or unknown. These are review hints, not truth judgments. It does not call an LLM or modify source records.
+- Persisted cognition output is a separate `observation` record with `status: inference`, a dedicated source, provenance, method version and a deduplication fingerprint. Derived records are excluded from later cognition scans.
 - Legacy MemoryLink remains synchronous. The compatibility facade preserves that API and exposes separate asynchronous canonical operations. Callers explicitly choose the write path; there is no automatic dual-write.
 - IndexedDB provides browser-local persistence, not a remote backup or a guarantee against browser data clearing. Remote replication and tested backup/restore remain separate work.
 - The new store is not yet connected to the live AI gateway. No existing memory is migrated or removed.
@@ -31,6 +34,10 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 - External writes, destructive actions, secret access/rotation, deployments, permission changes, and financial actions require founder approval.
 - The core does not contain API keys. Runtime secrets must be injected by the hosting platform, never committed to Git.
 - This foundation does not itself run continuously. Scheduling, remote storage, monitoring and recovery are separate integration steps.
+
+## Cognition engine
+
+`memory-cognition.js` is an intentionally conservative first step. It uses deterministic lexical heuristics only. Explicit contradiction requires identical substantive tokens and numeric context with opposite detected negation. Different numeric values are marked as possible tension, not contradiction. Similarity is lexical overlap, not semantic equivalence. Every finding retains both source records and must be reviewed before operational use. The default scan ceiling is 200 source records; increase only with measured performance and tests.
 
 ## Run tests
 From this directory with Node.js 20+:
