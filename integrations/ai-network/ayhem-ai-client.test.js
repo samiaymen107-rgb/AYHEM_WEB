@@ -41,6 +41,7 @@ test("validates the gateway response and returns normalized output", async () =>
     fetchImpl: async (url, init) => {
       assert.equal(url, "https://ai.example/");
       assert.equal(init.method, "POST");
+      assert.equal(init.credentials, "include");
       return new Response(JSON.stringify(validResponse), {
         status: 200, headers: { "Content-Type": "application/json" },
       });
@@ -83,7 +84,10 @@ test("surfaces gateway errors without retrying billable requests", async () => {
 test("accepts only a complete, internally consistent health response", async () => {
   const client = createAyhemAIClient({
     endpoint: "https://ai.example",
-    fetchImpl: async () => new Response(JSON.stringify(validHealth), { status: 200 }),
+    fetchImpl: async (_url, init) => {
+      assert.equal(init.credentials, "include");
+      return new Response(JSON.stringify(validHealth), { status: 200 });
+    },
   });
   assert.deepEqual(await client.health(), validHealth);
 });
@@ -102,4 +106,15 @@ test("rejects incomplete or contradictory health readiness", async () => {
     });
     await assert.rejects(client.health(), /health response/);
   }
+});
+
+
+test("allows an explicit supported credential mode and rejects invalid modes", () => {
+  assert.throws(
+    () => createAyhemAIClient({ endpoint: "https://ai.example", credentials: "invalid" }),
+    /credentials must be omit, same-origin, or include/,
+  );
+  assert.doesNotThrow(
+    () => createAyhemAIClient({ endpoint: "https://ai.example", credentials: "include" }),
+  );
 });
