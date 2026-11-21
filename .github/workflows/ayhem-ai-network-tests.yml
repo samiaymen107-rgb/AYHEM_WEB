@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "integrations/ai-network/**"
+      - "index.html"
       - ".github/workflows/ayhem-ai-network-tests.yml"
   push:
     branches: [main]
