@@ -37,6 +37,7 @@ function corsHeaders(origin) {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Credentials": "true",
     "Vary": "Origin",
   } : {};
 }
