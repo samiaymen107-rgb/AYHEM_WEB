@@ -43,13 +43,16 @@
 
 ## الفهرس
 
+- [الفهرس الموضوعي والعناوين الرسمية لجميع التقارير](./REPORT_CATALOG.md): يضم العناوين العربية المصنفة والروابط الثابتة وتدقيق الترقيم.
+
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-030-speed-precision-adaptive-correction.md](./2026-11-21-030-speed-precision-adaptive-correction.md) | تثبيت توجيهات المؤسس للسرعة والدقة وكشف الأخطاء والتصحيح السريع وتعديل المسار | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
-| [2026-11-21-029-post-merge-evidence-reconciliation.md](./2026-11-21-029-post-merge-evidence-reconciliation.md) | مطابقة تقارير 026–028 مع حالة الدمج ونتائج CI وPages وتحديث رقم آخر عملية | MERGED / GOVERNANCE CI VERIFIED / PAGES PENDING |
+| [2026-11-21-031-post-merge-030-reconciliation.md](./2026-11-21-031-post-merge-030-reconciliation.md) | مطابقة حالة العملية 030 بعد الدمج وتحديث الفهرس وبطاقة التقدم بالأدلة | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-030-speed-precision-adaptive-correction.md](./2026-11-21-030-speed-precision-adaptive-correction.md) | تثبيت توجيهات المؤسس للسرعة والدقة وكشف الأخطاء والتصحيح السريع وتعديل المسار | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
+| [2026-11-21-029-post-merge-evidence-reconciliation.md](./2026-11-21-029-post-merge-evidence-reconciliation.md) | مطابقة تقارير 026–028 مع حالة الدمج ونتائج CI وPages وتحديث رقم آخر عملية | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-028-real-browser-access-cors.md](./2026-11-21-028-real-browser-access-cors.md) | اختبار CORS وCookie جلسة Access في Chromium حقيقي بين أصلين مختلفين | MERGED / BROWSER CI VERIFIED / PAGES DEPLOYED / LIVE ACCESS PENDING |
 | [2026-11-21-027-cloudflare-access-cors-session.md](./2026-11-21-027-cloudflare-access-cors-session.md) | إصلاح إرسال Cookie جلسة Access وتوافق CORS preflight بين المتصفح والبوابة | MERGED / AI CLIENT CI VERIFIED / PAGES DEPLOYED / ACCESS CONFIG PENDING |
-| [2026-11-21-026-cross-repository-score-recalibration.md](./2026-11-21-026-cross-repository-score-recalibration.md) | مراجعة الأدلة عبر المستودعات وتصحيح نسبة المشروع من 41% إلى 44.75% وتحديث لوحة القياس | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-026-cross-repository-score-recalibration.md](./2026-11-21-026-cross-repository-score-recalibration.md) | مراجعة الأدلة عبر المستودعات وتصحيح نسبة المشروع من 41% إلى 44.75% وتحديث لوحة القياس | MERGED (PR #14) / POST-MERGE CHECKS NOT RECONFIRMED HERE |
 | [2026-11-21-024-authoritative-progress-dashboard.md](./2026-11-21-024-authoritative-progress-dashboard.md) | لوحة تقدم حية تقرأ scorecard موحداً وتتحقق من النسبة الموزونة وتفصلها عن الجاهزية الإنتاجية | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-023-founder-directives-progress-reporting.md](./2026-11-21-023-founder-directives-progress-reporting.md) | تثبيت تعليمات المؤسس الدائمة ومنهجية قياس التقدم الموزون والتقارير المرحلية | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-022-indexeddb-concurrent-write-atomicity.md](./2026-11-21-022-indexeddb-concurrent-write-atomicity.md) | اختبار ذرية الكتابة المتزامنة ومنع الكتابة الجزئية بين اتصالات IndexedDB | MERGED / CI VERIFIED / POST-MERGE CI VERIFIED |
