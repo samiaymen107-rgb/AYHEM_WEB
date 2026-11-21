@@ -1,0 +1,33 @@
+name: AYHEM Governance Tests
+
+on:
+  pull_request:
+    paths:
+      - "docs/governance/**"
+      - "docs/operations/**"
+      - "README.md"
+      - "tools/validate-governance.mjs"
+      - ".github/workflows/ayhem-governance-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/governance/**"
+      - "docs/operations/**"
+      - "README.md"
+      - "tools/validate-governance.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate founder directives and progress scorecard
+        run: node tools/validate-governance.mjs
