@@ -41,6 +41,7 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
+| [2026-11-21-014-memory-retrieval-ci-fix.md](./2026-11-21-014-memory-retrieval-ci-fix.md) | إصلاح بيانات اختبار ترتيب الاسترجاع بعد فشل CI | FIX COMMITTED / CI PENDING |
 | [2026-11-21-013-memory-link-compat.md](./2026-11-21-013-memory-link-compat.md) | توافق صريح بين MemoryLink المتزامن ومخزن الذاكرة غير المتزامن | IMPLEMENTED / CI PENDING |
 | [2026-11-21-012-memory-retrieval.md](./2026-11-21-012-memory-retrieval.md) | استرجاع معجمي مع provenance ومرشحات موثقة | IMPLEMENTED / CI PENDING |
 | [2026-11-21-011-local-memory-audit-ui.md](./2026-11-21-011-local-memory-audit-ui.md) | واجهة تشغيل معاينة الذاكرة محلياً | UI IMPLEMENTED / CI VERIFIED |
