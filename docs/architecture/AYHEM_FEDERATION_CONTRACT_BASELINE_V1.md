@@ -1,29 +1,44 @@
-# Federation contract baseline v1
+# AYHEM eight-repository federation baseline v1
 
-This baseline records the exact Git blob revisions of the five service schemas observed while preparing AYHEM_WEB federation compatibility tests.
+AYHEM is one coordinated federation of **eight existing repositories**. This is a topology and ownership map, not a claim that every service is already connected at runtime.
 
-## Service relationship: first to last
+## The eight repositories
 
-The first service in the five-repository sequence, **AYHEM-MEMORY**, is a domain-service extension built over the federation contracts owned by the final service, **AYHEM-LINK**.
+| Repository | Responsibility | Layer |
+|---|---|---|
+| AYHEM | Central vision, architecture, domain contracts | Foundation |
+| AYHEM_WEB | User application and portal | Application |
+| astro-blog-starter-template | Public website and presentation | Presentation |
+| AYHEM-MEMORY | Memory records and lifecycle | Service |
+| AYHEM-COGNITION | Reasoning and evidence analysis | Service |
+| AYHEM-AUTONOMY | Planning and orchestration | Service |
+| AYHEM-GUARD | Security and authorization | Service |
+| AYHEM-LINK | Shared federation envelope and inter-service coordination | Integration |
 
-- **AYHEM-LINK** owns the shared federation envelope and coordination contracts.
-- **AYHEM-MEMORY** owns memory records and memory lifecycle behavior, and expresses memory events through the LINK envelope.
-- The dependency is one-way at the contract boundary: MEMORY uses LINK's published contract; LINK does not import MEMORY's implementation.
-- This is coordinated federation, not a circular dependency and not a merging of the two repositories.
-- AYHEM_WEB's memory event adapter is the current bridge between the memory record model and the LINK event envelope.
+## First-to-last relationship
 
-## Scope
+**AYHEM-MEMORY (first service) is a domain-service extension over AYHEM-LINK (last service).**
 
-- The manifest is a **pinned source inventory**, not a copy of private schemas.
-- Automated tests currently check the manifest inventory, this first-to-last relationship, and the generated AYHEM-LINK event / AYHEM-MEMORY payload shape using synthetic data.
-- AYHEM-COGNITION, AYHEM-GUARD, and AYHEM-AUTONOMY are inventoried only. AYHEM_WEB does not yet consume those contracts.
-- This is **not full JSON Schema validation**. The repository currently has no JSON Schema validator dependency and no authenticated CI mechanism for retrieving the private source repositories.
-- Blob SHAs identify the exact schema files inspected. If a source schema changes, refresh this manifest deliberately and extend the relevant compatibility tests.
+- LINK owns shared event envelopes and coordination contracts.
+- MEMORY owns memory records, lifecycle and provenance, and emits/consumes events through LINK contracts.
+- Dependency is one-way at the contract boundary: MEMORY uses LINK's published contract; LINK does not import MEMORY implementation.
+- The two repositories remain independent; this is not a merge and must not create a circular dependency.
+
+## Federation rules
+
+- AYHEM is the architecture and contract authority; it does not replace service ownership.
+- AYHEM_WEB and the public site consume approved interfaces; they must not bypass service boundaries or access another service's database directly.
+- Services communicate through versioned APIs/events with trace IDs, schema versions, producer identity and idempotency semantics.
+- Preserve existing repositories, histories, files and data. Do not recreate or consolidate repositories.
+- Keep credentials and private service schemas out of public application code. No broad personal access tokens for CI.
+
+## Validation status
+
+- The manifest inventories all eight repositories and pins the inspected schema blob revisions for the five service repositories.
+- Synthetic tests cover the eight-repository inventory and the current MEMORY-to-LINK event adapter shape.
+- COGNITION, GUARD and AUTONOMY are currently inventory-only in this AYHEM_WEB test; this does not establish runtime connectivity.
+- Full Draft 2020-12 JSON Schema validation is not yet implemented. No claim of end-to-end eight-repository integration is made.
 
 ## Safety boundary
 
-No private repository credentials, tokens, user memory, network calls, migrations, remote writes, or autonomous execution are introduced. Tests use synthetic fixtures only.
-
-## Next integration gate
-
-Before claiming full cross-repository validation, add a reviewed, reproducible way for CI to obtain the exact private schema revisions and run a Draft 2020-12 JSON Schema validator (including format assertions). Do not add broad repository credentials or long-lived personal access tokens merely to make this test pass.
+No real user memory is migrated, no secrets are copied, and no live remote writes, autonomous actions or production deployments are introduced by this baseline.
