@@ -35,6 +35,13 @@ function requiredString(value, name, maxLength = 256) {
 function hex(bytes) {
   return [...new Uint8Array(bytes)].map(value => value.toString(16).padStart(2, "0")).join("");
 }
+function deepFreeze(value) {
+  if (value && typeof value === "object" && !Object.isFrozen(value)) {
+    Object.freeze(value);
+    for (const child of Object.values(value)) deepFreeze(child);
+  }
+  return value;
+}
 
 export function createMemoryEventAdapter({
   digest = globalThis.crypto?.subtle,
@@ -112,7 +119,7 @@ export function createMemoryEventAdapter({
 
       const eventTime = now();
       if (!canonicalUtc(eventTime)) throw new TypeError("event_time_invalid");
-      return Object.freeze({
+      return deepFreeze({
         specversion: "1.0",
         id: eventId,
         type: EVENT_TYPE,
