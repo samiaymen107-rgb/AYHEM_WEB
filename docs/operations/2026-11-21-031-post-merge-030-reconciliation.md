@@ -28,7 +28,10 @@ Acceptance:
 
 ## Changes
 
-- `docs/operations/README.md`: mark operation 030 as merged, Governance CI verified and Pages deployed; add operation 031.
+- `docs/operations/README.md`: mark operation 030 as merged, Governance CI verified and Pages deployed; add operation 031 and link the subject catalogue.
+- `docs/operations/REPORT_CATALOG.md`: catalogue all 30 existing reports by workstream, preserve each report's exact original H1 title, add an Arabic indexing title, and link each file.
+- Verified all 30 report paths by fetching their opening lines from this branch; operation 025 is explicitly recorded as unused rather than inventing a missing report.
+- Correct the malformed operation 004 link and reconcile stale index states for operations 026 and 029.
 - `docs/governance/progress-scorecard.json`: advance last documented operation to 31 and update AYHEM_WEB latest merged change to PR #18 / merge commit above.
 - This report: record the reconciliation and evidence.
 
