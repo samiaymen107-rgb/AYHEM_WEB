@@ -91,20 +91,42 @@ test("exports and restores a versioned snapshot idempotently", async () => {
 });
 
 test("rejects conflicting IDs and dangling references before import", async () => {
-  const target = createMemoryStore({ adapter: createTestAdapter() });
+  const target = createMemoryStore({
+    adapter: createTestAdapter(),
+    now: () => "2026-11-21T10:00:00.000Z",
+  });
   await target.append({ ...base, id: "mem-001" });
   const conflict = {
     format: "AYHEM_MEMORY_SNAPSHOT",
     schemaVersion: 1,
     exportedAt: "2026-11-21T12:00:00.000Z",
     recordCount: 1,
-    records: [{ ...base, id: "mem-001", content: "Altered historical record." }],
+    records: [{
+      ...base,
+      id: "mem-001",
+      createdAt: "2026-11-21T10:00:00.000Z",
+      content: "Altered historical record.",
+    }],
   };
   const inspection = await target.inspectSnapshot(conflict);
   assert.equal(inspection.valid, false);
   assert.ok(inspection.errors.includes("existing_id_conflict:mem-001"));
   await assert.rejects(target.importSnapshot(conflict), /snapshot rejected/);
   assert.equal((await target.get("mem-001")).content, base.content);
+
+  const dangling = {
+    ...conflict,
+    records: [{
+      ...base,
+      id: "mem-002",
+      createdAt: "2026-11-21T11:00:00.000Z",
+      supersedes: ["not-present"],
+    }],
+  };
+  dangling.recordCount = 1;
+  const danglingInspection = await target.inspectSnapshot(dangling);
+  assert.equal(danglingInspection.valid, false);
+  assert.ok(danglingInspection.errors.some(error => error.includes("supersedes_target_missing")));
 });
 
 test("refuses invalid adapters and empty searches", async () => {
