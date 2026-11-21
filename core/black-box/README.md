@@ -7,6 +7,7 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 - `memory-schema.js`: validates sourced, confidence-labelled, immutable memory records.
 - `memory-store.js`: append-only memory repository with search, filters, versioned export, snapshot inspection and idempotent restore.
 - `indexeddb-memory-adapter.js`: browser IndexedDB persistence adapter; it does not silently fall back to localStorage.
+- `legacy-memory-preview.js`: read-only inventory of known legacy localStorage keys; reports counts and shapes without exposing stored content or changing source data.
 - `ledger.js`: append-only hash-chained audit events using Web Crypto.
 
 ## Memory rules
@@ -27,6 +28,9 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 ## Run tests
 From this directory with Node.js 20+:
 `npm test`
+
+## Legacy memory audit
+The preview scans `AYHEM_MEMORY`, `AYHEM_LONG_MEMORY`, `ayhemPersistentMemory`, `AYHEM_ARCHIVE`, `AYHEM_ARCHIVE_BACKUP`, and `AYHEM_ARCHIVE_ADVANCED`. It is a read-only inventory only; volatile in-page globals are outside this scan. Review its report before designing any migration.
 
 ## Integration rule
 Do not migrate legacy memory or claim remote durability until backup/restore, compatibility, access-control and end-to-end tests pass.
