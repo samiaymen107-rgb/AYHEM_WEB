@@ -113,6 +113,46 @@ export function createIndexedDBMemoryAdapter({
     });
   }
 
+  async function persistRecordAndSyncEvent(record, tag) {
+    if (!record || typeof record.id !== "string" || !record.id) return Promise.reject(new TypeError("record_id_required"));
+    return openDatabase().then(db => new Promise((resolve, reject) => {
+      let inserted = false;
+      let failure = null;
+      let settled = false;
+      const tx = db.transaction([storeName, "syncOutbox"], "readwrite");
+      const records = tx.objectStore(storeName);
+      const outbox = tx.objectStore("syncOutbox");
+      const append = () => {
+        const event = {
+          eventId: "memory-record:" + record.id,
+          recordId: record.id,
+          payload: record,
+          status: "pending",
+          attempts: 0,
+          createdAt: record.createdAt,
+          updatedAt: record.createdAt,
+          deliveredAt: null,
+          lastError: null,
+        };
+        const addRecord = records.add(record);
+        addRecord.onerror = () => { failure = addRecord.error; try { tx.abort(); } catch {} };
+        const addEvent = outbox.add(event);
+        addEvent.onerror = () => { failure = addEvent.error; try { tx.abort(); } catch {} };
+        inserted = true;
+      };
+      if (typeof tag === "string" && tag) {
+        const lookup = records.index("tags").get(tag);
+        lookup.onsuccess = () => { if (lookup.result === undefined) append(); };
+        lookup.onerror = () => { failure = lookup.error; try { tx.abort(); } catch {} };
+      } else {
+        append();
+      }
+      tx.oncomplete = () => { if (!settled) { settled = true; resolve(inserted); } };
+      tx.onerror = () => { if (!settled) { settled = true; reject(failure || tx.error || new Error("memory_outbox_transaction_failed")); } };
+      tx.onabort = () => { if (!settled) { settled = true; reject(failure || tx.error || new Error("memory_outbox_transaction_aborted")); } };
+    }));
+  }
+
   return Object.freeze({
     getRecord(id) {
       return transact("readonly", store => store.get(id));
@@ -133,9 +173,16 @@ export function createIndexedDBMemoryAdapter({
     addRecord(record) {
       return transact("readwrite", store => store.add(record));
     },
+    addRecordAndEnqueueSyncEvent(record) {
+      return persistRecordAndSyncEvent(record);
+    },
     addRecords(records) {
       if (!Array.isArray(records)) return Promise.reject(new TypeError("records_must_be_array"));
       return transact("readwrite", store => records.map(record => store.add(record)));
+    },
+    addRecordIfTagAbsentAndEnqueueSyncEvent(record, tag) {
+      if (!record || typeof record !== "object" || typeof tag !== "string" || !tag) return Promise.reject(new TypeError("record_and_tag_required"));
+      return persistRecordAndSyncEvent(record, tag);
     },
     addRecordIfTagAbsent(record, tag) {
       if (!record || typeof record !== "object" || typeof tag !== "string" || !tag) {
