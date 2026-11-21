@@ -6,6 +6,7 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 - `policy.js`: deterministic action classification and approval gates.
 - `memory-schema.js`: validates sourced, confidence-labelled, immutable memory records.
 - `memory-store.js`: append-only memory repository with search, filters, versioned export, snapshot inspection and idempotent restore.
+- `memory-retrieval.js`: deterministic lexical retrieval with explicit filters, ranking and provenance; not semantic reasoning.
 - `indexeddb-memory-adapter.js`: browser IndexedDB persistence adapter; it does not silently fall back to localStorage.
 - `legacy-memory-preview.js`: read-only inventory of known legacy localStorage keys; reports counts and shapes without exposing stored content or changing source data.
 - `../../tools/legacy-memory-audit.html`: local browser page to run the preview and export a metadata-only report.
@@ -16,6 +17,7 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 - A correction is a new record that references earlier record IDs through `supersedes`; references must point to older records.
 - Snapshot restore validates every record, duplicate IDs, conflicts and supersedes references before a single atomic adapter batch is written.
 - Each record requires a source, status, canonical UTC timestamp and confidence from 0 to 1.
+- Retrieval returns original records with source, status, type, timestamp, confidence and supersedes provenance. Its lexical score is a relevance heuristic, not a truth score.
 - IndexedDB provides browser-local persistence, not a remote backup or a guarantee against browser data clearing. Remote replication and tested backup/restore remain separate work.
 - The new store is not yet connected to legacy memory modules or the live AI gateway. No existing memory is migrated or removed.
 
