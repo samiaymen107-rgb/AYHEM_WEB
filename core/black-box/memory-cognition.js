@@ -188,7 +188,7 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
         const validIds = Array.isArray(insight?.recordIds) && insight.recordIds.length === 2 &&
           insight.recordIds.every(id => typeof id === "string" && id.length > 0) &&
           insight.recordIds[0] !== insight.recordIds[1] &&
-          insight.recordIds[0] < insight.recordIds[1];
+          insight.recordIds[0].localeCompare(insight.recordIds[1]) < 0;
         const validProvenance = Array.isArray(insight?.provenance) && insight.provenance.length === 2 &&
           insight.provenance.every((item, index) => item && item.recordId === insight.recordIds?.[index] &&
             typeof item.source === "string" && typeof item.status === "string" &&
