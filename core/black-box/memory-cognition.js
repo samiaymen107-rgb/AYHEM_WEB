@@ -249,14 +249,26 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
           evidence: insight.evidence,
           fingerprint: insight.fingerprint,
         });
-        const record = await store.append({
+        const input = {
           type: "observation",
           content,
           status: "inference",
           source: DERIVED_SOURCE,
           confidence: Math.min(...insight.provenance.map(item => item.confidence)) * insight.confidence,
           tags: ["derived", "cognition", tag],
-        });
+        };
+        let record;
+        if (typeof store.appendIfTagAbsent === "function") {
+          record = await store.appendIfTagAbsent(input, tag);
+          if (!record) {
+            skipped.push(insight.fingerprint);
+            continue;
+          }
+        } else {
+          // Compatibility for test and non-IndexedDB stores: sequential
+          // idempotency only. Production IndexedDB stores expose the atomic API.
+          record = await store.append(input);
+        }
         persisted.push(record);
       }
       return Object.freeze({
