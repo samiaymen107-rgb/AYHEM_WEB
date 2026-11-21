@@ -35,6 +35,10 @@ for (const required of [
   "Progress model",
   "Separate progress indicators",
   "Report template",
+  "speed, precision, rapid correction and adaptive course control",
+  "Execution speed",
+  "Continuous fault detection",
+  "Adaptive course correction",
 ]) assert.ok(scorecard.includes(required), `missing required governance section: ${required}`);
 
 assert.ok(index.includes("2026-11-21-023-founder-directives-progress-reporting.md"), "operations index must link the current governance report");

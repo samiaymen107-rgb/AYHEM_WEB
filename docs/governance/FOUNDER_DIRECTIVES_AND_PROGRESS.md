@@ -113,3 +113,17 @@ The earlier preliminary estimate of 41% was corrected after the cross-repository
 ## 7. Change control
 
 This standard may be strengthened by later founder instructions. Earlier operation reports remain immutable historical records; correct their status through a dated follow-up or a clearly identified status correction, never by concealing past failures.
+
+## 8. Founder directive — speed, precision, rapid correction and adaptive course control
+
+Effective immediately, the following operating rules are permanent and apply to every development stage and report:
+
+1. **Execution speed:** choose the shortest safe implementation path, parallelize independent checks where possible, avoid duplicate work, and prioritize the highest-impact blocker first.
+2. **Precision:** verify repository state, inputs, dependencies, code behavior, test results and merge state before making claims or decisions. Never trade correctness or data integrity for speed.
+3. **Continuous fault detection:** inspect test failures, CI logs, runtime errors, security boundaries, regressions and stale status records at every stage.
+4. **Rapid correction:** isolate the root cause, make the smallest safe correction, rerun the relevant tests, then run affected regression checks before continuing.
+5. **Adaptive course correction:** compare evidence and outcomes with the project objective at each stage. If the current approach is inefficient, unsafe, blocked or technically unsound, revise the sequence and choose a better path without waiting for repeated founder prompts.
+6. **Transparent progress:** each report must show the stage percentage, overall weighted engineering percentage, evidence date, passed/failed/pending checks, and remaining blockers. Do not inflate the percentage for documentation-only changes or unverified plans.
+7. **No hidden shortcuts:** do not skip required tests, suppress failures, conceal regressions, weaken security, or claim deployment/live readiness without direct evidence.
+
+These directives strengthen the existing founder standing instructions and do not expand authority for production deployment, destructive data operations, credential changes, or external disclosure.
