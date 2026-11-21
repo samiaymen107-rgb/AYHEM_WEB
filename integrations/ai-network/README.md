@@ -31,6 +31,10 @@
 - `ready: true`
 - `aiConfigured: true`
 - `rateLimitConfigured: true`
+- `originConfigured: true`
+- `status: "online"` and `mode: "authenticated-gateway"`
+
+The client also requires a UUID-formatted `requestId` in every successful AI response.
 
 لا تفعّل الواجهة الإرسال قبل تحقق الجاهزية. لا يعني نجاح الاختبارات المحلية أو CI أن Worker منشور أو متصل فعلياً بمزود AI.
 
