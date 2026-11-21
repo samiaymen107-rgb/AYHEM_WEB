@@ -24,6 +24,17 @@ test("pins one versioned schema source for each federation service", () => {
   }
 });
 
+test("MEMORY is the first domain extension over the final LINK federation layer", () => {
+  assert.equal(manifest.service_relationship.first_service, "AYHEM-MEMORY");
+  assert.equal(manifest.service_relationship.last_service, "AYHEM-LINK");
+  assert.equal(
+    manifest.service_relationship.relationship,
+    "memory-is-a-domain-service-extension-over-link-federation-contracts",
+  );
+  assert.match(manifest.service_relationship.integration_direction, /^AYHEM-MEMORY -> AYHEM-LINK/);
+  assert.match(manifest.service_relationship.dependency_rule, /no circular dependency/);
+});
+
 test("adapter output obeys the pinned LINK envelope and MEMORY payload shape", async () => {
   const adapter = createMemoryEventAdapter({
     digest: webcrypto.subtle,
