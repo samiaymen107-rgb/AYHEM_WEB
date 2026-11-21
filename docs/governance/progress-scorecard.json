@@ -7,7 +7,7 @@
   "progress_status": "recalibrated_provisional",
   "production_readiness": "not_yet_rated",
   "weights_total_percent": 100,
-  "last_documented_operation": 26,
+  "last_documented_operation": 29,
   "workstreams": [
     {
       "name": "MEMORY",
@@ -74,7 +74,7 @@
       "evidence": "اختبارات Node وChromium ناجحة؛ فحوص Worker الحية وترحيل بيانات الإنتاج والتحقق الشامل للإصدار لم تكتمل."
     }
   ],
-  "recalibration_reason": "تم تصحيح التقدير الأولي 41% بعد مراجعة AYHEM_WEB PR #4 المدموج الذي أضاف أساس سياسة الاستقلالية وسجل التدقيق ومخطط الذاكرة واختبارات الحدود؛ AUTONOMY أصبح 25% بدلاً من 0%.",
+  "recalibration_reason": "تم تصحيح التقدير الأولي 41% بعد مراجعة AYHEM_WEB PR #4 المدموج الذي أضاف أساس سياسة الاستقلالية وسجل التدقيق ومخطط الذاكرة واختبارات الحدود؛ AUTONOMY أصبح 25% بدلاً من 0%.\nتمت مراجعة حالة العملية 028 بعد الدمج؛ لا يضيف اختبار CORS وحده نسبة إنجاز جديدة قبل التحقق من إعداد Cloudflare Access الفعلي والبوابة المنشورة.",
   "audit_repositories": [
     "samiaymen107-rgb/AYHEM",
     "samiaymen107-rgb/AYHEM_WEB",
