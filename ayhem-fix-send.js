@@ -10,6 +10,7 @@ export function bindLegacySendForm({
   outputElement = globalThis.document?.getElementById("aiOutput"),
   displayUser = globalThis.displayUser,
   displayAyhem = globalThis.displayAyhem,
+  talk = talkToAyhem,
 } = {}) {
   if (!sendButton || !inputField || typeof sendButton.addEventListener !== "function") {
     return false;
@@ -27,7 +28,7 @@ export function bindLegacySendForm({
     if (outputElement) outputElement.textContent = "جارٍ الاتصال ببوابة أيهم...";
 
     try {
-      const response = await talkToAyhem(userInput);
+      const response = await talk(userInput);
       if (typeof displayAyhem === "function") displayAyhem(response.output);
       else if (outputElement) outputElement.textContent = response.output;
     } catch {
