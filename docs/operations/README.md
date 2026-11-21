@@ -41,6 +41,7 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
+| [2026-11-21-016-memory-restore-contract.md](./2026-11-21-016-memory-restore-contract.md) | عقد استعادة snapshots على دفعات ومنع الكتابة عند وجود تعارض | COMMITTED / CI PENDING / BROWSER PENDING |
 | [2026-11-21-015-memory-lineage-integrity.md](./2026-11-21-015-memory-lineage-integrity.md) | فحص بنية سلسلة التصحيحات والإحالات والدورات في الذاكرة | IMPLEMENTED / CI VERIFIED |
 | [2026-11-21-014-memory-retrieval-ci-fix.md](./2026-11-21-014-memory-retrieval-ci-fix.md) | إصلاح بيانات اختبار ترتيب الاسترجاع بعد فشل CI | FIX COMMITTED / CI VERIFIED |
 | [2026-11-21-013-memory-link-compat.md](./2026-11-21-013-memory-link-compat.md) | توافق صريح بين MemoryLink المتزامن ومخزن الذاكرة غير المتزامن | IMPLEMENTED / CI PENDING |
