@@ -28,7 +28,7 @@ test("retrieves lexical matches with provenance and deterministic ranking", asyn
   await store.append({ ...base, id: "r-1" });
   await store.append({
     ...base, id: "r-2", content: "Olive orchard memory",
-    tags: ["olive"], confidence: 0.8,
+    tags: ["olive", "orchard"], confidence: 0.8,
     createdAt: "2026-11-21T11:00:00.000Z",
   });
   const retriever = createMemoryRetriever({ store });
