@@ -139,7 +139,6 @@ test("rejects invalid limits, malformed pairs, and invalid insights", async () =
   assert.throws(() => classifyMemoryPair(record("a", "x"), record("a", "y")), /distinct_memory_records/);
   const cognition = createMemoryCognition({ store: memoryStore([]) });
   await assert.rejects(cognition.persistInsights([{}]), /insight_invalid/);
-  await assert.rejects(cognition.analyze(), /pairCount|/).catch(() => {});
 });
 
 test("rejects analysis above the configured record ceiling", async () => {
