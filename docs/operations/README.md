@@ -39,6 +39,7 @@
 
 ## الفهرس
 
+| [2026-11-21-007-ai-contract-strict-validation.md](./2026-11-21-007-ai-contract-strict-validation.md) | تشديد التحقق من UUID وجاهزية البوابة | IMPLEMENTED / CI VERIFIED |
 | التقرير | النطاق | الحالة |
 |---|---|---|
 | [2026-11-21-006-core-contract-sync.md](./2026-11-21-006-core-contract-sync.md) | مزامنة عقد V1 مع AYHEM الأساسي | CONTRACT SYNCED / CI VERIFIED |
