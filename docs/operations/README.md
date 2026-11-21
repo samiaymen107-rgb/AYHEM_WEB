@@ -45,7 +45,8 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-028-real-browser-access-cors.md](./2026-11-21-028-real-browser-access-cors.md) | اختبار CORS وCookie جلسة Access في Chromium حقيقي بين أصلين مختلفين | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-029-post-merge-evidence-reconciliation.md](./2026-11-21-029-post-merge-evidence-reconciliation.md) | مطابقة تقارير 026–028 مع حالة الدمج ونتائج CI وPages وتحديث رقم آخر عملية | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-028-real-browser-access-cors.md](./2026-11-21-028-real-browser-access-cors.md) | اختبار CORS وCookie جلسة Access في Chromium حقيقي بين أصلين مختلفين | MERGED / BROWSER CI VERIFIED / PAGES DEPLOYED / LIVE ACCESS PENDING |
 | [2026-11-21-027-cloudflare-access-cors-session.md](./2026-11-21-027-cloudflare-access-cors-session.md) | إصلاح إرسال Cookie جلسة Access وتوافق CORS preflight بين المتصفح والبوابة | MERGED / AI CLIENT CI VERIFIED / PAGES DEPLOYED / ACCESS CONFIG PENDING |
 | [2026-11-21-026-cross-repository-score-recalibration.md](./2026-11-21-026-cross-repository-score-recalibration.md) | مراجعة الأدلة عبر المستودعات وتصحيح نسبة المشروع من 41% إلى 44.75% وتحديث لوحة القياس | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
 | [2026-11-21-024-authoritative-progress-dashboard.md](./2026-11-21-024-authoritative-progress-dashboard.md) | لوحة تقدم حية تقرأ scorecard موحداً وتتحقق من النسبة الموزونة وتفصلها عن الجاهزية الإنتاجية | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
