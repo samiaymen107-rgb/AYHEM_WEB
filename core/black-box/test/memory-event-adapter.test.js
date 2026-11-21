@@ -72,3 +72,21 @@ test("rejects missing trace IDs, invalid source kinds, and non-canonical dates",
     traceId: "trace-id-0000000004",
   }), /record_created_at_invalid/);
 });
+
+test("rejects record types and statuses outside the canonical AYHEM_WEB schema", async () => {
+  const adapter = createMemoryEventAdapter({ digest: webcrypto.subtle });
+  await assert.rejects(adapter.toEvent({
+    ...record,
+    type: "unsupported-type",
+  }, {
+    sourceKind: "user_input",
+    traceId: "trace-id-0000000005",
+  }), /record_type_invalid/);
+  await assert.rejects(adapter.toEvent({
+    ...record,
+    status: "unreviewed",
+  }, {
+    sourceKind: "user_input",
+    traceId: "trace-id-0000000006",
+  }), /record_status_invalid/);
+});
