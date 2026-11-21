@@ -1,0 +1,74 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { webcrypto } from "node:crypto";
+import { createMemoryEventAdapter } from "../memory-event-adapter.js";
+
+const record = {
+  id: "memory-record-0001",
+  type: "fact",
+  content: "Synthetic contract fixture only",
+  status: "documented",
+  createdAt: "2026-11-21T12:00:00.000Z",
+  source: "synthetic-fixture",
+  confidence: 0.9,
+  supersedes: [],
+  tags: ["synthetic", "contract"],
+};
+
+test("maps a canonical memory record into LINK event and MEMORY wire contracts", async () => {
+  const adapter = createMemoryEventAdapter({
+    digest: webcrypto.subtle,
+    idFactory: () => "event-id-00000001",
+    now: () => "2026-11-21T13:00:00.000Z",
+  });
+  const event = await adapter.toEvent(record, {
+    sourceKind: "user_input",
+    traceId: "trace-id-0000000001",
+  });
+
+  assert.deepEqual(
+    ["specversion", "id", "type", "source", "time", "datacontenttype", "data", "traceid"]
+      .filter(key => !(key in event)),
+    [],
+  );
+  assert.equal(event.specversion, "1.0");
+  assert.equal(event.type, "org.ayhem.memory.record.appended.v1");
+  assert.equal(event.subject, record.id);
+  assert.equal(event.data.schema_version, "1.0.0");
+  assert.equal(event.data.record_id, record.id);
+  assert.equal(event.data.source.kind, "user_input");
+  assert.equal(event.data.payload.content, record.content);
+  assert.equal(event.data.integrity.algorithm, "sha-256");
+  assert.match(event.data.integrity.digest, /^[a-f0-9]{64}$/);
+});
+
+test("keeps corrections append-only and carries supersedes lineage", async () => {
+  const adapter = createMemoryEventAdapter({ digest: webcrypto.subtle });
+  const correction = {
+    ...record,
+    id: "memory-record-0002",
+    createdAt: "2026-11-21T14:00:00.000Z",
+    supersedes: [record.id],
+  };
+  const event = await adapter.toEvent(correction, {
+    sourceKind: "service",
+    traceId: "trace-id-0000000002",
+  });
+  assert.deepEqual(event.data.supersedes, [record.id]);
+});
+
+test("rejects missing trace IDs, invalid source kinds, and non-canonical dates", async () => {
+  const adapter = createMemoryEventAdapter({ digest: webcrypto.subtle });
+  await assert.rejects(adapter.toEvent(record, { sourceKind: "user_input" }), /trace_id_invalid/);
+  await assert.rejects(adapter.toEvent(record, {
+    sourceKind: "unknown",
+    traceId: "trace-id-0000000003",
+  }), /source_kind_invalid/);
+  await assert.rejects(adapter.toEvent({
+    ...record,
+    createdAt: "2026-11-21",
+  }, {
+    sourceKind: "user_input",
+    traceId: "trace-id-0000000004",
+  }), /record_created_at_invalid/);
+});
