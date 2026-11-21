@@ -27,3 +27,11 @@ jobs:
       - name: Run foundation tests
         working-directory: core/black-box
         run: npm test
+      - name: Install Chromium test runtime
+        working-directory: core/black-box
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run real-browser IndexedDB tests
+        working-directory: core/black-box
+        run: npm run test:browser
