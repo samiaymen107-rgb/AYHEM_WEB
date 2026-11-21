@@ -423,3 +423,44 @@ test("real Chromium IndexedDB: cognition persistence checks existing fingerprint
     await page.close();
   }
 });
+
+
+test("real Chromium IndexedDB: sync outbox survives reopen and keeps delivery history", async () => {
+  const page = await browser.newPage();
+  try {
+    await page.goto(origin);
+    const result = await page.evaluate(async () => {
+      const { createIndexedDBMemoryAdapter } = await import("/core/black-box/indexeddb-memory-adapter.js");
+      const { createSyncOutbox } = await import("/core/black-box/sync-outbox.js");
+      const dbName = `AYHEM_SYNC_OUTBOX_${crypto.randomUUID()}`;
+      const adapter = createIndexedDBMemoryAdapter({ dbName });
+      const outbox = createSyncOutbox({ adapter, now: () => "2026-11-21T14:00:00.000Z", idFactory: () => "event-durable-1" });
+      const record = { id: "memory-sync-1", type: "fact", content: "Persist locally before remote sync.", status: "documented", createdAt: "2026-11-21T13:00:00.000Z", source: "browser-outbox-test", confidence: 1, supersedes: [], tags: ["sync"] };
+      const queued = await outbox.enqueue(record);
+      await adapter.close();
+      const reopenedAdapter = createIndexedDBMemoryAdapter({ dbName });
+      const reopenedOutbox = createSyncOutbox({ adapter: reopenedAdapter, now: () => "2026-11-21T14:01:00.000Z", idFactory: () => "unused" });
+      const pending = await reopenedOutbox.pending();
+      const delivered = await reopenedOutbox.markDelivered(queued.eventId);
+      await reopenedAdapter.close();
+      const finalAdapter = createIndexedDBMemoryAdapter({ dbName });
+      const finalEvents = await finalAdapter.listSyncEvents();
+      await finalAdapter.close();
+      await new Promise((resolveDelete, rejectDelete) => {
+        const request = indexedDB.deleteDatabase(dbName);
+        request.onsuccess = resolveDelete;
+        request.onerror = () => rejectDelete(request.error || new Error("database_cleanup_failed"));
+        request.onblocked = () => rejectDelete(new Error("database_cleanup_blocked"));
+      });
+      return { queuedStatus: queued.status, pendingCount: pending.length, pendingContent: pending[0]?.payload.content, deliveredStatus: delivered.status, finalCount: finalEvents.length, finalStatus: finalEvents[0]?.status };
+    });
+    assert.equal(result.queuedStatus, "pending");
+    assert.equal(result.pendingCount, 1);
+    assert.equal(result.pendingContent, "Persist locally before remote sync.");
+    assert.equal(result.deliveredStatus, "delivered");
+    assert.equal(result.finalCount, 1, "outbox event history must not be deleted on acknowledgement");
+    assert.equal(result.finalStatus, "delivered");
+  } finally {
+    await page.close();
+  }
+});
