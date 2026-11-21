@@ -1,141 +1,138 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!doctype html>
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة متابعة مشروع AYHEM_WEB</title>
-<style>
-  body { font-family: "Arial", sans-serif; background:#0d0d0d; color:#e0e0e0; margin:0; padding:20px; }
-  h1, h2 { color:#00bfff; }
-  table { width: 100%; border-collapse: collapse; margin-top:20px; }
-  th, td { border: 1px solid #444; padding: 10px; text-align: center; }
-  th { background-color:#222; color:#00ffff; }
-  tr:nth-child(even) { background-color:#1a1a1a; }
-  .progress-bar { background:#555; border-radius: 5px; overflow:hidden; height:20px; }
-  .progress-fill { height:100%; text-align:right; padding-right:5px; color:#fff; font-weight:bold; line-height:20px; }
-  .core { background:#ff6600; }
-  .memory { background:#ffcc00; color:#000; }
-  .ai { background:#66ff66; color:#000; }
-  .predictive { background:#66ccff; }
-  .nodes { background:#cc66ff; }
-  .ui { background:#ff6699; }
-  .security { background:#999999; }
-  .docs { background:#00cc99; color:#000; }
-  a { color:#00bfff; text-decoration:none; }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="لوحة تقدم AYHEM المبنية على أدلة التطوير والاختبارات">
+  <title>AYHEM — لوحة التقدم الهندسي</title>
+  <style>
+    :root{color-scheme:dark;--bg:#08111f;--panel:#111e31;--panel2:#16263d;--text:#f4f7fb;--muted:#a9b8cc;--line:#2c405b;--gold:#d7b56d;--green:#67c59a;--blue:#79aee8}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0,#1a3150 0,transparent 38%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.7}
+    main{width:min(1040px,calc(100% - 32px));margin:36px auto}
+    header,.panel{background:linear-gradient(145deg,rgba(22,38,61,.96),rgba(13,25,42,.96));border:1px solid var(--line);border-radius:20px;padding:24px}
+    header{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap}
+    h1{margin:0 0 8px;font-size:clamp(1.5rem,4vw,2.25rem)}
+    h2{margin:0 0 16px;font-size:1.15rem}
+    p{margin:8px 0;color:var(--muted)}
+    .eyebrow{color:var(--gold);font-weight:700;letter-spacing:.04em}
+    .hero{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:center;margin-top:20px}
+    .score{display:grid;place-items:center;min-height:190px;background:var(--panel2);border:1px solid var(--line);border-radius:18px;text-align:center}
+    .score strong{display:block;font-size:3.2rem;line-height:1.2;color:var(--gold);font-variant-numeric:tabular-nums}
+    .score span{color:var(--muted)}
+    .notice{border-right:4px solid var(--gold);padding:12px 16px;background:rgba(215,181,109,.08);border-radius:10px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+    .workstream{padding:16px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}
+    .work-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+    .work-head strong{font-size:1rem}
+    .numbers{color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap}
+    .track{height:11px;border-radius:20px;background:#26374d;overflow:hidden;margin:12px 0}
+    .fill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:20px;transition:width .4s ease}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .pill{padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:.88rem}
+    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    a,button{font:inherit}
+    a{color:var(--blue);text-decoration:none}
+    button{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:10px;padding:9px 14px;cursor:pointer}
+    button:hover,a:hover{text-decoration:underline}
+    footer{margin:20px 4px;color:var(--muted);font-size:.9rem}
+    #status{margin-top:12px;color:var(--muted)}
+    .error{color:#ffb4a9}
+    @media(max-width:700px){main{margin:16px auto}.hero{grid-template-columns:1fr}.score{min-height:150px}.grid{grid-template-columns:1fr}header,.panel{padding:18px}}
+  </style>
 </head>
 <body>
+<main>
+  <header>
+    <div>
+      <div class="eyebrow">AYHEM · FOUNDER SCORECARD</div>
+      <h1>لوحة التقدم الهندسي</h1>
+      <p>قياس موزون مبني على الإنجازات المثبتة، لا على عدد الملفات أو التقديرات الانطباعية.</p>
+    </div>
+    <div class="actions">
+      <a href="./index.html">العودة إلى الواجهة الرئيسية</a>
+      <button id="refresh" type="button">تحديث البيانات</button>
+    </div>
+  </header>
 
-<h1>لوحة متابعة مشروع AYHEM_WEB – أيهم</h1>
-<p>الحالة الحالية على GitHub: <a href="https://github.com/samiaymen107-rgb/AYHEM_WEB" target="_blank">AYHEM_WEB</a></p>
-<p>نسبة الإنجاز التقريبية: <strong>20%</strong></p>
+  <section class="hero" aria-live="polite">
+    <div class="score">
+      <div><strong id="overall">—%</strong><span>الإنجاز الهندسي الإجمالي</span></div>
+    </div>
+    <div class="panel">
+      <h2>كيف نقرأ هذه النسبة؟</h2>
+      <p id="scope">جارٍ تحميل نطاق القياس...</p>
+      <div class="notice">
+        <strong>تنبيه مهم:</strong>
+        نسبة الإنجاز الهندسي لا تعني جاهزية المنتج للإنتاج. جاهزية الإنتاج والاتصال الحي بالخدمات لهما تحقق مستقل.
+      </div>
+      <div class="meta">
+        <span class="pill" id="evidenceDate">تاريخ الأدلة: —</span>
+        <span class="pill" id="production">جاهزية الإنتاج: —</span>
+        <span class="pill" id="lastOperation">آخر عملية: —</span>
+      </div>
+      <p id="calculation"></p>
+    </div>
+  </section>
 
-<h2>1️⃣ الطبقات الأساسية ومكوناتها</h2>
-<table>
-  <thead>
-    <tr>
-      <th>الطبقة</th>
-      <th>المكون الرئيسي</th>
-      <th>الملفات / المسار</th>
-      <th>نسبة الإنجاز</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>CORE</td>
-      <td>التحكم المركزي</td>
-      <td>ayhem-core.js, ayhem-decision-core.js, ayhem-fusion-core.js</td>
-      <td>
-        <div class="progress-bar">
-          <div class="progress-fill core" style="width:25%;">25%</div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>MEMORY</td>
-      <td>الذاكرة الذكية</td>
-      <td>ayhem-smart-memory.js, ayhem-long-memory.js, persistent-memory.js, ayhem-memory-map.js</td>
-      <td>
-        <div class="progress-bar">
-          <div class="progress-fill memory" style="width:20%;">20%</div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>AI</td>
-      <td>الذكاء الاصطناعي</td>
-      <td>ayhem-ai.js, ayhem-ai-interpreter.js, ayhem-adapter-ai.js, ai-learning-module.js</td>
-      <td>
-        <div class="progress-bar">
-          <div class="progress-fill ai" style="width:15%;">15%</div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>PREDICTIVE</td>
-      <td>التنبؤ الاقتصادي / العالمي</td>
-      <td>ayhem-economic-predictor.js, global-predictive-module.js, ultimate-global-predictive.js</td>
-      <td>
-        <div class="progress-bar">
-          <div class="progress-fill predictive" style="width:10%;">10%</div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>NODES</td>
-      <td>العقد والمستشعرات</td>
-      <td>node-ai+.js, node-sentinelx.js, node-cyberforce.js, node-esi.js</td>
-      <td>
-        <div class="progress-bar">
-          <div class="progress-fill nodes" style="width:20%;">20%</div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>UI/UX</td>
-      <td>واجهة المستخدم</td>
-      <td>ayhem-dashboard.html, ayhem-dashboard-control.html, ultimate-ayhem-ui.js, ultimate-advanced-ui.html</td>
-      <td>
-        <div class="progress-bar">
-          <div class="progress-fill ui" style="width:30%;">30%</div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>SECURITY</td>
-      <td>الأمان و Silent Governor</td>
-      <td>ayhem-unit.js, ENC_CORE-01/02/03/MASTER</td>
-      <td>
-        <div class="progress-bar">
-          <div class="progress-fill security" style="width:10%;">10%</div>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>DOCS</td>
-      <td>الوثائق والتوثيق</td>
-      <td>ARCHITECTURE.md, AYHEM_CORE_STRUCTURE.md, system_guide.md</td>
-      <td>
-        <div class="progress-bar">
-          <div class="progress-fill docs" style="width:15%;">15%</div>
-        </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
+  <section class="panel" style="margin-top:20px">
+    <h2>تقدم وحدات المشروع</h2>
+    <div id="workstreams" class="grid"></div>
+    <p id="status" role="status" aria-live="polite">جارٍ التحقق من ملف القياس...</p>
+  </section>
 
-<h2>2️⃣ خطوات التصحيح والتوحيد القادمة</h2>
-<ol>
-  <li>دمج النسخ الأخيرة لكل الملفات الموحدة (Core/AI/Memory/Nodes).</li>
-  <li>توحيد مسارات كل الطبقات ضمن ayhem-central-config.js.</li>
-  <li>تحديث واجهات UI/UX لتتناسب مع النسخ المحدثة من Core/AI/Memory.</li>
-  <li>تكامل Predictive Modules مع Core و Memory.</li>
-  <li>تدقيق الأمان والتحقق من Silent Governor و ENC CORE.</li>
-  <li>تحديث الوثائق بشكل دوري مع كل تعديل لضمان مطابقة الواقع البرمجي.</li>
-</ol>
-
-<h2>3️⃣ الملاحظة النهائية</h2>
-<p>هذه اللوحة تمثل <strong>مرجع متابعة موحد</strong> لكل طبقات مشروع AYHEM_WEB ويمكن تحديثها بشكل دوري لتصبح لوحة رقمية حية لكل تقدم المشروع.</p>
-
+  <footer>
+    <a href="./docs/governance/FOUNDER_DIRECTIVES_AND_PROGRESS.md">منهجية القياس وتعليمات المؤسس</a>
+    ·
+    <a href="./docs/operations/README.md">سجل عمليات التطوير</a>
+    <p>يُحدّث هذا المؤشر عند تغير أدلة القبول فقط. الأرقام تقديرات هندسية قابلة للمراجعة وليست ضماناً للجودة.</p>
+  </footer>
+</main>
+<script type="module">
+const statusNode=document.getElementById("status");
+const setText=(id,value)=>{document.getElementById(id).textContent=value;};
+function makeWorkstream(item){
+  const card=document.createElement("article");
+  card.className="workstream";
+  const head=document.createElement("div");head.className="work-head";
+  const name=document.createElement("strong");name.textContent=item.label+" · "+item.name;
+  const numbers=document.createElement("span");numbers.className="numbers";numbers.textContent=item.completion_percent+"%";
+  head.append(name,numbers);
+  const track=document.createElement("div");track.className="track";track.setAttribute("role","progressbar");
+  track.setAttribute("aria-valuemin","0");track.setAttribute("aria-valuemax","100");track.setAttribute("aria-valuenow",String(item.completion_percent));track.setAttribute("aria-label",item.label);
+  const fill=document.createElement("div");fill.className="fill";fill.style.width=item.completion_percent+"%";track.append(fill);
+  const weight=document.createElement("p");weight.textContent="وزن الوحدة: "+item.weight_percent+"% · مساهمتها: "+Number(item.weighted_contribution).toFixed(2)+" نقطة";
+  const evidence=document.createElement("p");evidence.textContent=item.evidence;
+  card.append(head,track,weight,evidence);return card;
+}
+async function loadScorecard(){
+  statusNode.classList.remove("error");
+  statusNode.textContent="جارٍ تحميل البيانات والتحقق من الحساب...";
+  try{
+    const response=await fetch("./docs/governance/progress-scorecard.json",{cache:"no-store"});
+    if(!response.ok)throw new Error("تعذر تحميل ملف القياس ("+response.status+")");
+    const data=await response.json();
+    if(!Array.isArray(data.workstreams)||data.workstreams.length!==8)throw new Error("عدد وحدات القياس غير مطابق للمنهجية");
+    const weight=data.workstreams.reduce((sum,item)=>sum+Number(item.weight_percent),0);
+    const calculated=data.workstreams.reduce((sum,item)=>sum+Number(item.weighted_contribution),0);
+    const recomputed=data.workstreams.reduce((sum,item)=>sum+Number(item.weight_percent)*Number(item.completion_percent)/100,0);
+    if(weight!==100||Math.abs(calculated-recomputed)>0.011||Math.abs(recomputed-Number(data.overall_progress_percent))>0.011)throw new Error("فشل التحقق من مجموع الأوزان أو النسبة الإجمالية");
+    setText("overall",Number(data.overall_progress_percent).toFixed(data.overall_progress_percent%1?1:0)+"%");
+    setText("scope",data.scope);
+    setText("evidenceDate","تاريخ الأدلة: "+data.evidence_date);
+    setText("production",data.production_readiness==="not_yet_rated"?"جاهزية الإنتاج: غير مقيمة":"جاهزية الإنتاج: "+data.production_readiness);
+    setText("lastOperation","آخر عملية موثقة: #"+data.last_documented_operation);
+    setText("calculation","الحساب الموزون: "+recomputed.toFixed(2)+"% · حالة القياس: "+(data.progress_status==="provisional"?"خط أساس أولي":"محدّث"));
+    const host=document.getElementById("workstreams");host.replaceChildren(...data.workstreams.map(makeWorkstream));
+    statusNode.textContent="تم تحميل ملف القياس والتحقق من صحة الأوزان والحساب.";
+  }catch(error){
+    statusNode.classList.add("error");
+    statusNode.textContent="تعذر عرض نسبة موثوقة: "+error.message;
+    setText("overall","—%");
+  }
+}
+document.getElementById("refresh").addEventListener("click",loadScorecard);
+loadScorecard();
+</script>
 </body>
 </html>
