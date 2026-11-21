@@ -1,8 +1,10 @@
 import test, { before, after } from "node:test";
 import assert from "node:assert/strict";
-import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
-import { resolve, extname, sep } from "node:path";
+import { createServer } from "node:https";
+import { execFileSync } from "node:child_process";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { resolve, extname, sep, join } from "node:path";
+import { tmpdir } from "node:os";
 import { chromium } from "playwright";
 
 const root = resolve(process.cwd(), "../..");
@@ -13,6 +15,7 @@ let appOrigin;
 let gatewayOrigin;
 let gatewayRequests = [];
 let preflightCount = 0;
+let certificateDirectory;
 
 function listen(server) {
   return new Promise((resolveListen, reject) => {
@@ -26,7 +29,18 @@ function close(server) {
 }
 
 before(async () => {
-  appServer = createServer(async (request, response) => {
+  certificateDirectory = await mkdtemp(join(tmpdir(), "ayhem-cors-test-"));
+  const keyPath = join(certificateDirectory, "key.pem");
+  const certificatePath = join(certificateDirectory, "certificate.pem");
+  execFileSync("openssl", [
+    "req", "-x509", "-newkey", "rsa:2048", "-nodes",
+    "-keyout", keyPath, "-out", certificatePath,
+    "-days", "1", "-subj", "/CN=127.0.0.1",
+  ], { stdio: "ignore" });
+  const [key, cert] = await Promise.all([readFile(keyPath), readFile(certificatePath)]);
+  const tls = { key, cert };
+
+  appServer = createServer(tls, async (request, response) => {
     try {
       const pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
       if (pathname === "/") {
@@ -47,12 +61,12 @@ before(async () => {
     }
   });
   await listen(appServer);
-  appOrigin = `http://127.0.0.1:${appServer.address().port}`;
+  appOrigin = `https://127.0.0.1:${appServer.address().port}`;
 
-  gatewayServer = createServer(async (request, response) => {
+  gatewayServer = createServer(tls, async (request, response) => {
     if (request.url === "/set-cookie" && request.method === "GET") {
       response.writeHead(200, {
-        "Set-Cookie": "CF_Authorization=browser-test-session; Path=/; SameSite=Lax",
+        "Set-Cookie": "CF_Authorization=browser-test-session; Path=/; Secure; SameSite=Lax",
         "Cache-Control": "no-store",
       }).end("cookie_set");
       return;
@@ -109,7 +123,7 @@ before(async () => {
     response.writeHead(404, corsHeaders).end("not_found");
   });
   await listen(gatewayServer);
-  gatewayOrigin = `http://127.0.0.1:${gatewayServer.address().port}`;
+  gatewayOrigin = `https://127.0.0.1:${gatewayServer.address().port}`;
   browser = await chromium.launch({ headless: true });
 });
 
@@ -117,10 +131,12 @@ after(async () => {
   await browser?.close();
   await close(gatewayServer);
   await close(appServer);
+  if (certificateDirectory) await rm(certificateDirectory, { recursive: true, force: true });
 });
 
 test("real Chromium: cross-origin Access cookie, CORS preflight, health and AI POST", async () => {
-  const page = await browser.newPage();
+  const context = await browser.newContext({ ignoreHTTPSErrors: true });
+  const page = await context.newPage();
   try {
     await page.goto(`${gatewayOrigin}/set-cookie`);
     await page.goto(appOrigin);
@@ -143,6 +159,6 @@ test("real Chromium: cross-origin Access cookie, CORS preflight, health and AI P
     );
     assert.equal(JSON.parse(gatewayRequests[1].body).input, "hello");
   } finally {
-    await page.close();
+    await context.close();
   }
 });
