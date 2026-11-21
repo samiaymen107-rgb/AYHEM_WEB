@@ -20,7 +20,7 @@ export function createAyhemLegacyAdapter({
 
     const client = clientFactory({ endpoint });
     const health = await client.health();
-    if (health.aiConfigured !== true) {
+    if (health.ready !== true || health.aiConfigured !== true || health.rateLimitConfigured !== true) {
       throw new Error("AYHEM AI provider is not configured.");
     }
 
