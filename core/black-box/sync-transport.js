@@ -44,8 +44,8 @@ export function createSyncTransport({
     if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash) {
       throw new Error("sync_https_endpoint_required");
     }
-    parsed.pathname = parsed.pathname.replace(/\/$/, "");
-    endpoint = parsed.origin + parsed.pathname + PUSH_PATH;
+    const pathPrefix = parsed.pathname.replace(/\/+$/, "");
+    endpoint = parsed.origin + pathPrefix + PUSH_PATH;
   } catch (error) {
     if (error?.message === "sync_https_endpoint_required") throw error;
     throw new TypeError("sync_base_url_invalid");
