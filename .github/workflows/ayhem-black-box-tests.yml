@@ -35,3 +35,6 @@ jobs:
       - name: Run real-browser integration tests
         working-directory: core/black-box
         run: npm run test:browser
+      - name: Run cognition scan benchmark smoke
+        working-directory: core/black-box
+        run: npm run benchmark:cognition
