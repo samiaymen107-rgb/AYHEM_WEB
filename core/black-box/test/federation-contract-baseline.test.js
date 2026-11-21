@@ -9,9 +9,22 @@ const manifest = JSON.parse(await readFile(
   "utf8",
 ));
 
-test("pins one versioned schema source for each federation service", () => {
+test("federation manifest covers all eight existing repositories exactly once", () => {
   assert.equal(manifest.contract_set, "AYHEM_FEDERATION_V1");
   assert.equal(manifest.manifest_version, "1.0.0");
+  assert.equal(manifest.federation_size, 8);
+  assert.deepEqual(
+    manifest.repositories.map(repository => repository.name).sort(),
+    ["AYHEM", "AYHEM_WEB", "astro-blog-starter-template", "AYHEM-MEMORY", "AYHEM-COGNITION", "AYHEM-AUTONOMY", "AYHEM-GUARD", "AYHEM-LINK"].sort(),
+  );
+  assert.equal(new Set(manifest.repositories.map(repository => repository.name)).size, 8);
+  for (const repository of manifest.repositories) {
+    assert.ok(repository.role);
+    assert.ok(["foundation", "application", "presentation", "service", "integration"].includes(repository.layer));
+  }
+});
+
+test("pins the five service schema sources without claiming full JSON Schema validation", () => {
   assert.equal(manifest.full_json_schema_validation, false);
   assert.deepEqual(
     manifest.contracts.map(contract => contract.service).sort(),
