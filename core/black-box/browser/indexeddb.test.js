@@ -202,7 +202,7 @@ test("real Chromium IndexedDB: concurrent adapter connections close on versionch
       let blocked = false;
       let upgradeObserved = false;
       const upgraded = await new Promise((resolveUpgrade, rejectUpgrade) => {
-        const request = indexedDB.open(dbName, 3);
+        const request = indexedDB.open(dbName, 4);
         const timeout = setTimeout(() => rejectUpgrade(new Error("version_upgrade_timed_out")), 5000);
         request.onblocked = () => { blocked = true; };
         request.onerror = () => {
@@ -231,7 +231,7 @@ test("real Chromium IndexedDB: concurrent adapter connections close on versionch
 
     assert.equal(result.blocked, false, "adapter connections must close in response to versionchange");
     assert.equal(result.upgradeObserved, true, "the version upgrade must execute");
-    assert.equal(result.version, 3);
+    assert.equal(result.version, 4);
   } finally {
     await page.close();
   }
