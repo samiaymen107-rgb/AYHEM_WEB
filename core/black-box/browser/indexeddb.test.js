@@ -127,7 +127,6 @@ test("real Chromium IndexedDB: concurrent adapter connections close on versionch
       const second = createIndexedDBMemoryAdapter({ dbName });
 
       // Two independent adapters hold two connections to the same database.
-      assertNever = undefined;
       await first.getRecord("missing");
       await second.listRecords();
 
