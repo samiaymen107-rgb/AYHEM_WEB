@@ -496,7 +496,7 @@ test("real Chromium: memory append and outbox enqueue commit or abort together",
         request.onerror = () => rejectDelete(request.error || new Error("database_cleanup_failed"));
         request.onblocked = () => rejectDelete(new Error("database_cleanup_blocked"));
       });
-      return { firstRecordId: firstRecord?.id, firstEvents: firstEvents.map(event => ({ eventId: event.eventId, recordId: event.recordId, status: event.status })), duplicateWasNull: duplicate === null, eventCountAfterDuplicate: afterDuplicate.length, conflictRejected, conflictRecordAbsent: afterConflictRecord === null, conflictEventPreserved: allEvents.some(event => event.eventId === "memory-record:memory-atomic-conflict" && event.recordId === "other-record") };
+      return { firstRecordId: firstRecord?.id, firstEvents: firstEvents.map(event => ({ eventId: event.eventId, recordId: event.recordId, status: event.status })), duplicateWasNull: duplicate === null, eventCountAfterDuplicate: afterDuplicate.length, conflictRejected, conflictRecordAbsent: afterConflictRecord == null, conflictEventPreserved: allEvents.some(event => event.eventId === "memory-record:memory-atomic-conflict" && event.recordId === "other-record") };
     });
     assert.equal(result.firstRecordId, "memory-atomic-1");
     assert.deepEqual(result.firstEvents, [{ eventId: "memory-record:memory-atomic-1", recordId: "memory-atomic-1", status: "pending" }]);
