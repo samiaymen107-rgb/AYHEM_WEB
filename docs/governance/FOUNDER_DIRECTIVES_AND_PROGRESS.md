@@ -94,21 +94,21 @@ Every operation report must include:
 
 ## 6. Initial baseline — 2026-11-21
 
-The initial provisional engineering baseline is **41%**. It is based on the currently inspected repository evidence and the following explicit workstream estimates:
+The recalibrated provisional engineering baseline is **44.75%**. It is based on the currently inspected repository evidence and the following explicit workstream estimates:
 
 | Workstream | Weight | Current estimate | Weighted contribution | Evidence summary |
 |---|---:|---:|---:|---|
 | MEMORY | 25% | 70% | 17.50 | Append-only store, IndexedDB adapter, retrieval, lineage/integrity, snapshot restore, real Chromium transaction, persistence, versionchange and concurrent-write tests; user-data migration remains pending |
 | COGNITION | 15% | 25% | 3.75 | Deterministic lexical relation analysis and provenance validation; no calibrated semantic reasoning or learning loop |
-| AUTONOMY | 15% | 0% | 0.00 | No verified autonomous task orchestration engine |
+| AUTONOMY | 15% | 25% | 3.75 | Merged deterministic policy, append-only audit ledger, memory schema, adversarial boundary tests, and autonomy charter; no continuously running task orchestration engine |
 | GUARD | 10% | 25% | 2.50 | Some validation and security boundaries exist; complete deployed identity, policy enforcement and operational security verification remain pending |
 | LINK | 10% | 35% | 3.50 | AI client, API contract and Worker-side security code exist; live end-to-end service is not verified |
 | INTERFACE | 10% | 40% | 4.00 | Web interface and local memory-audit UI exist; full live AI product flow is not verified |
 | OPERATIONS | 10% | 75% | 7.50 | Versioned reports, branch/PR workflow, Node and browser CI, and Pages deployment evidence |
 | VALIDATION & RELEASE | 5% | 45% | 2.25 | Node and real Chromium CI pass; live Worker health checks, production data migration and end-to-end release validation remain pending |
-| **Total** | **100%** |  | **41.00%** | **Provisional engineering baseline** |
+| **Total** | **100%** |  | **44.75%** | **Recalibrated provisional engineering baseline** |
 
-This is a transparent baseline, not a claim that AYHEM is production-ready. It must be refined after a full cross-repository audit and updated when evidence changes. Do not reuse legacy hard-coded chart percentages as measured progress.
+The earlier preliminary estimate of 41% was corrected after the cross-repository audit identified the already-merged AYHEM_WEB PR #4 autonomy foundation. This is a measurement correction, not a claim that the latest work alone added 3.75 percentage points. This remains a transparent baseline, not a claim that AYHEM is production-ready. It must be refined after a full cross-repository audit and updated when evidence changes. Do not reuse legacy hard-coded chart percentages as measured progress.
 
 ## 7. Change control
 
