@@ -4,8 +4,10 @@
 - Repository: `samiaymen107-rgb/AYHEM_WEB`
 - Branch: `development/033-indexed-cognition-scan`
 - Base: `main` after merged PR #20
-- Status: IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED
-- Stage completion: **75% implementation**; deterministic Node and real-browser CI are pending.
+- Status: MERGED / NODE + CHROMIUM CI VERIFIED / PAGES NOT RECONFIRMED
+- Pull request: #21
+- Merge commit: `e0638a68437800abb9c5ab88ee141ff875c86c35`
+- Stage completion: **100%**; implementation, Node CI, real Chromium CI and merge verified. Pages post-merge not independently confirmed.
 - Overall AYHEM engineering progress: **44.75% provisional**, unchanged.
 
 ## Post-merge evidence for operation 032
