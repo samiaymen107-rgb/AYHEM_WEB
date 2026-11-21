@@ -41,7 +41,8 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-021-indexeddb-versionchange-contention.md](./2026-11-21-021-indexeddb-versionchange-contention.md) | اختبار اتصالات IndexedDB المتزامنة وإغلاقها عند versionchange قبل ترقية المخطط | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-022-indexeddb-concurrent-write-atomicity.md](./2026-11-21-022-indexeddb-concurrent-write-atomicity.md) | اختبار ذرية الكتابة المتزامنة ومنع فقدان/تجاوز سجل الذاكرة عند تنافس الاتصالات | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-021-indexeddb-versionchange-contention.md](./2026-11-21-021-indexeddb-versionchange-contention.md) | اختبار اتصالات IndexedDB المتزامنة وإغلاقها عند versionchange قبل ترقية المخطط | MERGED / CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-020-indexeddb-open-lifecycle.md](./2026-11-21-020-indexeddb-open-lifecycle.md) | معالجة اتصال IndexedDB المتأخر بعد blocked وحماية إعادة المحاولة | MERGED / CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-019-real-browser-indexeddb-tests.md](./2026-11-21-019-real-browser-indexeddb-tests.md) | اختبار IndexedDB في Chromium: atomic rollback، إعادة الفتح، واستعادة snapshot حقيقية | MERGED / CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-018-cognition-provenance-validation.md](./2026-11-21-018-cognition-provenance-validation.md) | التحقق من مصدر الاستنتاجات وصحة provenance قبل الحفظ ومنع الكتابة الجزئية بسبب مدخلات غير صالحة | MERGED / CI VERIFIED / PAGES DEPLOYED |
