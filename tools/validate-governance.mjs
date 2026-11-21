@@ -6,6 +6,8 @@ const scorecard = read("../docs/governance/FOUNDER_DIRECTIVES_AND_PROGRESS.md");
 const index = read("../docs/operations/README.md");
 const report = read("../docs/operations/2026-11-21-023-founder-directives-progress-reporting.md");
 const charter = read("../README.md");
+const scorecardData = JSON.parse(read("../docs/governance/progress-scorecard.json"));
+const dashboard = read("../AYHEM_PROGRESS_DASHBOARD.html");
 
 const rows = [...scorecard.matchAll(/^\|\s*(MEMORY|COGNITION|AUTONOMY|GUARD|LINK|INTERFACE|OPERATIONS|VALIDATION & RELEASE)\s*\|\s*(\d+)%\s*\|\s*(\d+)%\s*\|\s*([\d.]+)\s*\|/gm)];
 assert.equal(rows.length, 8, "scorecard must contain exactly eight defined workstreams");
@@ -38,5 +40,11 @@ assert.ok(index.includes("2026-11-21-023-founder-directives-progress-reporting.m
 assert.ok(report.includes("Stage completion:"), "stage report must state stage completion");
 assert.ok(report.includes("Overall AYHEM engineering progress:"), "stage report must state overall progress");
 assert.ok(charter.includes("دمج التغييرات الروتينية المفوضة"), "founder charter must reflect the delegated routine merge scope");
+assert.equal(scorecardData.overall_progress_percent, declared, "dashboard JSON and governance standard must use the same overall score");
+assert.equal(scorecardData.workstreams.length, 8, "dashboard data must contain all eight workstreams");
+assert.equal(scorecardData.workstreams.reduce((sum, item) => sum + Number(item.weight_percent), 0), 100, "dashboard data weights must total 100%");
+assert.ok(dashboard.includes("progress-scorecard.json"), "dashboard must load the authoritative scorecard JSON");
+assert.ok(dashboard.includes("production_readiness"), "dashboard must distinguish engineering progress from production readiness");
+assert.ok(index.includes("AYHEM_PROGRESS_DASHBOARD.html"), "main page must link to the progress dashboard");
 
 console.log(`AYHEM governance validation passed: ${rows.length} workstreams, ${totalWeight}% total weight, ${declared}% overall progress.`);
