@@ -1,75 +1,74 @@
-# AYHEM — الفهرس الموضوعي والعناوين الرسمية للتقارير
+# AYHEM — الفهرس الشامل وعناوين التقارير
 
 - تاريخ الفهرسة: 2026-11-21
 - المستودع: `samiaymen107-rgb/AYHEM_WEB`
-- النطاق: تقارير العمليات 001–031 الموجودة فعلياً في سجل التطوير.
-- قاعدة التسمية: `YYYY-MM-DD-NNN-short-topic.md`؛ الرقم هو المعرّف الثابت، والعنوان العربي يصف نطاق التقرير دون تغيير اسمه التاريخي أو رابطه.
+- العدد: **30 تقريراً موجوداً**.
+- يثبت عمود «العنوان الأصلي» نص عنوان H1 كما ظهر في أول أسطر الملف؛ وعمود «عنوان الفهرسة» ترجمة/وصف عربي لتسهيل التصفح. الروابط تستخدم أسماء الملفات الأصلية دون إعادة تسمية.
 
-## 1. شبكة الذكاء الاصطناعي والربط — العمليات 001–007
+## شبكة AI والربط
 
-| رقم | العنوان الرسمي | التقرير |
-|---:|---|---|
-| 001 | تأسيس شبكة AI الموحدة وعقد الاتصال الأولي | [2026-11-21-001-ai-network-mesh.md](./2026-11-21-001-ai-network-mesh.md) |
-| 002 | ربط الواجهة الرئيسية ببوابة AI | [2026-11-21-002-main-ui-ai-gateway.md](./2026-11-21-002-main-ui-ai-gateway.md) |
-| 003 | توحيد التوافق مع واجهات AI القديمة وإصلاح الإرسال | [2026-11-21-003-legacy-ai-compatibility.md](./2026-11-21-003-legacy-ai-compatibility.md) |
-| 004 | تأمين بوابة AI بمصادقة Access وحدود الاستخدام | [2026-11-21-004-ai-gateway-security.md](./2026-11-21-004-ai-gateway-security.md) |
-| 005 | مزامنة وثائق شبكة AI مع متطلبات التشغيل والأمان | [2026-11-21-005-ai-network-doc-sync.md](./2026-11-21-005-ai-network-doc-sync.md) |
-| 006 | مزامنة عقد AI Gateway V1 بين المستودعات | [2026-11-21-006-core-contract-sync.md](./2026-11-21-006-core-contract-sync.md) |
-| 007 | تشديد التحقق من عقد AI ومعرّفات الطلب وجاهزية البوابة | [2026-11-21-007-ai-contract-strict-validation.md](./2026-11-21-007-ai-contract-strict-validation.md) |
+| العملية | العنوان الأصلي داخل التقرير | عنوان الفهرسة بالعربية | الملف |
+|---:|---|---|---|
+| 001 | تقرير عملية AYHEM — 001: تأسيس عميل الاتصال الشبكي بالذكاء الاصطناعي | تأسيس عميل شبكة AI | [فتح التقرير](./2026-11-21-001-ai-network-mesh.md) |
+| 002 | تقرير عملية AYHEM — 002: ربط الواجهة الرئيسية ببوابة الذكاء الاصطناعي | ربط الواجهة ببوابة AI | [فتح التقرير](./2026-11-21-002-main-ui-ai-gateway.md) |
+| 003 | تقرير عملية AYHEM — 003: توحيد واجهات AI القديمة | توافق واجهات AI القديمة | [فتح التقرير](./2026-11-21-003-legacy-ai-compatibility.md) |
+| 004 | تقرير عملية AYHEM — 004: تأمين بوابة الذكاء الاصطناعي | تأمين بوابة AI | [فتح التقرير](./2026-11-21-004-ai-gateway-security.md) |
+| 005 | تقرير عملية AYHEM — 005: مزامنة دليل تشغيل شبكة AI | مزامنة دليل شبكة AI | [فتح التقرير](./2026-11-21-005-ai-network-doc-sync.md) |
+| 006 | تقرير عملية AYHEM_WEB — 006: مزامنة عقد AI مع المستودع الأساسي | مزامنة عقد AI بين المستودعات | [فتح التقرير](./2026-11-21-006-core-contract-sync.md) |
+| 007 | تقرير عملية AYHEM_WEB — 007: تشديد مطابقة عقد AI Gateway | تشديد التحقق من عقد AI | [فتح التقرير](./2026-11-21-007-ai-contract-strict-validation.md) |
 
-## 2. الذاكرة الدائمة وسلامة البيانات — العمليات 008–016
+## الذاكرة
 
-| رقم | العنوان الرسمي | التقرير |
-|---:|---|---|
-| 008 | تأسيس مخزن ذاكرة تراكمي باستخدام IndexedDB | [2026-11-21-008-memory-store-foundation.md](./2026-11-21-008-memory-store-foundation.md) |
-| 009 | تأسيس معاينة واستعادة آمنة لنسخ الذاكرة | [2026-11-21-009-memory-snapshot-restore.md](./2026-11-21-009-memory-snapshot-restore.md) |
-| 010 | جرد الذاكرة القديمة بوضع القراءة فقط | [2026-11-21-010-legacy-memory-audit.md](./2026-11-21-010-legacy-memory-audit.md) |
-| 011 | إنشاء واجهة محلية لتدقيق الذاكرة القديمة | [2026-11-21-011-local-memory-audit-ui.md](./2026-11-21-011-local-memory-audit-ui.md) |
-| 012 | بناء استرجاع ذاكرة معجمي مع مصادر وإثباتات | [2026-11-21-012-memory-retrieval.md](./2026-11-21-012-memory-retrieval.md) |
-| 013 | بناء طبقة توافق بين MemoryLink ومخزن الذاكرة | [2026-11-21-013-memory-link-compat.md](./2026-11-21-013-memory-link-compat.md) |
-| 014 | إصلاح فشل CI في ترتيب نتائج استرجاع الذاكرة | [2026-11-21-014-memory-retrieval-ci-fix.md](./2026-11-21-014-memory-retrieval-ci-fix.md) |
-| 015 | التحقق من سلامة سلسلة الذاكرة والإحالات والدورات | [2026-11-21-015-memory-lineage-integrity.md](./2026-11-21-015-memory-lineage-integrity.md) |
-| 016 | تثبيت عقد استعادة snapshots ومنع الكتابة عند التعارض | [2026-11-21-016-memory-restore-contract.md](./2026-11-21-016-memory-restore-contract.md) |
+| العملية | العنوان الأصلي داخل التقرير | عنوان الفهرسة بالعربية | الملف |
+|---:|---|---|---|
+| 008 | تقرير عملية AYHEM_WEB — 008: تأسيس مخزن الذاكرة التراكمي | تأسيس الذاكرة التراكمية | [فتح التقرير](./2026-11-21-008-memory-store-foundation.md) |
+| 009 | تقرير عملية AYHEM_WEB — 009: فحص واستعادة نسخ الذاكرة | فحص واستعادة نسخ الذاكرة | [فتح التقرير](./2026-11-21-009-memory-snapshot-restore.md) |
+| 010 | تقرير عملية AYHEM_WEB — 010: جرد الذاكرة القديمة دون تعديلها | جرد الذاكرة القديمة للقراءة فقط | [فتح التقرير](./2026-11-21-010-legacy-memory-audit.md) |
+| 011 | تقرير عملية AYHEM_WEB — 011: واجهة معاينة الذاكرة محلياً | واجهة تدقيق الذاكرة محلياً | [فتح التقرير](./2026-11-21-011-local-memory-audit-ui.md) |
+| 012 | AYHEM_WEB — تقرير العملية 012: الاسترجاع الموثّق لذاكرة AYHEM | الاسترجاع الموثّق للذاكرة | [فتح التقرير](./2026-11-21-012-memory-retrieval.md) |
+| 013 | AYHEM_WEB — تقرير العملية 013: طبقة توافق MemoryLink | طبقة توافق MemoryLink | [فتح التقرير](./2026-11-21-013-memory-link-compat.md) |
+| 014 | تقرير العملية 014 — إصلاح اختبار ترتيب استرجاع الذاكرة | إصلاح اختبار ترتيب الاسترجاع | [فتح التقرير](./2026-11-21-014-memory-retrieval-ci-fix.md) |
+| 015 | تقرير العملية 015 — فاحص سلامة سلسلة الذاكرة | فحص سلامة سلسلة الذاكرة | [فتح التقرير](./2026-11-21-015-memory-lineage-integrity.md) |
+| 016 | العملية 016 — عقد استعادة الذاكرة على دفعات | عقد استعادة الذاكرة الدفعي | [فتح التقرير](./2026-11-21-016-memory-restore-contract.md) |
 
-## 3. الإدراك والتحقق من الاستنتاجات — العمليات 017–018
+## الإدراك
 
-| رقم | العنوان الرسمي | التقرير |
-|---:|---|---|
-| 017 | بناء محرك إدراك أولي مع حفظ مصدر الأدلة وعدم تعديل الأصل | [2026-11-21-017-cognition-engine.md](./2026-11-21-017-cognition-engine.md) |
-| 018 | التحقق من provenance للاستنتاجات قبل حفظها | [2026-11-21-018-cognition-provenance-validation.md](./2026-11-21-018-cognition-provenance-validation.md) |
+| العملية | العنوان الأصلي داخل التقرير | عنوان الفهرسة بالعربية | الملف |
+|---:|---|---|---|
+| 017 | العملية 017 — محرك الإدراك الأولي وتصحيح مرجعية المؤسس | محرك الإدراك الأولي | [فتح التقرير](./2026-11-21-017-cognition-engine.md) |
+| 018 | AYHEM Operation 018 — Cognition provenance validation | التحقق من مصدر استنتاجات الإدراك | [فتح التقرير](./2026-11-21-018-cognition-provenance-validation.md) |
 
-## 4. اختبارات المتصفح وIndexedDB والتزامن — العمليات 019–022
+## اختبارات المتصفح وIndexedDB
 
-| رقم | العنوان الرسمي | التقرير |
-|---:|---|---|
-| 019 | اختبار IndexedDB في Chromium: التراجع والاستمرارية والاستعادة | [2026-11-21-019-real-browser-indexeddb-tests.md](./2026-11-21-019-real-browser-indexeddb-tests.md) |
-| 020 | إصلاح دورة فتح IndexedDB والتعامل مع blocked والفتح المتأخر | [2026-11-21-020-indexeddb-open-lifecycle.md](./2026-11-21-020-indexeddb-open-lifecycle.md) |
-| 021 | اختبار versionchange مع اتصالات IndexedDB المتزامنة | [2026-11-21-021-indexeddb-versionchange-contention.md](./2026-11-21-021-indexeddb-versionchange-contention.md) |
-| 022 | اختبار ذرية الكتابة المتزامنة ومنع الكتابة الجزئية | [2026-11-21-022-indexeddb-concurrent-write-atomicity.md](./2026-11-21-022-indexeddb-concurrent-write-atomicity.md) |
+| العملية | العنوان الأصلي داخل التقرير | عنوان الفهرسة بالعربية | الملف |
+|---:|---|---|---|
+| 019 | AYHEM 019 — Real-browser IndexedDB transaction and restore tests | اختبارات IndexedDB في Chromium الحقيقي | [فتح التقرير](./2026-11-21-019-real-browser-indexeddb-tests.md) |
+| 020 | AYHEM 020 — IndexedDB blocked-open lifecycle hardening | تحصين دورة فتح IndexedDB | [فتح التقرير](./2026-11-21-020-indexeddb-open-lifecycle.md) |
+| 021 | AYHEM 021 — IndexedDB versionchange and connection contention | اختبار تنازع اتصالات IndexedDB | [فتح التقرير](./2026-11-21-021-indexeddb-versionchange-contention.md) |
+| 022 | AYHEM 022 — Concurrent IndexedDB write atomicity | ذرية الكتابة المتزامنة في IndexedDB | [فتح التقرير](./2026-11-21-022-indexeddb-concurrent-write-atomicity.md) |
 
-## 5. الحوكمة وقياس التقدم — العمليات 023–024
+## الحوكمة وقياس التقدم
 
-| رقم | العنوان الرسمي | التقرير |
-|---:|---|---|
-| 023 | اعتماد تعليمات المؤسس ومنهجية قياس التقدم الهندسي | [2026-11-21-023-founder-directives-progress-reporting.md](./2026-11-21-023-founder-directives-progress-reporting.md) |
-| 024 | إنشاء لوحة تقدم موحدة مرتبطة ببطاقة القياس المرجعية | [2026-11-21-024-authoritative-progress-dashboard.md](./2026-11-21-024-authoritative-progress-dashboard.md) |
+| العملية | العنوان الأصلي داخل التقرير | عنوان الفهرسة بالعربية | الملف |
+|---:|---|---|---|
+| 023 | AYHEM 023 — Founder directives and measurable progress reporting | تعليمات المؤسس وقياس التقدم | [فتح التقرير](./2026-11-21-023-founder-directives-progress-reporting.md) |
+| 024 | AYHEM 024 — Authoritative engineering progress dashboard | لوحة التقدم الهندسي المرجعية | [فتح التقرير](./2026-11-21-024-authoritative-progress-dashboard.md) |
 
-## 6. إعادة المعايرة ومطابقة الأدلة وتثبيت توجيهات المؤسس — العمليات 026–031
+## التدقيق والمطابقة والحوكمة
 
-| رقم | العنوان الرسمي | التقرير |
-|---:|---|---|
-| 026 | إعادة معايرة التقدم الهندسي عبر المستودعات الثلاثة | [2026-11-21-026-cross-repository-score-recalibration.md](./2026-11-21-026-cross-repository-score-recalibration.md) |
-| 027 | إصلاح جلسة Cloudflare Access وCORS بين المتصفح والبوابة | [2026-11-21-027-cloudflare-access-cors-session.md](./2026-11-21-027-cloudflare-access-cors-session.md) |
-| 028 | اختبار CORS وCookie جلسة Access في Chromium حقيقي | [2026-11-21-028-real-browser-access-cors.md](./2026-11-21-028-real-browser-access-cors.md) |
-| 029 | مطابقة الأدلة بعد الدمج وتحديث بيانات التقدم | [2026-11-21-029-post-merge-evidence-reconciliation.md](./2026-11-21-029-post-merge-evidence-reconciliation.md) |
-| 030 | تثبيت توجيهات المؤسس الدائمة: السرعة والدقة والتصحيح التكيفي | [2026-11-21-030-speed-precision-adaptive-correction.md](./2026-11-21-030-speed-precision-adaptive-correction.md) |
-| 031 | مطابقة حالة العملية 030 بعد الدمج وتحديث الفهرس وبطاقة التقدم | [2026-11-21-031-post-merge-030-reconciliation.md](./2026-11-21-031-post-merge-030-reconciliation.md) |
+| العملية | العنوان الأصلي داخل التقرير | عنوان الفهرسة بالعربية | الملف |
+|---:|---|---|---|
+| 026 | AYHEM 026 — Cross-repository audit and progress score recalibration | مراجعة المستودعات وإعادة معايرة التقدم | [فتح التقرير](./2026-11-21-026-cross-repository-score-recalibration.md) |
+| 027 | AYHEM 027 — Cloudflare Access CORS and browser session transport | إصلاح CORS وجلسة Cloudflare Access | [فتح التقرير](./2026-11-21-027-cloudflare-access-cors-session.md) |
+| 028 | AYHEM 028 — Real-browser CORS and Access session transport | اختبار CORS وجلسة Access في متصفح حقيقي | [فتح التقرير](./2026-11-21-028-real-browser-access-cors.md) |
+| 029 | AYHEM 029 — Post-merge evidence reconciliation | مطابقة أدلة ما بعد الدمج | [فتح التقرير](./2026-11-21-029-post-merge-evidence-reconciliation.md) |
+| 030 | AYHEM 030 — Founder directive: speed, precision and adaptive correction | توجيهات المؤسس للسرعة والدقة والتصحيح التكيفي | [فتح التقرير](./2026-11-21-030-speed-precision-adaptive-correction.md) |
+| 031 | AYHEM 031 — Post-merge reconciliation for operation 030 | مطابقة العملية 030 وتحديث الفهرس | [فتح التقرير](./2026-11-21-031-post-merge-030-reconciliation.md) |
 
-## 7. تدقيق التسلسل والترقيم
+## تدقيق الترقيم
 
-- التقارير المفهرسة فعلياً: **30 تقريراً** (001–024 و026–031).
-- الرقم 025: **غير مستخدم في السجل الحالي؛ لا يوجد تقرير بهذا الرقم في الفهرس**. لا يُنشأ تقرير بأثر رجعي لمجرد سد الفجوة.
-- الأرقام 001–031 فريدة ضمن السجل الحالي.
-- كل رابط أعلاه يستخدم اسم الملف التاريخي كما هو؛ لا تُكسر الروابط بإعادة تسمية الملفات.
-- هذا الفهرس موضوعي مساعد، بينما [سجل العمليات](./README.md) هو الفهرس التشغيلي المرجعي للحالة والتنفيذ.
-- حالة الدمج والاختبارات والنشر يجب أن تُقرأ من سجل العمليات وتقارير المتابعة، ولا يُستنتج نجاحها من عنوان التقرير وحده.
+- التقارير الموجودة: **001–024 و026–031**، أي 30 تقريراً.
+- الرقم **025 غير مستخدم** ولا يوجد له تقرير في السجل الحالي؛ لم يُنشأ تقرير وهمي لسد الفجوة.
+- كل الروابط الـ30 تشير إلى ملفات تم التحقق من وجودها في فرع الفهرسة.
+- سجل العمليات [README.md](./README.md) هو المرجع التشغيلي لحالات التنفيذ والدمج والاختبارات والنشر؛ هذا الملف فهرس عناوين وموضوعات.
+- لا تعني فهرسة التقرير أو وجوده أن العمل المنشور أو الخدمة الحية مكتملة.
