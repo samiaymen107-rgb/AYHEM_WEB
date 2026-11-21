@@ -117,7 +117,7 @@ async function loadScorecard(){
     const calculated=data.workstreams.reduce((sum,item)=>sum+Number(item.weighted_contribution),0);
     const recomputed=data.workstreams.reduce((sum,item)=>sum+Number(item.weight_percent)*Number(item.completion_percent)/100,0);
     if(weight!==100||Math.abs(calculated-recomputed)>0.011||Math.abs(recomputed-Number(data.overall_progress_percent))>0.011)throw new Error("فشل التحقق من مجموع الأوزان أو النسبة الإجمالية");
-    setText("overall",Number(data.overall_progress_percent).toFixed(data.overall_progress_percent%1?1:0)+"%");
+    setText("overall",Number(data.overall_progress_percent).toFixed(data.overall_progress_percent%1?2:0)+"%");
     setText("scope",data.scope);
     setText("evidenceDate","تاريخ الأدلة: "+data.evidence_date);
     setText("production",data.production_readiness==="not_yet_rated"?"جاهزية الإنتاج: غير مقيمة":"جاهزية الإنتاج: "+data.production_readiness);
