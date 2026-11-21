@@ -33,6 +33,7 @@ Required fields: `protocolVersion`, `eventId`, `deviceId`, `recordId`, `recordSc
 - The server enforces a unique constraint on `(tenantId, eventId)`.
 - Repeated event IDs with the same canonical digest return the original acknowledgement.
 - Repeated event IDs with a different digest return `409 event_id_conflict`; neither version overwrites the other.
+- A successful push response is `{ protocolVersion: "1", acknowledgements: [{ eventId, status }] }`, where each status is exactly `accepted` or `duplicate`. A missing acknowledgement leaves that event pending; unknown IDs, duplicate acknowledgements, or any other status make the whole response invalid and must not mark events delivered.
 - The payload is a validated canonical memory record; correction uses `supersedes`, never update-in-place.
 - Pull responses use opaque cursors and stable ordering; clients persist the cursor only after the received batch is committed locally.
 
@@ -46,7 +47,11 @@ Required fields: `protocolVersion`, `eventId`, `deviceId`, `recordId`, `recordSc
 6. On transient failure, retain the event and apply bounded exponential backoff with jitter; permanent validation failures remain visible for user review.
 7. Pull remote events, validate schema and provenance, and append them locally. Never silently replace an existing record.
 
-## 5. Encryption and key management gates
+## 5. Client transport boundary
+
+The first client implementation is an explicit, foreground-only HTTPS push operation. It requires a consent callback that returns true for each invocation, a device identifier, and a short-lived token supplied at call time. It uses a bounded batch and payload size, SHA-256 payload digests, omits browser credentials, rejects redirects, validates per-event acknowledgements, and never schedules itself or retries automatically. Pull, cursor persistence, background scheduling, and end-to-end encryption remain separate future work.
+
+## 6. Encryption and key management gates
 
 - TLS is required in transit.
 - Server-side storage encryption and managed key rotation are required at rest.
@@ -54,14 +59,14 @@ Required fields: `protocolVersion`, `eventId`, `deviceId`, `recordId`, `recordSc
 - Never embed provider API keys or long-lived service secrets in browser code or repository files.
 - Do not invent a passphrase recovery path that silently weakens encryption.
 
-## 6. Identity and authorization
+## 7. Identity and authorization
 
 - Verify short-lived identity tokens at the service boundary (for example, Cloudflare Access JWT verification if that provider is selected).
 - Bind every read/write to a stable user/tenant identity and authorized device.
 - Enforce per-user quotas, payload limits, rate limits, token expiry, device revocation, and audit metadata.
 - A valid AI-provider key is not a substitute for user authentication or sync authorization.
 
-## 7. Conflict and recovery policy
+## 8. Conflict and recovery policy
 
 - Memory is append-only. Corrections are new records with `supersedes` references.
 - Same ID + same digest is an idempotent duplicate; same ID + different digest is a conflict requiring review.
@@ -69,14 +74,14 @@ Required fields: `protocolVersion`, `eventId`, `deviceId`, `recordId`, `recordSc
 - Backup restore runs a dry-run inspection first, checks counts and digests, imports idempotently, and verifies a post-restore export.
 - Retain a recovery point before schema migrations and test restore on an isolated database.
 
-## 8. Privacy and user controls
+## 9. Privacy and user controls
 
 - No camera, microphone, network, or background content capture is implied by sync.
 - Sync is off until the user explicitly enables it and selects the account/device scope.
 - Provide pause, resume, revoke-device, export, and disconnect controls.
 - Do not upload the legacy localStorage inventory or its contents automatically.
 
-## 9. Release gates — all required before calling cloud sync ready
+## 10. Release gates — all required before calling cloud sync ready
 
 1. A real server is deployed with TLS, authentication, tenant isolation, rate limits, and durable storage.
 2. Secrets are stored server-side and rotated; any previously exposed provider key is revoked.
