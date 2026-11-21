@@ -46,7 +46,7 @@ From this directory with Node.js 20+:
 - `npm test` — deterministic foundation and adapter-contract tests.
 - `npm run test:browser` — real Chromium IndexedDB integration test (requires the Playwright package and Chromium browser).
 
-The real-browser tests verify that a duplicate-key failure aborts an entire multi-request IndexedDB transaction, committed records survive closing and reopening, snapshot restore is idempotent, and concurrent adapter connections close on `versionchange` so a schema upgrade is not blocked. CI installs the browser runtime and runs these tests separately from the fast Node suite.
+The real-browser tests verify that duplicate-key failures abort entire multi-request IndexedDB transactions, committed records survive closing and reopening, snapshot restore is idempotent, concurrent adapter connections close on `versionchange`, and competing write batches preserve atomic append-only behavior across independent connections. CI installs the browser runtime and runs these tests separately from the fast Node suite.
 
 These tests use isolated, randomly named test databases. They do not open, inspect, migrate, or modify any founder browser data or legacy localStorage keys.
 
