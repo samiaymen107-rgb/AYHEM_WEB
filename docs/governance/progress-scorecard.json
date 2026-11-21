@@ -8,8 +8,6 @@
   "production_readiness": "not_yet_rated",
   "weights_total_percent": 100,
   "last_documented_operation": 26,
-  "last_merged_pull_request": 13,
-  "last_merged_commit": "04108836b39d0040ddad946eb34654c3d0d9ff91",
   "workstreams": [
     {
       "name": "MEMORY",
@@ -79,6 +77,24 @@
   "recalibration_reason": "تم تصحيح التقدير الأولي 41% بعد مراجعة AYHEM_WEB PR #4 المدموج الذي أضاف أساس سياسة الاستقلالية وسجل التدقيق ومخطط الذاكرة واختبارات الحدود؛ AUTONOMY أصبح 25% بدلاً من 0%.",
   "audit_repositories": [
     "samiaymen107-rgb/AYHEM",
-    "samiaymen107-rgb/AYHEM_WEB"
+    "samiaymen107-rgb/AYHEM_WEB",
+    "samiaymen107-rgb/astro-blog-starter-template"
+  ],
+  "latest_merged_changes": [
+    {
+      "repository": "samiaymen107-rgb/AYHEM",
+      "pull_request": 5,
+      "commit": "affd29ffe5bd5dd1d08c7230a73bfa874add9332"
+    },
+    {
+      "repository": "samiaymen107-rgb/AYHEM_WEB",
+      "pull_request": 13,
+      "commit": "04108836b39d0040ddad946eb34654c3d0d9ff91"
+    },
+    {
+      "repository": "samiaymen107-rgb/astro-blog-starter-template",
+      "pull_request": 1,
+      "commit": "7be0d049441fa1dbc1723d44f2cf71f1d3797f38"
+    }
   ]
 }
