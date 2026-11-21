@@ -11,6 +11,8 @@
 4. حفظ تقرير مستقل في هذا المجلد.
 5. تحديث هذا الفهرس بآخر تقرير.
 6. تحليل التقرير السابق قبل اختيار العملية التالية.
+7. تطبيق [تعليمات المؤسس ومعيار قياس التقدم](../governance/FOUNDER_DIRECTIVES_AND_PROGRESS.md) في كل مرحلة.
+8. إظهار نسبة إنجاز المرحلة ونسبة التقدم الهندسي الإجمالية في كل تقرير، مع طريقة الحساب والأدلة وتاريخ القياس.
 
 ## تسمية التقارير
 
@@ -34,15 +36,18 @@
 - لا تضع أسراراً في أمثلة الأوامر.
 - لا تصف الاتصال بأنه مباشر أو حي إلا بعد اختبار endpoint حقيقي.
 - لا تخلط بين وجود كود اتصال وبين نشره أو تفعيله.
-- لا تدمج أو تنشر إنتاجياً دون موافقة المؤسس.
+- الدمج الروتيني المفوض مسموح بعد نجاح الفحوصات المطلوبة ومراجعة المخاطر؛ أما النشر الإنتاجي والعمليات الحساسة خارج نطاق التفويض فتتطلب موافقة المؤسس.
 - يجب أن يتضمن كل تقرير المسارات الدقيقة والفرع وcommit ونتيجة الاختبارات والقيود والخطوة التالية.
+- يجب أن يتضمن كل تقرير نسبة الإنجاز الإجمالية ونسبة المرحلة، ولا تُحسب النسبة من عدد الملفات أو الأسطر.
+- افصل بين الإنجاز الهندسي ونجاح CI والنشر والجاهزية الإنتاجية والاتصال الحي بالخدمات.
 
 ## الفهرس
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-022-indexeddb-concurrent-write-atomicity.md](./2026-11-21-022-indexeddb-concurrent-write-atomicity.md) | اختبار ذرية الكتابة المتزامنة ومنع فقدان/تجاوز سجل الذاكرة عند تنافس الاتصالات | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
-| [2026-11-21-021-indexeddb-versionchange-contention.md](./2026-11-21-021-indexeddb-versionchange-contention.md) | اختبار اتصالات IndexedDB المتزامنة وإغلاقها عند versionchange قبل ترقية المخطط | MERGED / CI VERIFIED / PAGES DEPLOYED |
+| [2026-11-21-023-founder-directives-progress-reporting.md](./2026-11-21-023-founder-directives-progress-reporting.md) | تثبيت تعليمات المؤسس الدائمة ومنهجية قياس التقدم الموزون والتقارير المرحلية | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-022-indexeddb-concurrent-write-atomicity.md](./2026-11-21-022-indexeddb-concurrent-write-atomicity.md) | اختبار ذرية الكتابة المتزامنة ومنع الكتابة الجزئية بين اتصالات IndexedDB | MERGED / CI VERIFIED / POST-MERGE CI VERIFIED |
+| [2026-11-21-021-indexeddb-versionchange-contention.md](./2026-11-21-021-indexeddb-versionchange-contention.md) | اختبار اتصالات IndexedDB المتزامنة وإغلاقها عند versionchange قبل ترقية المخطط | MERGED / CI VERIFIED / POST-MERGE CI VERIFIED |
 | [2026-11-21-020-indexeddb-open-lifecycle.md](./2026-11-21-020-indexeddb-open-lifecycle.md) | معالجة اتصال IndexedDB المتأخر بعد blocked وحماية إعادة المحاولة | MERGED / CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-019-real-browser-indexeddb-tests.md](./2026-11-21-019-real-browser-indexeddb-tests.md) | اختبار IndexedDB في Chromium: atomic rollback، إعادة الفتح، واستعادة snapshot حقيقية | MERGED / CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-018-cognition-provenance-validation.md](./2026-11-21-018-cognition-provenance-validation.md) | التحقق من مصدر الاستنتاجات وصحة provenance قبل الحفظ ومنع الكتابة الجزئية بسبب مدخلات غير صالحة | MERGED / CI VERIFIED / PAGES DEPLOYED |
