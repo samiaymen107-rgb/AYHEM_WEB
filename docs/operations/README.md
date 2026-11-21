@@ -44,10 +44,12 @@
 ## الفهرس
 
 - [الفهرس الموضوعي والعناوين الرسمية لجميع التقارير](./REPORT_CATALOG.md): يضم العناوين العربية المصنفة والروابط الثابتة وتدقيق الترقيم.
+- آخر تحقق: PR #19 merged؛ AYHEM Governance Tests run 44920555550 نجح. Pages post-merge لم يُتحقق منه بعد.
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-031-post-merge-030-reconciliation.md](./2026-11-21-031-post-merge-030-reconciliation.md) | مطابقة حالة العملية 030 بعد الدمج وتحديث الفهرس وبطاقة التقدم بالأدلة | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-032-atomic-cognition-idempotency.md](./2026-11-21-032-atomic-cognition-idempotency.md) | منع حفظ الاستنتاج الإدراكي نفسه مرتين عند تنافس النوافذ والاتصالات عبر معاملة IndexedDB ذرية | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-031-post-merge-030-reconciliation.md](./2026-11-21-031-post-merge-030-reconciliation.md) | مطابقة حالة العملية 030 بعد الدمج وتحديث الفهرس وبطاقة التقدم بالأدلة | MERGED / GOVERNANCE CI VERIFIED / PAGES STATUS NOT RECONFIRMED |
 | [2026-11-21-030-speed-precision-adaptive-correction.md](./2026-11-21-030-speed-precision-adaptive-correction.md) | تثبيت توجيهات المؤسس للسرعة والدقة وكشف الأخطاء والتصحيح السريع وتعديل المسار | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-029-post-merge-evidence-reconciliation.md](./2026-11-21-029-post-merge-evidence-reconciliation.md) | مطابقة تقارير 026–028 مع حالة الدمج ونتائج CI وPages وتحديث رقم آخر عملية | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-028-real-browser-access-cors.md](./2026-11-21-028-real-browser-access-cors.md) | اختبار CORS وCookie جلسة Access في Chromium حقيقي بين أصلين مختلفين | MERGED / BROWSER CI VERIFIED / PAGES DEPLOYED / LIVE ACCESS PENDING |
