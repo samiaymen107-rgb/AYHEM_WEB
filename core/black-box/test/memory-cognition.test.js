@@ -198,8 +198,12 @@ test("validates the entire batch before writing any derived record", async () =>
   ]);
   const cognition = createMemoryCognition({ store });
   const valid = classifyMemoryPair(store.records[0], store.records[1]);
-  const invalid = classifyMemoryPair(store.records[2], store.records[3]);
-  invalid.provenance[0].source = "tampered-source";
+  const invalidBase = classifyMemoryPair(store.records[2], store.records[3]);
+  const invalid = {
+    ...invalidBase,
+    provenance: invalidBase.provenance.map((item, index) =>
+      index === 0 ? { ...item, source: "tampered-source" } : item),
+  };
   await assert.rejects(cognition.persistInsights([valid, invalid]), /provenance_mismatch/);
   assert.equal(store.records.length, 4);
 });
