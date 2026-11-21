@@ -28,5 +28,7 @@ test("Worker implementation matches request and response contract", () => {
 test("client and UI refuse to operate before gateway readiness", () => {
   assert.match(client, /maxInputLength = 8000/);
   assert.match(client, /result\.unit !== "U01-Σ"/);
+  assert.match(client, /validRequestId/);
+  assert.match(client, /originConfigured/);
   assert.match(ui, /health\.ready !== true/);
 });
