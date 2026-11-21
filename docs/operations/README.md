@@ -44,11 +44,12 @@
 ## الفهرس
 
 - [الفهرس الموضوعي والعناوين الرسمية لجميع التقارير](./REPORT_CATALOG.md): يضم العناوين العربية المصنفة والروابط الثابتة وتدقيق الترقيم.
-- آخر تحقق مدمج: PR #25 (تسوية التقارير)؛ العملية التقنية الأخيرة المؤكدة PR #24 مع نجاح Black Box run 44922079742 وGovernance run 44922079745. Pages post-merge غير مؤكد.
+- آخر تحقق مدمج: PR #26؛ Black Box run 44923638106 وGovernance run 44923638183 وPages run 44923637399 نجحت جميعها.
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-038-indexed-tag-deduplication.md](./2026-11-21-038-indexed-tag-deduplication.md) | تسريع منع تكرار الاستنتاجات بفهرس الوسوم مع ترقية آمنة لقاعدة البيانات | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-039-post-merge-038-verification.md](./2026-11-21-039-post-merge-038-verification.md) | التحقق بعد دمج العملية 038 وتوثيق اختبارات CI ونشر Pages | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-038-indexed-tag-deduplication.md](./2026-11-21-038-indexed-tag-deduplication.md) | تسريع منع تكرار الاستنتاجات بفهرس الوسوم مع ترقية آمنة لقاعدة البيانات | MERGED / NODE + CHROMIUM + GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-037-operation-036-reconciliation.md](./2026-11-21-037-operation-036-reconciliation.md) | تسوية أدلة العملية 036 وفهرسة التقرير | MERGED / DOCUMENTATION RECONCILED |
 | [2026-11-21-036-prepared-cognition-pairs.md](./2026-11-21-036-prepared-cognition-pairs.md) | إعادة استخدام السجلات المجهزة وتقليل كلفة الذاكرة في الأزواج المرشحة | MERGED / NODE + CHROMIUM + BENCHMARK CI VERIFIED / PAGES NOT RECONFIRMED |
 | [2026-11-21-035-full-ceiling-dense-benchmark.md](./2026-11-21-035-full-ceiling-dense-benchmark.md) | توسيع اختبار الذاكرة الكثيفة إلى الحد الأقصى 1,000 سجل | MERGED / NODE + CHROMIUM + BENCHMARK CI VERIFIED / PAGES NOT RECONFIRMED |
