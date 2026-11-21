@@ -90,3 +90,18 @@ test("rejects record types and statuses outside the canonical AYHEM_WEB schema",
     traceId: "trace-id-0000000006",
   }), /record_status_invalid/);
 });
+
+test("uses the canonical memory validator and rejects invalid lineage and trace syntax", async () => {
+  const adapter = createMemoryEventAdapter({ digest: webcrypto.subtle });
+  await assert.rejects(adapter.toEvent({
+    ...record,
+    supersedes: [record.id],
+  }, {
+    sourceKind: "user_input",
+    traceId: "trace-id-0000000007",
+  }), error => error.validationErrors?.includes("record_cannot_supersede_itself"));
+  await assert.rejects(adapter.toEvent(record, {
+    sourceKind: "user_input",
+    traceId: "trace id with spaces",
+  }), /trace_id_invalid/);
+});
