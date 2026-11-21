@@ -3,7 +3,7 @@
 - التاريخ: 2026-11-21
 - المستودع: `samiaymen107-rgb/AYHEM_WEB`
 - طلب السحب: #28
-- الحالة: **MERGED / GOVERNANCE VERIFIED / PAGES DEPLOYMENT CHECKED SEPARATELY**
+- الحالة: **MERGED / GOVERNANCE VERIFIED / PAGES DEPLOYED**
 - فرع التغيير: `governance/040-reconcile-operation-039-status`
 - Commit الدمج: `49c24a554c4fbf334b8d03ffa777cd9c70655fdd`
 - نسبة إنجاز المرحلة: **100%**
@@ -17,7 +17,7 @@
 
 - PR #28: مدمج على `main`.
 - Governance push run `44926947075`: ناجح على commit الدمج.
-- Pages run `44926946428`: بدأ بعد الدمج؛ لا يُعلن نجاح النشر إلا بعد اكتمال جميع وظائفه.
+- Pages run `44926946428`: نجحت وظائف build وreport-build-status وdeploy بعد الدمج.
 - لا تغييرات في كود التشغيل أو بيانات المستخدم أو الأسرار أو إعدادات الإنتاج.
 
 ## النتيجة والقيود
