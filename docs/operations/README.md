@@ -43,16 +43,18 @@
 
 ## الفهرس
 
-- [2026-11-21-043-indexed-existing-cognition-tags.md](./2026-11-21-043-indexed-existing-cognition-tags.md) — إزالة مسح القائمة في حفظ استنتاجات الإدراك (Node + Chromium + benchmark CI verified؛ الدمج pending).
-- [2026-11-21-044-consented-sensory-learning.md](./2026-11-21-044-consented-sensory-learning.md) — طبقة الحواس الرقمية والتعلّم التلقائي المصرّح به (CI pending).
+- [2026-11-21-047-post-merge-043-verification.md](./2026-11-21-047-post-merge-043-verification.md) — التحقق بعد الدمج والاختبارات والنشر للعملية 043.
+- [2026-11-21-043-indexed-existing-cognition-tags.md](./2026-11-21-043-indexed-existing-cognition-tags.md) — إزالة مسح القائمة في حفظ استنتاجات الإدراك (MERGED / POST-MERGE CI + PAGES VERIFIED).
+- [2026-11-21-044-consented-sensory-learning.md](./2026-11-21-044-consented-sensory-learning.md) — طبقة الحواس الرقمية والتعلّم التلقائي المصرّح به (MERGED / BLACK BOX + GOVERNANCE + PAGES VERIFIED).
 
 - [الفهرس الموضوعي والعناوين الرسمية لجميع التقارير](./REPORT_CATALOG.md): يضم العناوين العربية المصنفة والروابط الثابتة وتدقيق الترقيم.
-- آخر تحقق مدمج: PR #32؛ Governance run 44929333934 وAI Network run 44929334011 وBlack Box run 44929333936 وPages run 44929488440 نجحت جميعها.
+- آخر تحقق مدمج: PR #33؛ Black Box run 44930613768 وGovernance run 44930613702 وPages run 44930613186 نجحت جميعها بعد الدمج.
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-043-indexed-existing-cognition-tags.md](./2026-11-21-043-indexed-existing-cognition-tags.md) | إزالة مسح القائمة الكامل عند التحقق من وسوم استنتاجات الإدراك | IMPLEMENTED / NODE + CHROMIUM + BENCHMARK CI VERIFIED / MERGE PENDING |
-| [2026-11-21-044-consented-sensory-learning.md](./2026-11-21-044-consented-sensory-learning.md) | تأسيس الحواس الرقمية والتعلم التلقائي مع موافقة صريحة وحفظ تراكمي | IMPLEMENTED / CI PENDING |
+| [2026-11-21-047-post-merge-043-verification.md](./2026-11-21-047-post-merge-043-verification.md) | التحقق بعد دمج العملية 043: Black Box وGovernance وPages | MERGED / POST-MERGE CI + PAGES VERIFIED |
+| [2026-11-21-043-indexed-existing-cognition-tags.md](./2026-11-21-043-indexed-existing-cognition-tags.md) | إزالة مسح القائمة الكامل عند التحقق من وسوم استنتاجات الإدراك | MERGED / NODE + CHROMIUM + BENCHMARK + GOVERNANCE + PAGES VERIFIED |
+| [2026-11-21-044-consented-sensory-learning.md](./2026-11-21-044-consented-sensory-learning.md) | تأسيس الحواس الرقمية والتعلم التلقائي مع موافقة صريحة وحفظ تراكمي | MERGED / BLACK BOX + GOVERNANCE + PAGES VERIFIED |
 | [2026-11-21-042-post-merge-041-verification.md](./2026-11-21-042-post-merge-041-verification.md) | التحقق بعد دمج العملية 041: Black Box وGovernance وPages | MERGED / POST-MERGE BLACK BOX + GOVERNANCE + PAGES VERIFIED |
 | [2026-11-21-041-cache-cognition-provenance-lookups.md](./2026-11-21-041-cache-cognition-provenance-lookups.md) | تقليل قراءات مصدر الاستنتاجات المتكررة داخل دفعة الحفظ | MERGED / POST-MERGE CI VERIFIED (SEE REPORT 042) |
 | [2026-11-21-040-correct-operation-039-status.md](./2026-11-21-040-correct-operation-039-status.md) | تصحيح حالة العملية 039 والتحقق بعد الدمج | MERGED / GOVERNANCE VERIFIED / PAGES CHECK SEPARATE |
