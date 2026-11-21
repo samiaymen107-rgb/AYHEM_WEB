@@ -20,6 +20,16 @@
 
 احمِ نطاق Worker بتطبيق Cloudflare Access. يتحقق Worker من ترويسة `Cf-Access-Jwt-Assertion` ولا يقبل طلبات AI مجهولة. لا تضع مفاتيح أو Service Tokens في المتصفح.
 
+## جلسات Access وطلبات CORS العابرة للنطاق
+
+- يرسل عميل المتصفح `credentials: "include"` افتراضياً حتى تصل Cookie جلسة `CF_Authorization` إلى نطاق Worker عند السماح بذلك من إعدادات المتصفح.
+- يعيد Worker `Access-Control-Allow-Credentials: true` مع `Access-Control-Allow-Origin` الدقيق من قائمة السماح؛ لا تستخدم `*` مع الطلبات المعتمدة على Cookies.
+- طلب `POST` مع `Content-Type: application/json` يسبب CORS preflight. Cloudflare Access قد يرفض `OPTIONS` قبل وصوله إلى Worker ما لم تُضبط CORS في تطبيق Access.
+- في Cloudflare Zero Trust > Access > Applications > التطبيق الخاص بالبوابة > Advanced settings > CORS، اضبط استجابة preflight لتطابق origin والطرق `GET, POST, OPTIONS` والرأس `Content-Type` و`Access-Control-Allow-Credentials: true`، أو اسمح لـ OPTIONS فقط بالوصول إلى Worker. لا تتجاوز Access على POST أو GET.
+- يظل Worker مسؤولاً عن التحقق من JWT وتطابق origin وحدود الاستخدام. قد تمنع سياسات المتصفح Cookies الطرف الثالث؛ يفضّل نطاق API مخصصاً من نفس الموقع أو مساراً خلفياً موحد الأصل.
+
+مرجع: [Cloudflare Access CORS](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/cors/) و[Authorization cookies](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/).
+
 ## إعداد عنوان البوابة في الواجهة
 
 بعد نشر Worker وتأمينه، اضبط `window.AYHEM_WORKER_URL` في إعداد نشر الواجهة إلى عنوان HTTPS الفعلي. لا تضع عنواناً تخمينياً أو عنوان Worker قديم.

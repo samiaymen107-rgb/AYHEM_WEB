@@ -13,12 +13,16 @@ export function createAyhemAIClient({
   fetchImpl = globalThis.fetch,
   timeoutMs = 30000,
   maxInputLength = 8000,
+  credentials = "include",
 } = {}) {
   if (typeof endpoint !== "string" || !/^https:\/\//i.test(endpoint)) {
     throw new TypeError("A valid HTTPS AYHEM gateway endpoint is required.");
   }
   if (typeof fetchImpl !== "function") {
     throw new TypeError("A fetch implementation is required.");
+  }
+  if (!["omit", "same-origin", "include"].includes(credentials)) {
+    throw new TypeError("credentials must be omit, same-origin, or include.");
   }
   if (!Number.isInteger(timeoutMs) || timeoutMs < 1000 || timeoutMs > 60000) {
     throw new RangeError("timeoutMs must be between 1000 and 60000.");
@@ -32,6 +36,7 @@ export function createAyhemAIClient({
     try {
       const response = await fetchImpl(base + path, {
         ...init,
+        credentials,
         signal: controller.signal,
         cache: "no-store",
       });

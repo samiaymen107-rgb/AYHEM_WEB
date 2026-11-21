@@ -19,7 +19,7 @@ The browser must never connect directly to the AI provider and must never contai
 
 - GET /health — gateway health metadata.
 - POST / — JSON body { "input": "..." }.
-- Successful response — { "unit": "U01-Σ", "output": "..." }.
+- Successful response — { "unit": "U01-Σ", "output": "...", "requestId": "<uuid>" }.
 - HTTPS is mandatory.
 - The reusable client validates inputs and response shape, enforces a request timeout, and does not automatically retry billable POST requests.
 
@@ -33,7 +33,7 @@ The gateway now fails closed unless Cloudflare Access JWT validation is configur
 - Worker variable: `ALLOWED_ORIGINS` — exact comma-separated browser origins.
 - Cloudflare Rate Limiting binding: `AI_RATE_LIMITER` — configured in Cloudflare and keyed by the verified Access subject.
 
-Protect the Worker hostname with a Cloudflare Access application so authenticated browser requests receive `Cf-Access-Jwt-Assertion`. The Worker validates its signature against Cloudflare's JWKS and checks issuer, audience, expiry, and subject. CORS is retained as a browser-origin policy, not treated as authentication.
+Protect the Worker hostname with a Cloudflare Access application so authenticated browser requests receive `Cf-Access-Jwt-Assertion`. Configure the Access application's CORS settings to answer preflight requests or narrowly allow OPTIONS to reach the Worker. Cloudflare Access blocks preflight OPTIONS by default on protected cross-origin applications; never bypass Access for the authenticated GET or POST routes. The Worker validates its signature against Cloudflare's JWKS and checks issuer, audience, expiry, and subject. CORS is retained as a browser-origin policy, not treated as authentication. For cross-origin browser calls, the client sends `credentials: "include"` and the Worker returns `Access-Control-Allow-Credentials: true` with an exact allow-listed origin.
 
 The authenticated health response reports `ready: true` only when the provider secret, rate-limit binding, and origin allow-list are configured. The UI must remain disabled otherwise.
 
@@ -59,6 +59,8 @@ Treat all client input, retrieved memory, external documents, and model output a
 - [ ] Provider key revoked and replacement created.
 - [ ] Cloudflare Worker Secret configured.
 - [ ] Exact ALLOWED_ORIGINS configured.
+- [ ] Cloudflare Access CORS preflight settings match the Worker origin, methods, headers, and credential response.
+- [ ] Cross-origin browser session verified with credentials included and OPTIONS preflight successful.
 - [ ] Worker deployed and health endpoint verified.
 - [ ] Service-to-service authentication configured and tested.
 - [ ] Rate limits and spending caps tested.
