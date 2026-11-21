@@ -57,18 +57,25 @@ export function createIndexedDBMemoryAdapter({
         settled = true;
         reject(error || new Error("indexeddb_transaction_failed"));
       };
-      let request;
+      let requests;
+      let multiple = false;
       try {
-        request = operation(tx.objectStore(storeName));
+        const result = operation(tx.objectStore(storeName));
+        multiple = Array.isArray(result);
+        requests = multiple ? result : result ? [result] : [];
       } catch (error) {
         fail(error);
         try { tx.abort(); } catch {}
         return;
       }
-      if (request) {
-        request.onsuccess = () => { value = request.result; };
+      const results = [];
+      requests.forEach((request, index) => {
+        request.onsuccess = () => {
+          results[index] = request.result;
+          value = multiple ? results : results[0];
+        };
         request.onerror = () => fail(request.error);
-      }
+      });
       tx.oncomplete = () => {
         if (settled) return;
         settled = true;
@@ -88,6 +95,10 @@ export function createIndexedDBMemoryAdapter({
     },
     addRecord(record) {
       return transact("readwrite", store => store.add(record));
+    },
+    addRecords(records) {
+      if (!Array.isArray(records)) return Promise.reject(new TypeError("records_must_be_array"));
+      return transact("readwrite", store => records.map(record => store.add(record)));
     },
     async close() {
       if (!databasePromise) return;
