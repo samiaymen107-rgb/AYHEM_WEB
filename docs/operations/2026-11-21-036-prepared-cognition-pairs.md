@@ -4,8 +4,10 @@
 - Repository: `samiaymen107-rgb/AYHEM_WEB`
 - Branch: `development/036-prepared-cognition-pairs`
 - Base: `main` after merged PR #23
-- Status: IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED
-- Stage completion: **75% implementation**; parity, Node, Chromium and benchmark CI remain.
+- Status: MERGED / NODE + CHROMIUM + BENCHMARK CI VERIFIED / PAGES NOT RECONFIRMED
+- Pull request: #24
+- Merge commit: `c57c6a91078828d64b000b908ad8328145e0b30a`
+- Stage completion: **100%**; parity, Node, Chromium, benchmark CI and merge verified.
 - Overall AYHEM engineering progress: **44.75% provisional**, unchanged.
 
 ## Post-merge evidence for operation 035
@@ -46,6 +48,14 @@ Changes:
 - Stage completion: **75% implementation**; Node/Chromium/benchmark CI and merge remain.
 - Overall AYHEM engineering progress: **44.75% provisional**, unchanged.
 - Production readiness and live AI connectivity remain unverified.
+
+## Verification results
+
+- AYHEM Black Box Tests run `44922079742`: Node foundation tests, real Chromium tests and benchmark smoke all passed.
+- AYHEM Governance Tests run `44922079745`: passed.
+- Dense 1,000-record workload: 884.78 ms observed versus 1,784.23 ms in operation 035 (about 50.4% lower on comparable CI runner classes).
+- Sparse 1,000-record workload: 9.18 ms versus 9.12 ms; no meaningful regression is inferred from this small timing difference.
+- These timings are observational, not hardware-independent guarantees.
 
 ## Next step
 
