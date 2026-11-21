@@ -43,6 +43,7 @@
 
 ## الفهرس
 
+- [2026-11-21-052-explicit-consent-sync-transport.md](./2026-11-21-052-explicit-consent-sync-transport.md) — عميل دفع HTTPS بموافقة صريحة، مع SHA-256 وحدود payload والتحقق بعد الدمج (Node وChromium وPages SUCCESS).
 - [2026-11-21-050-post-merge-049-atomic-memory-outbox.md](./2026-11-21-050-post-merge-049-atomic-memory-outbox.md) — التحقق بعد الدمج: الذرية المحلية للذاكرة وoutbox واختبارات Node وChromium وPages.
 - [2026-11-21-048-durable-local-sync-outbox.md](./2026-11-21-048-durable-local-sync-outbox.md) — صندوق مزامنة محلي دائم، اختبارات Node وChromium، وبروتوكول خادم موثق (CLOUD NOT DEPLOYED).
 - [2026-11-21-047-post-merge-043-verification.md](./2026-11-21-047-post-merge-043-verification.md) — التحقق بعد الدمج والاختبارات والنشر للعملية 043.
@@ -50,7 +51,7 @@
 - [2026-11-21-044-consented-sensory-learning.md](./2026-11-21-044-consented-sensory-learning.md) — طبقة الحواس الرقمية والتعلّم التلقائي المصرّح به (MERGED / BLACK BOX + GOVERNANCE + PAGES VERIFIED).
 
 - [الفهرس الموضوعي والعناوين الرسمية لجميع التقارير](./REPORT_CATALOG.md): يضم العناوين العربية المصنفة والروابط الثابتة وتدقيق الترقيم.
-- آخر تحقق مدمج: PR #37؛ Black Box run 44932289537 وPages run 44932288728 نجحت جميعها بعد الدمج. المزامنة السحابية غير منشورة.
+- آخر تحقق مكتمل: PR #37؛ Black Box run 44932289537 وPages run 44932288728 نجحت بعد الدمج. العملية 051 دُمجت في PR #39؛ PR CI run 44932889090 وPost-merge Black Box run 44932959990 وPages run 44932959372 نجحت. المزامنة السحابية غير منشورة.
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
