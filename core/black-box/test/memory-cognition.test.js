@@ -188,3 +188,18 @@ test("rejects malformed provenance arrays and invalid confidence", async () => {
   }]), /insight_invalid/);
   assert.equal(store.records.length, 2);
 });
+
+test("validates the entire batch before writing any derived record", async () => {
+  const store = memoryStore([
+    record("a", "the water pump is active"),
+    record("b", "the water pump is not active"),
+    record("c", "the solar inverter is active"),
+    record("d", "the solar inverter is not active"),
+  ]);
+  const cognition = createMemoryCognition({ store });
+  const valid = classifyMemoryPair(store.records[0], store.records[1]);
+  const invalid = classifyMemoryPair(store.records[2], store.records[3]);
+  invalid.provenance[0].source = "tampered-source";
+  await assert.rejects(cognition.persistInsights([valid, invalid]), /provenance_mismatch/);
+  assert.equal(store.records.length, 4);
+});
