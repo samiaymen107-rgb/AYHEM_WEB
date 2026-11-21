@@ -29,7 +29,7 @@ test("does not enable chat when provider secret is not configured", async () => 
   const result = await mountAyhemAIUI({
     documentRef,
     windowRef: {},
-    clientFactory: () => ({ health: async () => ({ aiConfigured: false }) }),
+    clientFactory: () => ({ health: async () => ({ aiConfigured: false, rateLimitConfigured: false, ready: false }) }),
   });
   assert.equal(result.state, "provider-not-configured");
   assert.equal(documentRef.elements.aiSendBtn.disabled, true);
@@ -42,7 +42,7 @@ test("enables chat only after a positive health check and safely renders text", 
     documentRef,
     windowRef: {},
     clientFactory: () => ({
-      health: async () => ({ aiConfigured: true }),
+      health: async () => ({ aiConfigured: true, rateLimitConfigured: true, ready: true }),
       ask: async prompt => { received = prompt; return { output: "<script>not HTML</script>" }; },
     }),
   });
