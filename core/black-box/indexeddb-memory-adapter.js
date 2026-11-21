@@ -19,7 +19,7 @@ export function createIndexedDBMemoryAdapter({
     let openingPromise;
     openingPromise = new Promise((resolve, reject) => {
       let settled = false;
-      const request = indexedDBImpl.open(dbName, 1);
+      const request = indexedDBImpl.open(dbName, 2);
       request.onupgradeneeded = () => {
         const db = request.result;
         if (!db.objectStoreNames.contains(storeName)) {
@@ -27,6 +27,13 @@ export function createIndexedDBMemoryAdapter({
           store.createIndex("createdAt", "createdAt", { unique: false });
           store.createIndex("type", "type", { unique: false });
           store.createIndex("status", "status", { unique: false });
+        }
+        const recordStore = request.transaction.objectStore(storeName);
+        if (!recordStore.indexNames.contains("tags")) {
+          // Multi-entry indexing makes tag existence checks proportional to
+          // the matching tag range instead of scanning every stored record.
+          // The lookup and append remain inside one readwrite transaction.
+          recordStore.createIndex("tags", "tags", { unique: false, multiEntry: true });
         }
       };
       request.onsuccess = () => {
@@ -128,12 +135,11 @@ export function createIndexedDBMemoryAdapter({
           settled = true;
           reject(error || new Error("indexeddb_transaction_failed"));
         };
-        const scan = tx.objectStore(storeName).getAll();
+        const recordStore = tx.objectStore(storeName);
+        const scan = recordStore.index("tags").get(tag);
         scan.onsuccess = () => {
-          if (scan.result.some(item => Array.isArray(item.tags) && item.tags.includes(tag))) {
-            return;
-          }
-          const add = tx.objectStore(storeName).add(record);
+          if (scan.result !== undefined) return;
+          const add = recordStore.add(record);
           add.onsuccess = () => { inserted = true; };
           add.onerror = () => fail(add.error);
         };

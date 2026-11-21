@@ -10,7 +10,7 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 - `memory-cognition.js`: bounded, deterministic lexical relationship signals with provenance; not general semantic understanding or fact verification. Derived observations are explicitly marked as inference.
 - `memory-integrity.js`: deterministic structural inspection of supersedes lineage, current records, missing references, chronology violations and cycles; it does not infer semantic truth or contradictions.
 - `memory-link-compat.js`: explicit facade for legacy synchronous MemoryLink and the asynchronous canonical store; no implicit mirroring or migration.
-- `indexeddb-memory-adapter.js`: browser IndexedDB persistence adapter; it does not silently fall back to localStorage.
+- `indexeddb-memory-adapter.js`: browser IndexedDB persistence adapter with a multi-entry tag index for atomic cognition de-duplication; schema v1 upgrades to v2 without rewriting records, and it does not silently fall back to localStorage.
 - `legacy-memory-preview.js`: read-only inventory of known legacy localStorage keys; reports counts and shapes without exposing stored content or changing source data.
 - `../../tools/legacy-memory-audit.html`: local browser page to run the preview and export a metadata-only report.
 - `ledger.js`: append-only hash-chained audit events using Web Crypto.
