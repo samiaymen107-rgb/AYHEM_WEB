@@ -12,7 +12,7 @@ Operations 008, 016 and 018 established the IndexedDB adapter, snapshot restore 
 
 ## Changes
 
-1. Added `core/black-box/test/browser-indexeddb.test.js`.
+1. Added `core/black-box/browser/indexeddb.test.js`.
    - Starts a temporary local HTTP server and loads the real ES modules in Chromium.
    - Uses random, isolated IndexedDB database names.
    - Verifies a duplicate-key request aborts a multi-request readwrite transaction and rolls back the earlier successful request.
