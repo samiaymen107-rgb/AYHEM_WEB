@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createMemoryStore } from "../memory-store.js";
+import { createIndexedDBMemoryAdapter } from "../indexeddb-memory-adapter.js";
 
 function createTestAdapter() {
   const records = new Map();
@@ -127,6 +128,13 @@ test("rejects conflicting IDs and dangling references before import", async () =
   const danglingInspection = await target.inspectSnapshot(dangling);
   assert.equal(danglingInspection.valid, false);
   assert.ok(danglingInspection.errors.some(error => error.includes("supersedes_target_missing")));
+});
+
+test("fails closed when browser IndexedDB is unavailable", () => {
+  assert.throws(
+    () => createIndexedDBMemoryAdapter({ indexedDBImpl: null }),
+    /indexeddb_unavailable/,
+  );
 });
 
 test("refuses invalid adapters and empty searches", async () => {
