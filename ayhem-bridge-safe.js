@@ -1,39 +1,29 @@
-// =====================================
-// AYHEM WORKER BRIDGE — FINAL (SAFE)
-// نسخة واحدة موحّدة | لا تكسر القديم
-// =====================================
-
-// 🔴 غيّر الرابط فقط حسب Worker الخاص بك
-const AYHEM_WORKER_URL = "https://ayhem-core.yourname.workers.dev";
-
 /**
- * الدالة الموحدة للتواصل مع أيهم
- * @param {string} input
- * @returns {string} output
+ * AYHEM browser bridge.
+ * Set window.AYHEM_WORKER_URL to the deployed Worker URL before loading this file.
+ * Never place API keys or private tokens in browser code.
  */
-window.talkToAyhem = async function (input) {
-  try {
-    const res = await fetch(AYHEM_WORKER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input })
-    });
+(function () {
+  "use strict";
 
-    if (!res.ok) throw new Error("NETWORK_ERROR");
-
-    const data = await res.json();
-
-    // التأكد أن الرد فعلي من U01-Σ
-    if (data && data.unit === "U01-Σ") {
-      console.log("🧠 AYHEM WORKER ACTIVE");
-      return data.output;
+  window.talkToAyhem = async function (input) {
+    const endpoint = window.AYHEM_WORKER_URL;
+    if (typeof endpoint !== "string" || !/^https:\/\//.test(endpoint)) {
+      throw new Error("AYHEM_WORKER_URL is not configured.");
+    }
+    if (typeof input !== "string" || !input.trim()) {
+      throw new TypeError("AYHEM input must be a non-empty string.");
     }
 
-    throw new Error("INVALID_CORE");
-
-  } catch (e) {
-    console.warn("⚠️ AYHEM Worker offline – fallback to local");
-    // إعادة الرد القديم كـ fallback
-    return "أنا أيهم، الاتصال مستقر الآن ✅";
-  }
-};
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input: input.trim() }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data.unit !== "U01-Σ" || typeof data.output !== "string") {
+      throw new Error(data.error || "AYHEM Worker request failed.");
+    }
+    return data.output;
+  };
+})();
