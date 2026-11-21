@@ -1,3 +1,4 @@
+import { validateMemoryRecord } from "./memory-schema.js";
 /**
  * Maps a canonical AYHEM_WEB memory record to the AYHEM-MEMORY v1 wire
  * record inside an AYHEM-LINK v1 event envelope.
@@ -51,6 +52,12 @@ export function createMemoryEventAdapter({
       if (!record || typeof record !== "object" || Array.isArray(record)) {
         throw new TypeError("memory_record_required");
       }
+      const canonical = validateMemoryRecord(record);
+      if (!canonical.valid) {
+        const error = new TypeError("canonical_memory_record_invalid");
+        error.validationErrors = canonical.errors;
+        throw error;
+      }
       requiredString(record.id, "record_id", 128);
       requiredString(record.type, "record_type", 64);
       if (!RECORD_TYPES.has(record.type)) throw new TypeError("record_type_invalid");
@@ -61,7 +68,9 @@ export function createMemoryEventAdapter({
       if (!canonicalUtc(record.createdAt)) throw new TypeError("record_created_at_invalid");
       if (!SOURCE_KINDS.has(sourceKind)) throw new TypeError("source_kind_invalid");
       requiredString(traceId, "trace_id", 128);
-      if (traceId.length < 16) throw new TypeError("trace_id_too_short");
+      if (traceId.length < 16 || !/^[A-Za-z0-9._:-]+$/.test(traceId)) {
+        throw new TypeError("trace_id_invalid");
+      }
       requiredString(eventId, "event_id", 128);
       if (eventId.length < 16 || !/^[A-Za-z0-9._:-]+$/.test(eventId)) {
         throw new TypeError("event_id_invalid");
