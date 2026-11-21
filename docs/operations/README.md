@@ -41,6 +41,7 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
+| [2026-11-21-005-ai-network-doc-sync.md](./2026-11-21-005-ai-network-doc-sync.md) | مزامنة دليل تشغيل شبكة AI مع متطلبات الأمان | DOCUMENTATION UPDATED |
 | [2026-11-21-004-ai-gateway-security.md](./2026-11-21-004-ai-gateway-security.md) | تأمين بوابة AI بمصادقة Access وحدود استخدام | SECURITY CODE / CI VERIFIED / CONFIG PENDING |
 | [2026-11-21-003-legacy-ai-compatibility.md](./2026-11-21-003-legacy-ai-compatibility.md) | توحيد واجهات AI القديمة وإصلاح معالج الإرسال | IMPLEMENTED / CI VERIFIED / LIVE PENDING |
 | [2026-11-21-002-main-ui-ai-gateway.md](./2026-11-21-002-main-ui-ai-gateway.md) | ربط الواجهة الرئيسية ببوابة AI | IMPLEMENTED / CI VERIFIED / LIVE PENDING |
