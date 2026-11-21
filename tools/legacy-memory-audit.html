@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>AYHEM — معاينة الذاكرة القديمة</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    body { max-width: 820px; margin: 2rem auto; padding: 0 1rem; line-height: 1.7; }
+    main { border: 1px solid #8886; border-radius: 14px; padding: 1.25rem; }
+    button { padding: .7rem 1rem; border: 0; border-radius: 8px; cursor: pointer; margin: .25rem; }
+    button:disabled { opacity: .55; cursor: wait; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 1rem; border-radius: 8px; background: #8882; }
+    .note { opacity: .8; font-size: .95rem; }
+    .status { font-weight: 650; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>معاينة الذاكرة القديمة — AYHEM</h1>
+    <p>هذه الأداة تقرأ مفاتيح الذاكرة المحلية المعروفة في هذا النطاق فقط، وتعرض الأعداد والأشكال والتكرارات. لا ترسل محتوى الذاكرة إلى أي خادم ولا تستخدم AI.</p>
+    <p class="note">وضع القراءة فقط: لا كتابة، لا حذف، لا ترحيل، ولا تعديل للسجلات الأصلية.</p>
+    <button id="runPreview" type="button">ابدأ المعاينة المحلية</button>
+    <button id="exportReport" type="button" disabled>تصدير تقرير المعاينة</button>
+    <p id="status" class="status" role="status" aria-live="polite">لم تبدأ المعاينة بعد.</p>
+    <pre id="report" aria-label="نتيجة المعاينة">ستظهر النتائج هنا بعد التشغيل.</pre>
+  </main>
+  <script type="module">
+    import { previewLegacyMemory } from "../core/black-box/legacy-memory-preview.js";
+
+    const runButton = document.getElementById("runPreview");
+    const exportButton = document.getElementById("exportReport");
+    const status = document.getElementById("status");
+    const reportElement = document.getElementById("report");
+    let lastReport = null;
+
+    runButton.addEventListener("click", () => {
+      runButton.disabled = true;
+      exportButton.disabled = true;
+      status.textContent = "جارٍ فحص مفاتيح التخزين محلياً...";
+      try {
+        lastReport = previewLegacyMemory();
+        reportElement.textContent = JSON.stringify(lastReport, null, 2);
+        status.textContent = "اكتملت المعاينة. لم يتم تغيير أي بيانات.";
+        exportButton.disabled = false;
+      } catch (error) {
+        lastReport = null;
+        reportElement.textContent = "تعذر إجراء المعاينة: " + String(error?.message || "unknown_error");
+        status.textContent = "فشلت المعاينة دون تعديل البيانات.";
+      } finally {
+        runButton.disabled = false;
+      }
+    });
+
+    exportButton.addEventListener("click", () => {
+      if (!lastReport) return;
+      const blob = new Blob([JSON.stringify(lastReport, null, 2)], {
+        type: "application/json;charset=utf-8",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "AYHEM-legacy-memory-preview.json";
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
