@@ -39,13 +39,14 @@
 
 ## الفهرس
 
+| التقرير | النطاق | الحالة |
+|---|---|---|
+| [2026-11-21-012-memory-retrieval.md](./2026-11-21-012-memory-retrieval.md) | استرجاع معجمي مع provenance ومرشحات موثقة | IMPLEMENTED / CI PENDING |
 | [2026-11-21-011-local-memory-audit-ui.md](./2026-11-21-011-local-memory-audit-ui.md) | واجهة تشغيل معاينة الذاكرة محلياً | UI IMPLEMENTED / CI VERIFIED |
 | [2026-11-21-010-legacy-memory-audit.md](./2026-11-21-010-legacy-memory-audit.md) | جرد الذاكرة القديمة دون تعديلها | READ-ONLY PREVIEW / CI VERIFIED |
 | [2026-11-21-009-memory-snapshot-restore.md](./2026-11-21-009-memory-snapshot-restore.md) | معاينة واستعادة نسخ الذاكرة بأمان | IMPLEMENTED / CI VERIFIED |
 | [2026-11-21-008-memory-store-foundation.md](./2026-11-21-008-memory-store-foundation.md) | تأسيس مخزن ذاكرة تراكمي مع IndexedDB | IMPLEMENTED / CI VERIFIED / MIGRATION PENDING |
 | [2026-11-21-007-ai-contract-strict-validation.md](./2026-11-21-007-ai-contract-strict-validation.md) | تشديد التحقق من UUID وجاهزية البوابة | IMPLEMENTED / CI VERIFIED |
-| التقرير | النطاق | الحالة |
-|---|---|---|
 | [2026-11-21-006-core-contract-sync.md](./2026-11-21-006-core-contract-sync.md) | مزامنة عقد V1 مع AYHEM الأساسي | CONTRACT SYNCED / CI VERIFIED |
 | [2026-11-21-005-ai-network-doc-sync.md](./2026-11-21-005-ai-network-doc-sync.md) | مزامنة دليل تشغيل شبكة AI مع متطلبات الأمان | DOCUMENTATION UPDATED |
 | [2026-11-21-004-ai-gateway-security.md](./2026-11-21-004-ai-gateway-security.md) | تأمين بوابة AI بمصادقة Access وحدود استخدام | SECURITY CODE / CI VERIFIED / CONFIG PENDING |
