@@ -68,11 +68,14 @@ export function createMemoryStore({
     async search(query) {
       if (typeof query !== "string" || !query.trim()) throw new TypeError("memory_query_required");
       const normalized = query.trim().toLocaleLowerCase();
-      const records = await this.list();
-      return records.filter(record =>
-        record.content.toLocaleLowerCase().includes(normalized) ||
-        record.tags.some(value => value.toLocaleLowerCase().includes(normalized))
-      );
+      const records = await adapter.listRecords();
+      const checked = await Promise.all(records.map(checkedRecord));
+      return checked
+        .filter(record =>
+          record.content.toLocaleLowerCase().includes(normalized) ||
+          record.tags.some(value => value.toLocaleLowerCase().includes(normalized))
+        )
+        .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
     },
 
     async exportSnapshot() {
