@@ -45,7 +45,7 @@ From this directory with Node.js 20+:
 
 - `npm test` — deterministic foundation and adapter-contract tests.
 - `npm run test:browser` — real Chromium integration tests for IndexedDB and credentialed cross-origin CORS (requires the Playwright package and Chromium browser).
-- `npm run benchmark:cognition` — synthetic sparse (1,000 records) and dense (500 records) scan benchmark; elapsed times are observational, while pair counts are validated.
+- `npm run benchmark:cognition` — synthetic sparse (1,000 records) and dense (1,000 records) scan benchmark; elapsed times are observational, while pair counts are validated.
 
 The real-browser tests verify that duplicate-key failures abort entire multi-request IndexedDB transactions, committed records survive closing and reopening, snapshot restore is idempotent, concurrent adapter connections close on `versionchange`, competing write batches preserve atomic append-only behavior across independent connections, concurrent cognition writers persist one derived insight only, and the AI client completes a cross-origin OPTIONS preflight and authenticated-session cookie transport in a real Chromium browser. CI installs the browser runtime and runs these tests separately from the fast Node suite.
 
