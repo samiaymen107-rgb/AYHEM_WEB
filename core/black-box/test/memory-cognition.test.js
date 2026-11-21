@@ -62,7 +62,7 @@ test("does not call different dates contradictory", () => {
 test("similarity is a lexical signal and preserves both sources", () => {
   const result = classifyMemoryPair(
     record("a", "olive orchard soil moisture monitoring system"),
-    record("b", "olive orchard soil moisture monitoring equipment"),
+    record("b", "olive orchard soil moisture monitoring system equipment"),
   );
   assert.equal(result.relation, "semantic_similarity");
   assert.deepEqual(result.provenance.map(item => item.source), ["source-a", "source-b"]);
