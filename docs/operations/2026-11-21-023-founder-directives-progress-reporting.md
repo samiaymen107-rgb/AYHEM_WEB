@@ -5,6 +5,8 @@
 - Branch: `governance/founder-directives-progress-metrics`
 - Base commit: `0af55ede04aae8d42cc5ab0b2ae7f7b672f1fa8a`
 - Status: IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED
+- Stage completion: **90%** (governance standard and reports committed; CI and merge remain pending)
+- Overall AYHEM engineering progress: **41% (provisional baseline)**
 
 ## Objective
 
