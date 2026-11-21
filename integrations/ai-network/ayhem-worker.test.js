@@ -119,3 +119,21 @@ test("rejects origins outside the explicit allow-list", async () => {
     assert.equal(mock.upstreamCalls(), 0);
   } finally { mock.restore(); }
 });
+
+
+test("returns credentialed CORS headers for an exact-origin preflight", async () => {
+  const response = await worker.fetch(new Request("https://gateway.example/", {
+    method: "OPTIONS",
+    headers: {
+      Origin: "https://app.example",
+      "Access-Control-Request-Method": "POST",
+      "Access-Control-Request-Headers": "content-type",
+    },
+  }), baseEnv({ limit: async () => ({ success: true }) }));
+
+  assert.equal(response.status, 204);
+  assert.equal(response.headers.get("Access-Control-Allow-Origin"), "https://app.example");
+  assert.equal(response.headers.get("Access-Control-Allow-Credentials"), "true");
+  assert.equal(response.headers.get("Access-Control-Allow-Methods"), "POST, GET, OPTIONS");
+  assert.equal(response.headers.get("Access-Control-Allow-Headers"), "Content-Type");
+});
