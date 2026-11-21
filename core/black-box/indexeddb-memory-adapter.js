@@ -19,7 +19,7 @@ export function createIndexedDBMemoryAdapter({
     let openingPromise;
     openingPromise = new Promise((resolve, reject) => {
       let settled = false;
-      const request = indexedDBImpl.open(dbName, 2);
+      const request = indexedDBImpl.open(dbName, 3);
       request.onupgradeneeded = () => {
         const db = request.result;
         if (!db.objectStoreNames.contains(storeName)) {
@@ -34,6 +34,11 @@ export function createIndexedDBMemoryAdapter({
           // the matching tag range instead of scanning every stored record.
           // The lookup and append remain inside one readwrite transaction.
           recordStore.createIndex("tags", "tags", { unique: false, multiEntry: true });
+        }
+        if (!db.objectStoreNames.contains("syncOutbox")) {
+          const outbox = db.createObjectStore("syncOutbox", { keyPath: "eventId" });
+          outbox.createIndex("status", "status", { unique: false });
+          outbox.createIndex("createdAt", "createdAt", { unique: false });
         }
       };
       request.onsuccess = () => {
@@ -161,6 +166,51 @@ export function createIndexedDBMemoryAdapter({
         };
         tx.onerror = () => fail(tx.error);
         tx.onabort = () => fail(tx.error || scan.error);
+      }));
+    },
+    enqueueSyncEvent(event) {
+      if (!event || typeof event.eventId !== "string" || !event.eventId) return Promise.reject(new TypeError("sync_event_id_required"));
+      return openDatabase().then(db => new Promise((resolve, reject) => {
+        let result; let conflict = null; let settled = false;
+        const tx = db.transaction("syncOutbox", "readwrite");
+        const store = tx.objectStore("syncOutbox");
+        const request = store.get(event.eventId);
+        request.onsuccess = () => {
+          const existing = request.result;
+          if (existing) {
+            if (existing.recordId !== event.recordId || JSON.stringify(existing.payload) !== JSON.stringify(event.payload)) {
+              conflict = new Error("sync_event_id_conflict"); try { tx.abort(); } catch {} return;
+            }
+            result = existing; return;
+          }
+          result = event; store.add(event);
+        };
+        request.onerror = () => { conflict = request.error; try { tx.abort(); } catch {} };
+        tx.oncomplete = () => { if (!settled) { settled = true; resolve(result); } };
+        tx.onerror = () => { if (!settled) { settled = true; reject(conflict || tx.error || new Error("sync_outbox_write_failed")); } };
+        tx.onabort = () => { if (!settled) { settled = true; reject(conflict || tx.error || new Error("sync_outbox_write_aborted")); } };
+      }));
+    },
+    listSyncEvents() {
+      return openDatabase().then(db => new Promise((resolve, reject) => {
+        const tx = db.transaction("syncOutbox", "readonly");
+        const request = tx.objectStore("syncOutbox").getAll();
+        let result = []; request.onsuccess = () => { result = request.result; };
+        tx.oncomplete = () => resolve(result);
+        tx.onerror = () => reject(tx.error || new Error("sync_outbox_read_failed"));
+        tx.onabort = () => reject(tx.error || new Error("sync_outbox_read_aborted"));
+      }));
+    },
+    updateSyncEvent(eventId, patch) {
+      if (typeof eventId !== "string" || !eventId || !patch || typeof patch !== "object") return Promise.reject(new TypeError("sync_event_update_invalid"));
+      return openDatabase().then(db => new Promise((resolve, reject) => {
+        const tx = db.transaction("syncOutbox", "readwrite");
+        const store = tx.objectStore("syncOutbox"); const request = store.get(eventId);
+        let updated = null;
+        request.onsuccess = () => { if (!request.result) { try { tx.abort(); } catch {} return; } updated = { ...request.result, ...patch, eventId }; store.put(updated); };
+        tx.oncomplete = () => resolve(updated);
+        tx.onerror = () => reject(tx.error || new Error("sync_outbox_update_failed"));
+        tx.onabort = () => reject(tx.error || new Error("sync_outbox_event_not_found"));
       }));
     },
     async close() {

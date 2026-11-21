@@ -178,7 +178,7 @@ test("real Chromium IndexedDB: version-1 records migrate to an indexed tag looku
     assert.equal(result.duplicateInserted, false, "the migrated tag index must find existing version-1 tags");
     assert.equal(result.uniqueInserted, true, "a new tag must append successfully");
     assert.deepEqual(result.ids, ["legacy-derived", "new-derived"]);
-    assert.equal(result.version, 2, "the adapter must upgrade the database to schema version 2");
+    assert.equal(result.version, 3, "the adapter must upgrade the database to schema version 3");
   } finally {
     await page.close();
   }
@@ -202,7 +202,7 @@ test("real Chromium IndexedDB: concurrent adapter connections close on versionch
       let blocked = false;
       let upgradeObserved = false;
       const upgraded = await new Promise((resolveUpgrade, rejectUpgrade) => {
-        const request = indexedDB.open(dbName, 3);
+        const request = indexedDB.open(dbName, 4);
         const timeout = setTimeout(() => rejectUpgrade(new Error("version_upgrade_timed_out")), 5000);
         request.onblocked = () => { blocked = true; };
         request.onerror = () => {
@@ -231,7 +231,7 @@ test("real Chromium IndexedDB: concurrent adapter connections close on versionch
 
     assert.equal(result.blocked, false, "adapter connections must close in response to versionchange");
     assert.equal(result.upgradeObserved, true, "the version upgrade must execute");
-    assert.equal(result.version, 3);
+    assert.equal(result.version, 4);
   } finally {
     await page.close();
   }
@@ -419,6 +419,47 @@ test("real Chromium IndexedDB: cognition persistence checks existing fingerprint
     assert.equal(result.secondSkipped, 1);
     assert.equal(result.derivedCount, 1);
     assert.equal(result.listCalls, 0, "persistence must not call list/getAll to check known fingerprints");
+  } finally {
+    await page.close();
+  }
+});
+
+
+test("real Chromium IndexedDB: sync outbox survives reopen and keeps delivery history", async () => {
+  const page = await browser.newPage();
+  try {
+    await page.goto(origin);
+    const result = await page.evaluate(async () => {
+      const { createIndexedDBMemoryAdapter } = await import("/core/black-box/indexeddb-memory-adapter.js");
+      const { createSyncOutbox } = await import("/core/black-box/sync-outbox.js");
+      const dbName = `AYHEM_SYNC_OUTBOX_${crypto.randomUUID()}`;
+      const adapter = createIndexedDBMemoryAdapter({ dbName });
+      const outbox = createSyncOutbox({ adapter, now: () => "2026-11-21T14:00:00.000Z" });
+      const record = { id: "memory-sync-1", type: "fact", content: "Persist locally before remote sync.", status: "documented", createdAt: "2026-11-21T13:00:00.000Z", source: "browser-outbox-test", confidence: 1, supersedes: [], tags: ["sync"] };
+      const queued = await outbox.enqueue(record);
+      await adapter.close();
+      const reopenedAdapter = createIndexedDBMemoryAdapter({ dbName });
+      const reopenedOutbox = createSyncOutbox({ adapter: reopenedAdapter, now: () => "2026-11-21T14:01:00.000Z" });
+      const pending = await reopenedOutbox.pending();
+      const delivered = await reopenedOutbox.markDelivered(queued.eventId);
+      await reopenedAdapter.close();
+      const finalAdapter = createIndexedDBMemoryAdapter({ dbName });
+      const finalEvents = await finalAdapter.listSyncEvents();
+      await finalAdapter.close();
+      await new Promise((resolveDelete, rejectDelete) => {
+        const request = indexedDB.deleteDatabase(dbName);
+        request.onsuccess = resolveDelete;
+        request.onerror = () => rejectDelete(request.error || new Error("database_cleanup_failed"));
+        request.onblocked = () => rejectDelete(new Error("database_cleanup_blocked"));
+      });
+      return { queuedStatus: queued.status, pendingCount: pending.length, pendingContent: pending[0]?.payload.content, deliveredStatus: delivered.status, finalCount: finalEvents.length, finalStatus: finalEvents[0]?.status };
+    });
+    assert.equal(result.queuedStatus, "pending");
+    assert.equal(result.pendingCount, 1);
+    assert.equal(result.pendingContent, "Persist locally before remote sync.");
+    assert.equal(result.deliveredStatus, "delivered");
+    assert.equal(result.finalCount, 1, "outbox event history must not be deleted on acknowledgement");
+    assert.equal(result.finalStatus, "delivered");
   } finally {
     await page.close();
   }
