@@ -167,3 +167,63 @@ test("real Chromium IndexedDB: concurrent adapter connections close on versionch
     await page.close();
   }
 });
+
+
+test("real Chromium IndexedDB: concurrent duplicate batches preserve atomic append-only writes", async () => {
+  const page = await browser.newPage();
+  try {
+    await page.goto(origin);
+    const result = await page.evaluate(async () => {
+      const { createIndexedDBMemoryAdapter } = await import("/core/black-box/indexeddb-memory-adapter.js");
+      const dbName = `AYHEM_022_CONCURRENT_WRITE_${crypto.randomUUID()}`;
+      const first = createIndexedDBMemoryAdapter({ dbName });
+      const second = createIndexedDBMemoryAdapter({ dbName });
+
+      const leftBatch = [
+        { id: "shared-id", payload: "left-wins-if-committed" },
+        { id: "left-only", payload: "left-unique-record" },
+      ];
+      const rightBatch = [
+        { id: "shared-id", payload: "right-wins-if-committed" },
+        { id: "right-only", payload: "right-unique-record" },
+      ];
+
+      const outcomes = await Promise.allSettled([
+        first.addRecords(leftBatch),
+        second.addRecords(rightBatch),
+      ]);
+      const committed = outcomes.filter(item => item.status === "fulfilled").length;
+      const rejected = outcomes.filter(item => item.status === "rejected").length;
+      const records = await first.listRecords();
+      const shared = records.find(record => record.id === "shared-id");
+
+      await first.close();
+      await second.close();
+      await new Promise((resolveDelete, rejectDelete) => {
+        const request = indexedDB.deleteDatabase(dbName);
+        request.onsuccess = resolveDelete;
+        request.onerror = () => rejectDelete(request.error || new Error("database_cleanup_failed"));
+        request.onblocked = () => rejectDelete(new Error("database_cleanup_blocked"));
+      });
+
+      return {
+        committed,
+        rejected,
+        ids: records.map(record => record.id).sort(),
+        sharedPayload: shared?.payload,
+      };
+    });
+
+    assert.equal(result.committed, 1, "exactly one competing transaction must commit");
+    assert.equal(result.rejected, 1, "the competing duplicate-key transaction must abort");
+    assert.equal(result.ids.includes("shared-id"), true);
+    assert.equal(result.ids.length, 2, "the failed transaction's unique row must also roll back");
+    assert.equal(result.ids.includes("left-only") !== result.ids.includes("right-only"), true);
+    assert.ok(
+      result.sharedPayload === "left-wins-if-committed" || result.sharedPayload === "right-wins-if-committed",
+      "the original shared record must be preserved from exactly one committed batch",
+    );
+  } finally {
+    await page.close();
+  }
+});
