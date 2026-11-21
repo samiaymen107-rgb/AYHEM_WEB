@@ -41,7 +41,9 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-020-indexeddb-open-lifecycle.md](./2026-11-21-020-indexeddb-open-lifecycle.md) | معالجة اتصال IndexedDB المتأخر بعد blocked وحماية إعادة المحاولة | IMPLEMENTED / CI PENDING / NOT MERGED |\n| [2026-11-21-019-real-browser-indexeddb-tests.md](./2026-11-21-019-real-browser-indexeddb-tests.md) | اختبار IndexedDB في Chromium: atomic rollback، إعادة الفتح، واستعادة snapshot حقيقية | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-021-indexeddb-versionchange-contention.md](./2026-11-21-021-indexeddb-versionchange-contention.md) | اختبار اتصالات IndexedDB المتزامنة وإغلاقها عند versionchange قبل ترقية المخطط | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-020-indexeddb-open-lifecycle.md](./2026-11-21-020-indexeddb-open-lifecycle.md) | معالجة اتصال IndexedDB المتأخر بعد blocked وحماية إعادة المحاولة | MERGED / CI VERIFIED / PAGES DEPLOYED |
+| [2026-11-21-019-real-browser-indexeddb-tests.md](./2026-11-21-019-real-browser-indexeddb-tests.md) | اختبار IndexedDB في Chromium: atomic rollback، إعادة الفتح، واستعادة snapshot حقيقية | MERGED / CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-018-cognition-provenance-validation.md](./2026-11-21-018-cognition-provenance-validation.md) | التحقق من مصدر الاستنتاجات وصحة provenance قبل الحفظ ومنع الكتابة الجزئية بسبب مدخلات غير صالحة | MERGED / CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-017-cognition-engine.md](./2026-11-21-017-cognition-engine.md) | محرك إدراك أولي محافظ مع provenance وتصنيف إشارات العلاقات دون تعديل الذاكرة الأصلية | IMPLEMENTED / CI VERIFIED #84 / HUMAN REVIEW REQUIRED |
 | [2026-11-21-016-memory-restore-contract.md](./2026-11-21-016-memory-restore-contract.md) | عقد استعادة snapshots على دفعات ومنع الكتابة عند وجود تعارض | COMMITTED / CI VERIFIED ON d5cd290 / REAL-BROWSER INDEXEDDB PENDING |

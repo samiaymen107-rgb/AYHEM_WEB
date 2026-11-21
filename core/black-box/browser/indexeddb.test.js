@@ -114,3 +114,56 @@ test("real Chromium IndexedDB: atomic batch rollback, persistence, and snapshot 
     await page.close();
   }
 });
+
+
+test("real Chromium IndexedDB: concurrent adapter connections close on versionchange", async () => {
+  const page = await browser.newPage();
+  try {
+    await page.goto(origin);
+    const result = await page.evaluate(async () => {
+      const { createIndexedDBMemoryAdapter } = await import("/core/black-box/indexeddb-memory-adapter.js");
+      const dbName = `AYHEM_021_VERSIONCHANGE_${crypto.randomUUID()}`;
+      const first = createIndexedDBMemoryAdapter({ dbName });
+      const second = createIndexedDBMemoryAdapter({ dbName });
+
+      // Two independent adapters hold two connections to the same database.
+      await first.getRecord("missing");
+      await second.listRecords();
+
+      let blocked = false;
+      let upgradeObserved = false;
+      const upgraded = await new Promise((resolveUpgrade, rejectUpgrade) => {
+        const request = indexedDB.open(dbName, 2);
+        const timeout = setTimeout(() => rejectUpgrade(new Error("version_upgrade_timed_out")), 5000);
+        request.onblocked = () => { blocked = true; };
+        request.onerror = () => {
+          clearTimeout(timeout);
+          rejectUpgrade(request.error || new Error("version_upgrade_failed"));
+        };
+        request.onupgradeneeded = () => { upgradeObserved = true; };
+        request.onsuccess = () => {
+          clearTimeout(timeout);
+          resolveUpgrade(request.result);
+        };
+      });
+
+      const version = upgraded.version;
+      upgraded.close();
+      await first.close();
+      await second.close();
+      await new Promise((resolveDelete, rejectDelete) => {
+        const request = indexedDB.deleteDatabase(dbName);
+        request.onsuccess = resolveDelete;
+        request.onerror = () => rejectDelete(request.error || new Error("database_cleanup_failed"));
+        request.onblocked = () => rejectDelete(new Error("database_cleanup_blocked"));
+      });
+      return { blocked, upgradeObserved, version };
+    });
+
+    assert.equal(result.blocked, false, "adapter connections must close in response to versionchange");
+    assert.equal(result.upgradeObserved, true, "the version upgrade must execute");
+    assert.equal(result.version, 2);
+  } finally {
+    await page.close();
+  }
+});
