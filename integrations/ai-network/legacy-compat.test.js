@@ -13,7 +13,7 @@ test("legacy adapter checks provider readiness and preserves output shape", asyn
     clientFactory: ({ endpoint }) => {
       assert.equal(endpoint, "https://gateway.example");
       return {
-        health: async () => ({ aiConfigured: true }),
+        health: async () => ({ aiConfigured: true, rateLimitConfigured: true, ready: true }),
         ask: async input => ({ output: `answer: ${input}`, unit: "U01-Σ", requestId: "req-2" }),
       };
     },
@@ -30,7 +30,7 @@ test("legacy adapter refuses to send when provider is not ready", async () => {
   const send = createAyhemLegacyAdapter({
     endpointResolver: () => "https://gateway.example",
     clientFactory: () => ({
-      health: async () => ({ aiConfigured: false }),
+      health: async () => ({ aiConfigured: false, rateLimitConfigured: false, ready: false }),
       ask: async () => { throw new Error("must not call ask"); },
     }),
   });
