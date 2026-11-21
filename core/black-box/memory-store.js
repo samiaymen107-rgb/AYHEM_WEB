@@ -174,6 +174,16 @@ export function createMemoryStore({
 
     list: listRecords,
 
+    findExistingTags: typeof adapter.findExistingTags === "function"
+      ? async tags => {
+        if (!Array.isArray(tags) || tags.some(tag => typeof tag !== "string" || !tag)) {
+          throw new TypeError("memory_tags_must_be_nonempty_strings");
+        }
+        const uniqueTags = [...new Set(tags)];
+        return adapter.findExistingTags(uniqueTags);
+      }
+      : undefined,
+
     search: async query => {
       if (typeof query !== "string" || !query.trim()) throw new TypeError("memory_query_required");
       const normalized = query.trim().toLocaleLowerCase();

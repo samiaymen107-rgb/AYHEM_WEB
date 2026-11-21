@@ -13,6 +13,9 @@ function memoryStore(records) {
   const data = [...records];
   return {
     async list() { return [...data]; },
+    async findExistingTags(tags) {
+      return tags.filter(tag => data.some(item => (item.tags ?? []).includes(tag)));
+    },
     async get(id) { return data.find(item => item.id === id) ?? null; },
     async append(input) {
       const item = Object.freeze({ ...input, id: `derived-${data.length + 1}`,
@@ -269,4 +272,31 @@ test("indexed candidate scan preserves exhaustive classifications and determinis
   assert.deepEqual(indexed.insights, knownFromExhaustive);
   assert.deepEqual(indexed.counts, exhaustive.counts);
   assert.ok(indexed.candidatePairCount <= indexed.pairCount);
+});
+
+
+test("uses indexed existing-tag lookup instead of listing the full memory during persistence", async () => {
+  const store = memoryStore([
+    record("a", "the water pump is active"),
+    record("b", "the water pump is not active"),
+  ]);
+  let listCalls = 0;
+  let indexedLookups = 0;
+  const originalList = store.list;
+  const originalFind = store.findExistingTags;
+  store.list = async () => {
+    listCalls++;
+    return originalList();
+  };
+  store.findExistingTags = async tags => {
+    indexedLookups++;
+    return originalFind(tags);
+  };
+  const cognition = createMemoryCognition({ store });
+  const { insights } = await cognition.analyze();
+  const analysisListCalls = listCalls;
+  const result = await cognition.persistInsights(insights);
+  assert.equal(result.persisted.length, 1);
+  assert.equal(indexedLookups, 1);
+  assert.equal(listCalls, analysisListCalls, "persistence must not scan the complete memory list");
 });

@@ -229,14 +229,13 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
         throw new TypeError("cognition_store_append_and_get_required");
       }
       if (!Array.isArray(insights)) throw new TypeError("cognition_insights_must_be_array");
-      const existing = await store.list();
-      const known = new Set(existing.flatMap(record => record.tags ?? []));
       // Source records are immutable. Cache provenance reads for this batch so
       // insights sharing a source record do not issue duplicate storage reads.
       const sourceRecords = new Map();
       const persisted = [];
       const skipped = [];
-      const pending = [];
+      const candidates = [];
+      const batchTags = new Set();
       for (const insight of insights) {
         const allowedRelations = ["explicit_contradiction", "possible_tension", "semantic_similarity"];
         const validIds = Array.isArray(insight?.recordIds) && insight.recordIds.length === 2 &&
@@ -285,16 +284,30 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
         }
 
         const tag = `cognition:v1:${insight.fingerprint}`;
-        if (known.has(tag)) {
+        if (batchTags.has(tag)) {
           skipped.push(insight.fingerprint);
           continue;
         }
-        known.add(tag);
-        pending.push(insight);
+        batchTags.add(tag);
+        candidates.push(insight);
       }
 
-      // Validate every candidate before the first write, preventing malformed
-      // later entries from causing a partially persisted batch.
+      // Resolve existing fingerprints through the IndexedDB multi-entry tag
+      // index when available. Older adapters retain the list-based fallback.
+      // All insights and provenance are validated before the first write.
+      const known = typeof store.findExistingTags === "function"
+        ? new Set(await store.findExistingTags([...batchTags]))
+        : new Set((await store.list()).flatMap(record => record.tags ?? []));
+      const pending = candidates.filter(insight => {
+        const tag = `cognition:v1:${insight.fingerprint}`;
+        if (known.has(tag)) {
+          skipped.push(insight.fingerprint);
+          return false;
+        }
+        return true;
+      });
+
+      // Persist only candidates not already present in the indexed tag lookup.
       for (const insight of pending) {
         const tag = `cognition:v1:${insight.fingerprint}`;
         const content = JSON.stringify({
