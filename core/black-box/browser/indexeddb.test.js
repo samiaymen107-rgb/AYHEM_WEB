@@ -116,6 +116,75 @@ test("real Chromium IndexedDB: atomic batch rollback, persistence, and snapshot 
 });
 
 
+test("real Chromium IndexedDB: version-1 records migrate to an indexed tag lookup", async () => {
+  const page = await browser.newPage();
+  try {
+    await page.goto(origin);
+    const result = await page.evaluate(async () => {
+      const dbName = `AYHEM_038_TAG_MIGRATION_${crypto.randomUUID()}`;
+      const legacy = await new Promise((resolveOpen, rejectOpen) => {
+        const request = indexedDB.open(dbName, 1);
+        request.onupgradeneeded = () => {
+          const store = request.result.createObjectStore("records", { keyPath: "id" });
+          store.createIndex("createdAt", "createdAt", { unique: false });
+          store.createIndex("type", "type", { unique: false });
+          store.createIndex("status", "status", { unique: false });
+        };
+        request.onsuccess = () => resolveOpen(request.result);
+        request.onerror = () => rejectOpen(request.error || new Error("legacy_open_failed"));
+      });
+      const legacyRecord = {
+        id: "legacy-derived", type: "observation", content: "legacy insight",
+        status: "inference", createdAt: "2026-11-21T10:00:00.000Z",
+        source: "ayhem-cognition:v1", confidence: 0.65, supersedes: [],
+        tags: ["cognition:legacy-fingerprint"],
+      };
+      await new Promise((resolveWrite, rejectWrite) => {
+        const tx = legacy.transaction("records", "readwrite");
+        tx.objectStore("records").add(legacyRecord);
+        tx.oncomplete = resolveWrite;
+        tx.onerror = () => rejectWrite(tx.error || new Error("legacy_write_failed"));
+      });
+      legacy.close();
+
+      const { createIndexedDBMemoryAdapter } = await import("/core/black-box/indexeddb-memory-adapter.js");
+      const adapter = createIndexedDBMemoryAdapter({ dbName });
+      const duplicateInserted = await adapter.addRecordIfTagAbsent({
+        ...legacyRecord, id: "duplicate-derived",
+      }, "cognition:legacy-fingerprint");
+      const uniqueInserted = await adapter.addRecordIfTagAbsent({
+        ...legacyRecord, id: "new-derived", tags: ["cognition:new-fingerprint"],
+      }, "cognition:new-fingerprint");
+      const records = await adapter.listRecords();
+      const version = await new Promise((resolveVersion, rejectVersion) => {
+        const request = indexedDB.open(dbName);
+        request.onsuccess = () => { const db = request.result; const v = db.version; db.close(); resolveVersion(v); };
+        request.onerror = () => rejectVersion(request.error || new Error("version_read_failed"));
+      });
+      await adapter.close();
+      await new Promise((resolveDelete, rejectDelete) => {
+        const request = indexedDB.deleteDatabase(dbName);
+        request.onsuccess = resolveDelete;
+        request.onerror = () => rejectDelete(request.error || new Error("database_cleanup_failed"));
+        request.onblocked = () => rejectDelete(new Error("database_cleanup_blocked"));
+      });
+      return {
+        duplicateInserted,
+        uniqueInserted,
+        ids: records.map(item => item.id).sort(),
+        version,
+      };
+    });
+    assert.equal(result.duplicateInserted, false, "the migrated tag index must find existing version-1 tags");
+    assert.equal(result.uniqueInserted, true, "a new tag must append successfully");
+    assert.deepEqual(result.ids, ["legacy-derived", "new-derived"]);
+    assert.equal(result.version, 2, "the adapter must upgrade the database to schema version 2");
+  } finally {
+    await page.close();
+  }
+});
+
+
 test("real Chromium IndexedDB: concurrent adapter connections close on versionchange", async () => {
   const page = await browser.newPage();
   try {
@@ -133,7 +202,7 @@ test("real Chromium IndexedDB: concurrent adapter connections close on versionch
       let blocked = false;
       let upgradeObserved = false;
       const upgraded = await new Promise((resolveUpgrade, rejectUpgrade) => {
-        const request = indexedDB.open(dbName, 2);
+        const request = indexedDB.open(dbName, 3);
         const timeout = setTimeout(() => rejectUpgrade(new Error("version_upgrade_timed_out")), 5000);
         request.onblocked = () => { blocked = true; };
         request.onerror = () => {
@@ -162,7 +231,7 @@ test("real Chromium IndexedDB: concurrent adapter connections close on versionch
 
     assert.equal(result.blocked, false, "adapter connections must close in response to versionchange");
     assert.equal(result.upgradeObserved, true, "the version upgrade must execute");
-    assert.equal(result.version, 2);
+    assert.equal(result.version, 3);
   } finally {
     await page.close();
   }
