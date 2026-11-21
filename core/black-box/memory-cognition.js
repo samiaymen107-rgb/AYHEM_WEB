@@ -175,19 +175,57 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
     },
 
     async persistInsights(insights) {
-      if (typeof store.append !== "function") throw new TypeError("cognition_store_append_required");
+      if (typeof store.append !== "function" || typeof store.get !== "function") {
+        throw new TypeError("cognition_store_append_and_get_required");
+      }
       if (!Array.isArray(insights)) throw new TypeError("cognition_insights_must_be_array");
       const existing = await store.list();
       const known = new Set(existing.flatMap(record => record.tags ?? []));
       const persisted = [];
       const skipped = [];
       for (const insight of insights) {
-        if (!insight || insight.method !== VERSION ||
-            !["explicit_contradiction", "possible_tension", "semantic_similarity"].includes(insight.relation) ||
-            !Array.isArray(insight.recordIds) || insight.recordIds.length !== 2 ||
-            !insight.provenance || typeof insight.fingerprint !== "string") {
+        const allowedRelations = ["explicit_contradiction", "possible_tension", "semantic_similarity"];
+        const validIds = Array.isArray(insight?.recordIds) && insight.recordIds.length === 2 &&
+          insight.recordIds.every(id => typeof id === "string" && id.length > 0) &&
+          insight.recordIds[0] !== insight.recordIds[1] &&
+          insight.recordIds[0] < insight.recordIds[1];
+        const validProvenance = Array.isArray(insight?.provenance) && insight.provenance.length === 2 &&
+          insight.provenance.every((item, index) => item && item.recordId === insight.recordIds?.[index] &&
+            typeof item.source === "string" && typeof item.status === "string" &&
+            typeof item.type === "string" && typeof item.createdAt === "string" &&
+            Number.isFinite(item.confidence) && item.confidence >= 0 && item.confidence <= 1);
+        const validEvidence = insight?.evidence && typeof insight.evidence === "object" &&
+          Array.isArray(insight.evidence.sharedWords) &&
+          insight.evidence.sharedWords.every(word => typeof word === "string") &&
+          Number.isFinite(insight.evidence.lexicalOverlap) &&
+          insight.evidence.lexicalOverlap >= 0 && insight.evidence.lexicalOverlap <= 1 &&
+          typeof insight.evidence.leftNegated === "boolean" &&
+          typeof insight.evidence.rightNegated === "boolean" &&
+          Array.isArray(insight.evidence.leftNumbers) && Array.isArray(insight.evidence.rightNumbers);
+        if (!insight || insight.method !== VERSION || !allowedRelations.includes(insight.relation) ||
+            !validIds || !validProvenance || !validEvidence ||
+            typeof insight.reason !== "string" || !insight.reason ||
+            !Number.isFinite(insight.confidence) || insight.confidence < 0 || insight.confidence > 1 ||
+            typeof insight.fingerprint !== "string" ||
+            !/^[0-9a-f]{8}$/.test(insight.fingerprint) ||
+            fnv1a([VERSION, insight.relation, ...insight.recordIds, insight.reason].join("|")) !== insight.fingerprint) {
           throw new TypeError("cognition_insight_invalid");
         }
+
+        for (let index = 0; index < insight.recordIds.length; index++) {
+          const sourceRecord = await store.get(insight.recordIds[index]);
+          const claimed = insight.provenance[index];
+          if (!sourceRecord || sourceRecord.source === DERIVED_SOURCE ||
+              claimed.recordId !== sourceRecord.id ||
+              claimed.source !== sourceRecord.source ||
+              claimed.status !== sourceRecord.status ||
+              claimed.type !== sourceRecord.type ||
+              claimed.createdAt !== sourceRecord.createdAt ||
+              claimed.confidence !== sourceRecord.confidence) {
+            throw new TypeError("cognition_insight_provenance_mismatch");
+          }
+        }
+
         const tag = `cognition:v1:${insight.fingerprint}`;
         if (known.has(tag)) {
           skipped.push(insight.fingerprint);
