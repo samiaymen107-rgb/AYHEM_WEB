@@ -1,0 +1,31 @@
+{
+  "contract_set": "AYHEM_FEDERATION_V1",
+  "manifest_version": "1.0.0",
+  "federation_size": 8,
+  "validation_scope": "eight-repository-topology-and-pinned-service-schema-inventory",
+  "full_json_schema_validation": false,
+  "repositories": [
+    {"name":"AYHEM","role":"central-architecture-and-domain-contracts","layer":"foundation"},
+    {"name":"AYHEM_WEB","role":"user-application-and-web-portal","layer":"application"},
+    {"name":"astro-blog-starter-template","role":"public-site-and-presentation","layer":"presentation"},
+    {"name":"AYHEM-MEMORY","role":"persistent-memory-domain-service","layer":"service"},
+    {"name":"AYHEM-COGNITION","role":"reasoning-and-evidence-service","layer":"service"},
+    {"name":"AYHEM-AUTONOMY","role":"planning-and-orchestration-service","layer":"service"},
+    {"name":"AYHEM-GUARD","role":"security-and-authorization-service","layer":"service"},
+    {"name":"AYHEM-LINK","role":"federation-and-inter-service-contracts","layer":"integration"}
+  ],
+  "service_relationship": {
+    "first_service": "AYHEM-MEMORY",
+    "last_service": "AYHEM-LINK",
+    "relationship": "memory-is-a-domain-service-extension-over-link-federation-contracts",
+    "integration_direction": "AYHEM-MEMORY -> AYHEM-LINK event envelope",
+    "dependency_rule": "MEMORY consumes LINK contracts; LINK does not import MEMORY implementation; no circular dependency"
+  },
+  "contracts": [
+    {"service":"AYHEM-LINK","path":"schemas/event-envelope.v1.schema.json","schema_id":"https://ayhem.invalid/schemas/event-envelope.v1.schema.json","source_blob_sha":"f78463c78265fd9e243c1e19c1e516e6aec32c80","role":"shared-federation-envelope"},
+    {"service":"AYHEM-MEMORY","path":"schemas/memory-record.v1.schema.json","schema_id":"https://ayhem.local/schemas/memory-record.v1.schema.json","source_blob_sha":"b42b86b51b1ee86a0ce7dc0f222ae28eb11ca790","role":"first-domain-service-using-link-envelope"},
+    {"service":"AYHEM-COGNITION","path":"schemas/reasoning-result.v1.schema.json","schema_id":"https://ayhem.local/schemas/reasoning-result.v1.schema.json","source_blob_sha":"9c4e697c9930652232d3b6230edf98ee358e203b","role":"inventory-only"},
+    {"service":"AYHEM-GUARD","path":"schemas/authorization-request.v1.schema.json","schema_id":"https://ayhem.local/schemas/authorization-request.v1.schema.json","source_blob_sha":"ec6d67f76c85b3346892c3ec95ff4fa5e62309b4","role":"inventory-only"},
+    {"service":"AYHEM-AUTONOMY","path":"schemas/task-request.v1.schema.json","schema_id":"https://ayhem.local/schemas/task-request.v1.schema.json","source_blob_sha":"4776fde53a5513da0bb5be208dc658011af85301","role":"inventory-only"}
+  ]
+}
