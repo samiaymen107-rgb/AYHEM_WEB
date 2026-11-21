@@ -68,17 +68,9 @@ function prepare(record) {
  * for identical lexical content except for a detected negation marker.
  * Different numeric values are only a possible tension, never a fact conflict.
  */
-export function classifyMemoryPair(leftRecord, rightRecord, { similarityThreshold = 0.72 } = {}) {
-  if (!leftRecord || !rightRecord || leftRecord.id === rightRecord.id ||
-      typeof leftRecord.content !== "string" || typeof rightRecord.content !== "string") {
-    throw new TypeError("cognition_pair_requires_two_distinct_memory_records");
-  }
-  if (!Number.isFinite(similarityThreshold) || similarityThreshold < 0.5 || similarityThreshold > 1) {
-    throw new RangeError("cognition_similarity_threshold_invalid");
-  }
-
-  const left = prepare(leftRecord);
-  const right = prepare(rightRecord);
+function classifyPreparedPair(left, right, similarityThreshold) {
+  const leftRecord = left.record;
+  const rightRecord = right.record;
   const commonWords = left.words.filter(token => right.words.includes(token));
   const overlap = jaccard(left.substantive, right.substantive);
   let relation = "unknown";
@@ -125,6 +117,17 @@ export function classifyMemoryPair(leftRecord, rightRecord, { similarityThreshol
   });
 }
 
+export function classifyMemoryPair(leftRecord, rightRecord, { similarityThreshold = 0.72 } = {}) {
+  if (!leftRecord || !rightRecord || leftRecord.id === rightRecord.id ||
+      typeof leftRecord.content !== "string" || typeof rightRecord.content !== "string") {
+    throw new TypeError("cognition_pair_requires_two_distinct_memory_records");
+  }
+  if (!Number.isFinite(similarityThreshold) || similarityThreshold < 0.5 || similarityThreshold > 1) {
+    throw new RangeError("cognition_similarity_threshold_invalid");
+  }
+  return classifyPreparedPair(prepare(leftRecord), prepare(rightRecord), similarityThreshold);
+}
+
 export function createMemoryCognition({ store, maxRecords = 200, similarityThreshold = 0.72 } = {}) {
   if (!store || typeof store.list !== "function") {
     throw new TypeError("cognition_store_with_list_required");
@@ -154,6 +157,7 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
         unknown: 0,
       };
       const pairCount = records.length * (records.length - 1) / 2;
+      const preparedRecords = records.map(prepare);
       let candidatePairCount = 0;
 
       if (includeUnknown) {
@@ -161,7 +165,7 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
         // The exhaustive mode intentionally materializes every pair.
         for (let i = 0; i < records.length; i++) {
           for (let j = i + 1; j < records.length; j++) {
-            const insight = classifyMemoryPair(records[i], records[j], { similarityThreshold });
+            const insight = classifyPreparedPair(preparedRecords[i], preparedRecords[j], similarityThreshold);
             counts[insight.relation]++;
             insights.push(insight);
           }
@@ -171,7 +175,7 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
         // token. Inverted postings avoid comparing unrelated sparse records.
         const postings = new Map();
         for (let index = 0; index < records.length; index++) {
-          const uniqueTokens = new Set(prepare(records[index]).substantive);
+          const uniqueTokens = new Set(preparedRecords[index].substantive);
           for (const token of uniqueTokens) {
             if (!postings.has(token)) postings.set(token, []);
             postings.get(token).push(index);
@@ -179,25 +183,24 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
         }
 
         const candidateKeys = new Set();
-        const candidates = [];
         for (const indexes of postings.values()) {
           for (let left = 0; left < indexes.length; left++) {
             for (let right = left + 1; right < indexes.length; right++) {
               const i = indexes[left];
               const j = indexes[right];
-              const key = i * records.length + j;
-              if (!candidateKeys.has(key)) {
-                candidateKeys.add(key);
-                candidates.push([i, j]);
-              }
+              candidateKeys.add(i * records.length + j);
             }
           }
         }
-        candidates.sort((left, right) => left[0] - right[0] || left[1] - right[1]);
-        candidatePairCount = candidates.length;
+        // Numeric pair keys avoid allocating a second array object for every
+        // candidate pair. Sorting preserves the original i/j traversal order.
+        const orderedKeys = [...candidateKeys].sort((left, right) => left - right);
+        candidatePairCount = orderedKeys.length;
 
-        for (const [i, j] of candidates) {
-          const insight = classifyMemoryPair(records[i], records[j], { similarityThreshold });
+        for (const key of orderedKeys) {
+          const i = Math.floor(key / records.length);
+          const j = key % records.length;
+          const insight = classifyPreparedPair(preparedRecords[i], preparedRecords[j], similarityThreshold);
           counts[insight.relation]++;
           if (insight.relation !== "unknown") insights.push(insight);
         }

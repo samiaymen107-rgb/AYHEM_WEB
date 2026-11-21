@@ -2,7 +2,7 @@
 
 - تاريخ الفهرسة: 2026-11-21
 - المستودع: `samiaymen107-rgb/AYHEM_WEB`
-- العدد: **34 تقريراً موجوداً**.
+- العدد: **35 تقريراً موجوداً**.
 - يثبت عمود «العنوان الأصلي» نص عنوان H1 كما ظهر في أول أسطر الملف؛ وعمود «عنوان الفهرسة» ترجمة/وصف عربي لتسهيل التصفح. الروابط تستخدم أسماء الملفات الأصلية دون إعادة تسمية.
 
 ## شبكة AI والربط
@@ -81,3 +81,4 @@
 | 033 | AYHEM 033 — Indexed cognition scans and sparse-pair optimization | تسريع تحليل الذاكرة بفهرس الرموز | [فتح التقرير](./2026-11-21-033-indexed-cognition-scan.md) |
 | 034 | AYHEM 034 — Dense and sparse cognition scan benchmarks | قياس أداء الإدراك في الذاكرة المتناثرة والكثيفة | [فتح التقرير](./2026-11-21-034-dense-cognition-benchmark.md) |
 | 035 | AYHEM 035 — Full-ceiling dense cognition benchmark | اختبار الحد الأقصى للذاكرة الكثيفة | [فتح التقرير](./2026-11-21-035-full-ceiling-dense-benchmark.md) |
+| 036 | AYHEM 036 — Prepared cognition records and compact candidate keys | تقليل كلفة تجهيز أزواج الذاكرة | [فتح التقرير](./2026-11-21-036-prepared-cognition-pairs.md) |
