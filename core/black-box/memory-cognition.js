@@ -183,6 +183,7 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
       const known = new Set(existing.flatMap(record => record.tags ?? []));
       const persisted = [];
       const skipped = [];
+      const pending = [];
       for (const insight of insights) {
         const allowedRelations = ["explicit_contradiction", "possible_tension", "semantic_similarity"];
         const validIds = Array.isArray(insight?.recordIds) && insight.recordIds.length === 2 &&
@@ -231,6 +232,14 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
           skipped.push(insight.fingerprint);
           continue;
         }
+        known.add(tag);
+        pending.push(insight);
+      }
+
+      // Validate every candidate before the first write, preventing malformed
+      // later entries from causing a partially persisted batch.
+      for (const insight of pending) {
+        const tag = `cognition:v1:${insight.fingerprint}`;
         const content = JSON.stringify({
           relation: insight.relation,
           reason: insight.reason,
@@ -248,7 +257,6 @@ export function createMemoryCognition({ store, maxRecords = 200, similarityThres
           confidence: Math.min(...insight.provenance.map(item => item.confidence)) * insight.confidence,
           tags: ["derived", "cognition", tag],
         });
-        known.add(tag);
         persisted.push(record);
       }
       return Object.freeze({
