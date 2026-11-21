@@ -44,11 +44,12 @@
 ## الفهرس
 
 - [الفهرس الموضوعي والعناوين الرسمية لجميع التقارير](./REPORT_CATALOG.md): يضم العناوين العربية المصنفة والروابط الثابتة وتدقيق الترقيم.
-- آخر تحقق: PR #21 merged؛ Black Box run 44921359091 وGovernance run 44921359108 نجحا. Pages post-merge لم يُتحقق منه بعد.
+- آخر تحقق: PR #22 merged؛ Black Box run 44921604148 وGovernance run 44921604169 نجحا. Pages post-merge لم يُتحقق منه بعد.
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-034-dense-cognition-benchmark.md](./2026-11-21-034-dense-cognition-benchmark.md) | قياس سلوك محرك الإدراك في الذاكرة المتناثرة والكثيفة وإضافة benchmark إلى CI | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-035-full-ceiling-dense-benchmark.md](./2026-11-21-035-full-ceiling-dense-benchmark.md) | توسيع اختبار الذاكرة الكثيفة إلى الحد الأقصى 1,000 سجل | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-034-dense-cognition-benchmark.md](./2026-11-21-034-dense-cognition-benchmark.md) | قياس سلوك محرك الإدراك في الذاكرة المتناثرة والكثيفة وإضافة benchmark إلى CI | MERGED / NODE + CHROMIUM + BENCHMARK CI VERIFIED / PAGES NOT RECONFIRMED |
 | [2026-11-21-033-indexed-cognition-scan.md](./2026-11-21-033-indexed-cognition-scan.md) | تسريع تحليل الذاكرة بفهرس الرموز مع المحافظة على نتائج التصنيف الدقيقة | MERGED / NODE + CHROMIUM CI VERIFIED / PAGES NOT RECONFIRMED |
 | [2026-11-21-032-atomic-cognition-idempotency.md](./2026-11-21-032-atomic-cognition-idempotency.md) | منع حفظ الاستنتاج الإدراكي نفسه مرتين عند تنافس النوافذ والاتصالات عبر معاملة IndexedDB ذرية | MERGED / NODE + CHROMIUM CI VERIFIED / PAGES NOT RECONFIRMED |
 | [2026-11-21-031-post-merge-030-reconciliation.md](./2026-11-21-031-post-merge-030-reconciliation.md) | مطابقة حالة العملية 030 بعد الدمج وتحديث الفهرس وبطاقة التقدم بالأدلة | MERGED / GOVERNANCE CI VERIFIED / PAGES NOT RECONFIRMED |
