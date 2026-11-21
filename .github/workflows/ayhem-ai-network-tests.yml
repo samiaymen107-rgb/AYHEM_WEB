@@ -5,6 +5,7 @@ on:
     paths:
       - "integrations/ai-network/**"
       - "index.html"
+      - "ayhem-fix-send.js"
       - ".github/workflows/ayhem-ai-network-tests.yml"
   push:
     branches: [main]
