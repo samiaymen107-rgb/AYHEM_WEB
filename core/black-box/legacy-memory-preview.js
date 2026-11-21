@@ -5,6 +5,7 @@ export const LEGACY_MEMORY_KEYS = Object.freeze([
   "AYHEM_LONG_MEMORY",
   "ayhemPersistentMemory",
   "AYHEM_ARCHIVE",
+  "AYHEM_ARCHIVE_BACKUP",
   "AYHEM_ARCHIVE_ADVANCED",
 ]);
 
