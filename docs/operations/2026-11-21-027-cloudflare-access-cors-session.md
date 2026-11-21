@@ -65,3 +65,13 @@ Overall engineering progress remains **44.75%** until the cross-origin flow is v
 ## Next stage
 
 Run the full Node suite and add a real-browser CORS preflight test. After the founder's Cloudflare Access application is configured, verify a browser session, authenticated health response, and one non-sensitive AI request. Do not expose tokens or prompts in logs.
+
+
+## Status correction — 2026-11-21
+
+- PR #15 merged into `main` at `48b7a17ef3b4c79e74850782d4b8cd5cf0d271c0`.
+- AI Network Client Tests passed on the PR branch and after merge.
+- Governance CI passed on the PR branch and after merge.
+- GitHub Pages deployment passed after merge.
+- Stage completion: **95%**. The remaining 5% is the Cloudflare Access application CORS configuration and real-browser verification, addressed by operation 028.
+- Overall AYHEM engineering progress remains **44.75% (provisional)** pending real-browser integration evidence and external Access configuration.
