@@ -45,7 +45,8 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-030-speed-precision-adaptive-correction.md](./2026-11-21-030-speed-precision-adaptive-correction.md) | تثبيت توجيهات المؤسس للسرعة والدقة وكشف الأخطاء والتصحيح السريع وتعديل المسار | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-031-post-merge-030-reconciliation.md](./2026-11-21-031-post-merge-030-reconciliation.md) | مطابقة حالة العملية 030 بعد الدمج وتحديث الفهرس وبطاقة التقدم بالأدلة | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-030-speed-precision-adaptive-correction.md](./2026-11-21-030-speed-precision-adaptive-correction.md) | تثبيت توجيهات المؤسس للسرعة والدقة وكشف الأخطاء والتصحيح السريع وتعديل المسار | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-029-post-merge-evidence-reconciliation.md](./2026-11-21-029-post-merge-evidence-reconciliation.md) | مطابقة تقارير 026–028 مع حالة الدمج ونتائج CI وPages وتحديث رقم آخر عملية | MERGED / GOVERNANCE CI VERIFIED / PAGES PENDING |
 | [2026-11-21-028-real-browser-access-cors.md](./2026-11-21-028-real-browser-access-cors.md) | اختبار CORS وCookie جلسة Access في Chromium حقيقي بين أصلين مختلفين | MERGED / BROWSER CI VERIFIED / PAGES DEPLOYED / LIVE ACCESS PENDING |
 | [2026-11-21-027-cloudflare-access-cors-session.md](./2026-11-21-027-cloudflare-access-cors-session.md) | إصلاح إرسال Cookie جلسة Access وتوافق CORS preflight بين المتصفح والبوابة | MERGED / AI CLIENT CI VERIFIED / PAGES DEPLOYED / ACCESS CONFIG PENDING |
@@ -70,7 +71,7 @@
 | [2026-11-21-007-ai-contract-strict-validation.md](./2026-11-21-007-ai-contract-strict-validation.md) | تشديد التحقق من UUID وجاهزية البوابة | IMPLEMENTED / CI VERIFIED |
 | [2026-11-21-006-core-contract-sync.md](./2026-11-21-006-core-contract-sync.md) | مزامنة عقد V1 مع AYHEM الأساسي | CONTRACT SYNCED / CI VERIFIED |
 | [2026-11-21-005-ai-network-doc-sync.md](./2026-11-21-005-ai-network-doc-sync.md) | مزامنة دليل تشغيل شبكة AI مع متطلبات الأمان | DOCUMENTATION UPDATED |
-| [2026-11-21-004-ai-gateway-security.md](./2026-11-21-004-ai-gateway-security.md) | تأمين بوابة AI بمصادقة Access وحدود استخدام | SECURITY CODE / CI VERIFIED / CONFIG PENDING |
+| [2026-11-21-004-ai-gateway-security.md](./2026-11-21-21-004-ai-gateway-security.md) | تأمين بوابة AI بمصادقة Access وحدود استخدام | SECURITY CODE / CI VERIFIED / CONFIG PENDING |
 | [2026-11-21-003-legacy-ai-compatibility.md](./2026-11-21-003-legacy-ai-compatibility.md) | توحيد واجهات AI القديمة وإصلاح معالج الإرسال | IMPLEMENTED / CI VERIFIED / LIVE PENDING |
 | [2026-11-21-002-main-ui-ai-gateway.md](./2026-11-21-002-main-ui-ai-gateway.md) | ربط الواجهة الرئيسية ببوابة AI | IMPLEMENTED / CI VERIFIED / LIVE PENDING |
 | [2026-11-21-001-ai-network-mesh.md](./2026-11-21-001-ai-network-mesh.md) | عميل بوابة AI وعقد الشبكة | COMMITTED / CI VERIFIED / LIVE PENDING |
