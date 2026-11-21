@@ -1,19 +1,10 @@
-// المفتاح الرئيسي للمشروع لعام 2025
-// يستخدم لتشفير البيانات والوصول إلى جميع الطبقات والملفات الحساسة داخل مشروع أيهم
-
-export const AYHEM_KEY_2025 = (() => {
-  const key = "AYHEM-2025-MASTER-KEY-ENCRYPTED";
-
-  function getKey() {
-    return key;
-  }
-
-  function validate(inputKey) {
-    return inputKey === key;
-  }
-
-  return {
-    getKey,
-    validate
-  };
-})();
+/**
+ * DEPRECATED — this file never implemented cryptographic key management.
+ * Do not use it for authentication, encryption, or authorization.
+ * Real secrets must be stored in the server-side secret manager.
+ */
+export const AYHEM_KEY_2025 = Object.freeze({
+  deprecated: true,
+  getKey() { return null; },
+  validate() { return false; },
+});
