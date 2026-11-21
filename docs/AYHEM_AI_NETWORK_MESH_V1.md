@@ -23,17 +23,31 @@ The browser must never connect directly to the AI provider and must never contai
 - HTTPS is mandatory.
 - The reusable client validates inputs and response shape, enforces a request timeout, and does not automatically retry billable POST requests.
 
+## Required Cloudflare Worker configuration
+
+The gateway now fails closed unless Cloudflare Access JWT validation is configured.
+
+- Worker Secret: `OPENAI_API_KEY` — provider credential; never commit it.
+- Worker variable: `CF_ACCESS_TEAM_DOMAIN` — the HTTPS Cloudflare Access team domain.
+- Worker variable: `CF_ACCESS_AUD` — the Access application's exact audience tag.
+- Worker variable: `ALLOWED_ORIGINS` — exact comma-separated browser origins.
+- Cloudflare Rate Limiting binding: `AI_RATE_LIMITER` — configured in Cloudflare and keyed by the verified Access subject.
+
+Protect the Worker hostname with a Cloudflare Access application so authenticated browser requests receive `Cf-Access-Jwt-Assertion`. The Worker validates its signature against Cloudflare's JWKS and checks issuer, audience, expiry, and subject. CORS is retained as a browser-origin policy, not treated as authentication.
+
+The authenticated health response reports `ready: true` only when the provider secret, rate-limit binding, and origin allow-list are configured. The UI must remain disabled otherwise.
+
 ## Security requirements before production
 
 1. Revoke the previously exposed provider key and issue a replacement.
 2. Store the replacement only as a Cloudflare Worker Secret named OPENAI_API_KEY.
-3. Configure ALLOWED_ORIGINS with exact web origins.
-4. Add authenticated service-to-service access (Cloudflare Access service tokens or an equivalent verified identity mechanism); CORS is not authentication.
-5. Add per-client rate limits, concurrency limits, request body byte limits, and provider spending limits.
-6. Return a degraded/unconfigured health status when the provider secret is absent; never equate an HTTP 200 health response with provider readiness.
+3. Configure the Access team domain, audience tag, and Access application for the Worker hostname.
+4. Configure ALLOWED_ORIGINS with exact web origins.
+5. Create the AI_RATE_LIMITER binding and set an appropriate per-user threshold and spending cap.
+6. Return a degraded/unconfigured health status unless every required binding is present.
 7. Redact prompts, credentials, and personal data from logs.
-8. Add request IDs and trace IDs across gateway and downstream services.
-9. Apply schema validation and explicit model allow-lists; clients cannot select arbitrary models.
+8. Keep request IDs and trace IDs across gateway and downstream services.
+9. Keep model selection server-controlled and validate request schemas.
 10. Keep autonomy execution disabled until policy, approvals, sandboxing, audit, and kill-switch controls are verified.
 
 ## Network trust model
