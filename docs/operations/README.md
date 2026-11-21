@@ -39,6 +39,7 @@
 
 ## الفهرس
 
+| [2026-11-21-010-legacy-memory-audit.md](./2026-11-21-010-legacy-memory-audit.md) | جرد الذاكرة القديمة دون تعديلها | READ-ONLY PREVIEW / CI VERIFIED |
 | [2026-11-21-009-memory-snapshot-restore.md](./2026-11-21-009-memory-snapshot-restore.md) | معاينة واستعادة نسخ الذاكرة بأمان | IMPLEMENTED / CI VERIFIED |
 | [2026-11-21-008-memory-store-foundation.md](./2026-11-21-008-memory-store-foundation.md) | تأسيس مخزن ذاكرة تراكمي مع IndexedDB | IMPLEMENTED / CI VERIFIED / MIGRATION PENDING |
 | [2026-11-21-007-ai-contract-strict-validation.md](./2026-11-21-007-ai-contract-strict-validation.md) | تشديد التحقق من UUID وجاهزية البوابة | IMPLEMENTED / CI VERIFIED |
