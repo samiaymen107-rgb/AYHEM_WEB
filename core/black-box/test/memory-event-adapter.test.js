@@ -105,3 +105,17 @@ test("uses the canonical memory validator and rejects invalid lineage and trace 
     traceId: "trace id with spaces",
   }), /trace_id_invalid/);
 });
+
+test("freezes the complete event envelope and nested memory payload", async () => {
+  const adapter = createMemoryEventAdapter({ digest: webcrypto.subtle });
+  const event = await adapter.toEvent(record, {
+    sourceKind: "user_input",
+    traceId: "trace-id-0000000008",
+  });
+  assert.equal(Object.isFrozen(event), true);
+  assert.equal(Object.isFrozen(event.data), true);
+  assert.equal(Object.isFrozen(event.data.source), true);
+  assert.equal(Object.isFrozen(event.data.payload), true);
+  assert.equal(Object.isFrozen(event.data.payload.tags), true);
+  assert.throws(() => event.data.payload.tags.push("mutation"), TypeError);
+});
