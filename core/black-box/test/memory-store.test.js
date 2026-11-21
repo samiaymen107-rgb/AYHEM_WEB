@@ -11,6 +11,10 @@ function createTestAdapter() {
       if (records.has(record.id)) throw new Error("duplicate_key");
       records.set(record.id, record);
     },
+    async addRecords(batch) {
+      if (batch.some(record => records.has(record.id))) throw new Error("duplicate_key");
+      for (const record of batch) records.set(record.id, record);
+    },
   };
 }
 
@@ -31,6 +35,7 @@ test("appends sourced records and keeps corrections as new records", async () =>
     id: "mem-002",
     type: "correction",
     content: "The orchard has 42 olive trees.",
+    createdAt: "2026-11-21T10:01:00.000Z",
     supersedes: ["mem-001"],
   });
 
@@ -40,11 +45,14 @@ test("appends sourced records and keeps corrections as new records", async () =>
   assert.equal((await store.list()).length, 2);
 });
 
-test("rejects duplicate IDs and dangling supersedes references", async () => {
+test("rejects duplicate IDs, missing references and non-chronological corrections", async () => {
   const store = createMemoryStore({ adapter: createTestAdapter() });
-  await store.append({ ...base, id: "mem-001" });
+  await store.append({ ...base, id: "mem-001", createdAt: "2026-11-21T10:00:00.000Z" });
   await assert.rejects(store.append({ ...base, id: "mem-001" }), /memory_id_already_exists/);
   await assert.rejects(store.append({ ...base, id: "mem-002", supersedes: ["missing"] }), /memory_supersedes_target_missing/);
+  await assert.rejects(store.append({
+    ...base, id: "mem-003", createdAt: "2026-11-21T09:00:00.000Z", supersedes: ["mem-001"],
+  }), /memory_supersedes_target_not_older/);
 });
 
 test("search and filters return only matching validated records", async () => {
@@ -59,17 +67,44 @@ test("search and filters return only matching validated records", async () => {
   assert.equal((await store.list({ tag: "weather" })).length, 1);
 });
 
-test("exports a versioned snapshot without modifying stored records", async () => {
-  const store = createMemoryStore({
+test("exports and restores a versioned snapshot idempotently", async () => {
+  const source = createMemoryStore({
     adapter: createTestAdapter(),
     now: () => "2026-11-21T12:00:00.000Z",
   });
-  await store.append({ ...base, id: "mem-001" });
-  const snapshot = await store.exportSnapshot();
-  assert.equal(snapshot.format, "AYHEM_MEMORY_SNAPSHOT");
-  assert.equal(snapshot.schemaVersion, 1);
-  assert.equal(snapshot.recordCount, 1);
-  assert.equal(snapshot.records[0].id, "mem-001");
+  await source.append({ ...base, id: "mem-001", createdAt: "2026-11-21T10:00:00.000Z" });
+  await source.append({
+    ...base, id: "mem-002", type: "correction",
+    content: "The orchard has 42 olive trees.",
+    createdAt: "2026-11-21T11:00:00.000Z",
+    supersedes: ["mem-001"],
+  });
+  const snapshot = await source.exportSnapshot();
+
+  const target = createMemoryStore({ adapter: createTestAdapter() });
+  assert.deepEqual(await target.inspectSnapshot(snapshot).then(x => ({
+    valid: x.valid, newCount: x.newRecords.length, duplicateCount: x.duplicateCount,
+  })), { valid: true, newCount: 2, duplicateCount: 0 });
+  assert.deepEqual(await target.importSnapshot(snapshot), { imported: 2, skippedDuplicates: 0 });
+  assert.deepEqual(await target.importSnapshot(snapshot), { imported: 0, skippedDuplicates: 2 });
+  assert.equal((await target.list()).length, 2);
+});
+
+test("rejects conflicting IDs and dangling references before import", async () => {
+  const target = createMemoryStore({ adapter: createTestAdapter() });
+  await target.append({ ...base, id: "mem-001" });
+  const conflict = {
+    format: "AYHEM_MEMORY_SNAPSHOT",
+    schemaVersion: 1,
+    exportedAt: "2026-11-21T12:00:00.000Z",
+    recordCount: 1,
+    records: [{ ...base, id: "mem-001", content: "Altered historical record." }],
+  };
+  const inspection = await target.inspectSnapshot(conflict);
+  assert.equal(inspection.valid, false);
+  assert.ok(inspection.errors.includes("existing_id_conflict:mem-001"));
+  await assert.rejects(target.importSnapshot(conflict), /snapshot rejected/);
+  assert.equal((await target.get("mem-001")).content, base.content);
 });
 
 test("refuses invalid adapters and empty searches", async () => {
