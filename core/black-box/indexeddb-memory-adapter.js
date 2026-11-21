@@ -115,6 +115,16 @@ export function createIndexedDBMemoryAdapter({
     listRecords() {
       return transact("readonly", store => store.getAll());
     },
+    findExistingTags(tags) {
+      if (!Array.isArray(tags) || tags.some(tag => typeof tag !== "string" || !tag)) {
+        return Promise.reject(new TypeError("memory_tags_must_be_nonempty_strings"));
+      }
+      const uniqueTags = [...new Set(tags)];
+      if (!uniqueTags.length) return Promise.resolve([]);
+      return transact("readonly", store =>
+        uniqueTags.map(tag => store.index("tags").get(tag))
+      ).then(results => uniqueTags.filter((tag, index) => results[index] !== undefined));
+    },
     addRecord(record) {
       return transact("readwrite", store => store.add(record));
     },
