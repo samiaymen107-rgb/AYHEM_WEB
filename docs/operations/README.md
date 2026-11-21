@@ -43,13 +43,14 @@
 
 ## الفهرس
 
+- [2026-11-21-050-post-merge-049-atomic-memory-outbox.md](./2026-11-21-050-post-merge-049-atomic-memory-outbox.md) — التحقق بعد الدمج: الذرية المحلية للذاكرة وoutbox واختبارات Node وChromium وPages.
 - [2026-11-21-048-durable-local-sync-outbox.md](./2026-11-21-048-durable-local-sync-outbox.md) — صندوق مزامنة محلي دائم، اختبارات Node وChromium، وبروتوكول خادم موثق (CLOUD NOT DEPLOYED).
 - [2026-11-21-047-post-merge-043-verification.md](./2026-11-21-047-post-merge-043-verification.md) — التحقق بعد الدمج والاختبارات والنشر للعملية 043.
 - [2026-11-21-043-indexed-existing-cognition-tags.md](./2026-11-21-043-indexed-existing-cognition-tags.md) — إزالة مسح القائمة في حفظ استنتاجات الإدراك (MERGED / POST-MERGE CI + PAGES VERIFIED).
 - [2026-11-21-044-consented-sensory-learning.md](./2026-11-21-044-consented-sensory-learning.md) — طبقة الحواس الرقمية والتعلّم التلقائي المصرّح به (MERGED / BLACK BOX + GOVERNANCE + PAGES VERIFIED).
 
 - [الفهرس الموضوعي والعناوين الرسمية لجميع التقارير](./REPORT_CATALOG.md): يضم العناوين العربية المصنفة والروابط الثابتة وتدقيق الترقيم.
-- آخر تحقق مدمج: PR #35؛ Black Box run 44931583349 وPages run 44931582345 نجحت جميعها بعد الدمج.
+- آخر تحقق مدمج: PR #37؛ Black Box run 44932289537 وPages run 44932288728 نجحت جميعها بعد الدمج. المزامنة السحابية غير منشورة.
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
