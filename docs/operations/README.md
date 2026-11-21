@@ -43,10 +43,13 @@
 
 ## الفهرس
 
+- [2026-11-21-044-consented-sensory-learning.md](./2026-11-21-044-consented-sensory-learning.md) — طبقة الحواس الرقمية والتعلّم التلقائي المصرّح به (CI pending).
+
 - [الفهرس الموضوعي والعناوين الرسمية لجميع التقارير](./REPORT_CATALOG.md): يضم العناوين العربية المصنفة والروابط الثابتة وتدقيق الترقيم.
 - آخر تحقق مدمج: PR #29؛ Black Box run 44927404897 وGovernance run 44927404980 وPages run 44927404603 (build/report-build-status/deploy) نجحت جميعها بعد الدمج.
 
 | التقرير | النطاق | الحالة |
+| [2026-11-21-044-consented-sensory-learning.md](./2026-11-21-044-consented-sensory-learning.md) | تأسيس الحواس الرقمية والتعلم التلقائي مع موافقة صريحة وحفظ تراكمي | IMPLEMENTED / CI PENDING |
 |---|---|---|
 | [2026-11-21-042-post-merge-041-verification.md](./2026-11-21-042-post-merge-041-verification.md) | التحقق بعد دمج العملية 041: Black Box وGovernance وPages | MERGED / POST-MERGE BLACK BOX + GOVERNANCE + PAGES VERIFIED |\n| [2026-11-21-041-cache-cognition-provenance-lookups.md](./2026-11-21-041-cache-cognition-provenance-lookups.md) | تقليل قراءات مصدر الاستنتاجات المتكررة داخل دفعة الحفظ | MERGED / POST-MERGE CI VERIFIED (SEE REPORT 042) |
 | [2026-11-21-040-correct-operation-039-status.md](./2026-11-21-040-correct-operation-039-status.md) | تصحيح حالة العملية 039 والتحقق بعد الدمج | MERGED / GOVERNANCE VERIFIED / PAGES CHECK SEPARATE |
