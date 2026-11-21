@@ -41,5 +41,6 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
+| [2026-11-21-003-legacy-ai-compatibility.md](./2026-11-21-003-legacy-ai-compatibility.md) | توحيد واجهات AI القديمة وإصلاح معالج الإرسال | IMPLEMENTED / CI VERIFIED / LIVE PENDING |
 | [2026-11-21-002-main-ui-ai-gateway.md](./2026-11-21-002-main-ui-ai-gateway.md) | ربط الواجهة الرئيسية ببوابة AI | IMPLEMENTED / CI VERIFIED / LIVE PENDING |
 | [2026-11-21-001-ai-network-mesh.md](./2026-11-21-001-ai-network-mesh.md) | عميل بوابة AI وعقد الشبكة | COMMITTED / CI VERIFIED / LIVE PENDING |
