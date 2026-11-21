@@ -178,7 +178,7 @@ test("real Chromium IndexedDB: version-1 records migrate to an indexed tag looku
     assert.equal(result.duplicateInserted, false, "the migrated tag index must find existing version-1 tags");
     assert.equal(result.uniqueInserted, true, "a new tag must append successfully");
     assert.deepEqual(result.ids, ["legacy-derived", "new-derived"]);
-    assert.equal(result.version, 2, "the adapter must upgrade the database to schema version 2");
+    assert.equal(result.version, 3, "the adapter must upgrade the database to schema version 3");
   } finally {
     await page.close();
   }
