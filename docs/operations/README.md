@@ -45,8 +45,9 @@
 
 | التقرير | النطاق | الحالة |
 |---|---|---|
-| [2026-11-21-024-authoritative-progress-dashboard.md](./2026-11-21-024-authoritative-progress-dashboard.md) | لوحة تقدم حية تقرأ scorecard موحداً وتتحقق من النسبة الموزونة وتفصلها عن الجاهزية الإنتاجية | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
-| [2026-11-21-023-founder-directives-progress-reporting.md](./2026-11-21-023-founder-directives-progress-reporting.md) | تثبيت تعليمات المؤسس الدائمة ومنهجية قياس التقدم الموزون والتقارير المرحلية | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-026-cross-repository-score-recalibration.md](./2026-11-21-026-cross-repository-score-recalibration.md) | مراجعة الأدلة عبر المستودعات وتصحيح نسبة المشروع من 41% إلى 44.75% وتحديث لوحة القياس | IMPLEMENTED ON BRANCH / CI PENDING / NOT MERGED |
+| [2026-11-21-024-authoritative-progress-dashboard.md](./2026-11-21-024-authoritative-progress-dashboard.md) | لوحة تقدم حية تقرأ scorecard موحداً وتتحقق من النسبة الموزونة وتفصلها عن الجاهزية الإنتاجية | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
+| [2026-11-21-023-founder-directives-progress-reporting.md](./2026-11-21-023-founder-directives-progress-reporting.md) | تثبيت تعليمات المؤسس الدائمة ومنهجية قياس التقدم الموزون والتقارير المرحلية | MERGED / GOVERNANCE CI VERIFIED / PAGES DEPLOYED |
 | [2026-11-21-022-indexeddb-concurrent-write-atomicity.md](./2026-11-21-022-indexeddb-concurrent-write-atomicity.md) | اختبار ذرية الكتابة المتزامنة ومنع الكتابة الجزئية بين اتصالات IndexedDB | MERGED / CI VERIFIED / POST-MERGE CI VERIFIED |
 | [2026-11-21-021-indexeddb-versionchange-contention.md](./2026-11-21-021-indexeddb-versionchange-contention.md) | اختبار اتصالات IndexedDB المتزامنة وإغلاقها عند versionchange قبل ترقية المخطط | MERGED / CI VERIFIED / POST-MERGE CI VERIFIED |
 | [2026-11-21-020-indexeddb-open-lifecycle.md](./2026-11-21-020-indexeddb-open-lifecycle.md) | معالجة اتصال IndexedDB المتأخر بعد blocked وحماية إعادة المحاولة | MERGED / CI VERIFIED / PAGES DEPLOYED |

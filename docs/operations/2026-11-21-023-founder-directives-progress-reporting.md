@@ -48,3 +48,11 @@ No user memory, browser storage, production database, Worker secrets, credential
 ## Next stage
 
 Implement a trustworthy progress dashboard based on the authoritative weighted scorecard. The dashboard must read a maintained, reviewed progress data file, display the evidence date and scope, and never imply that a Pages deployment proves the AI Worker is live.
+
+
+## Status and score correction — 2026-11-21
+
+- PR #12 was merged into `main` at `e56b8f62f9428fc616ad8351f63a306f393f4328`.
+- Governance CI passed on PR and post-merge; GitHub Pages deployment passed.
+- Stage completion: **100%**.
+- The preliminary 41% estimate was later recalibrated to **44.75%** after cross-repository review confirmed the already-merged AYHEM_WEB PR #4 autonomy foundation. This corrects the baseline; it does not attribute the 3.75-point difference to this governance operation.

@@ -25,7 +25,7 @@ for (const row of rows) {
   weightedProgress += contribution;
 }
 assert.equal(totalWeight, 100, "workstream weights must total 100%");
-const declared = Number(scorecard.match(/initial provisional engineering baseline is \*\*(\d+(?:\.\d+)?)%\*\*/i)?.[1]);
+const declared = Number(scorecard.match(/(?:initial|recalibrated) provisional engineering baseline is \*\*(\d+(?:\.\d+)?)%\*\*/i)?.[1]);
 assert.ok(Number.isFinite(declared), "scorecard must declare an initial overall percentage");
 assert.ok(Math.abs(weightedProgress - declared) < 0.011, "declared overall progress must equal the weighted score");
 

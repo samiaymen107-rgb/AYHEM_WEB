@@ -1,15 +1,13 @@
 {
   "schema_version": 1,
   "project": "AYHEM",
-  "scope": "تقدير النضج الهندسي للوحدات الثماني وفق الأدلة التي تمت مراجعتها في مستودع AYHEM_WEB حتى تاريخ القياس؛ وليس قياساً لجاهزية الإنتاج.",
+  "scope": "تقدير النضج الهندسي للوحدات الثماني وفق أدلة مستودعي AYHEM وAYHEM_WEB التي تمت مراجعتها حتى تاريخ القياس؛ وليس قياساً لجاهزية الإنتاج أو اكتمال موقع العرض.",
   "evidence_date": "2026-11-21",
-  "overall_progress_percent": 41,
-  "progress_status": "provisional",
+  "overall_progress_percent": 44.75,
+  "progress_status": "recalibrated_provisional",
   "production_readiness": "not_yet_rated",
   "weights_total_percent": 100,
-  "last_documented_operation": 23,
-  "last_merged_pull_request": 12,
-  "last_merged_commit": "e56b8f62f9428fc616ad8351f63a306f393f4328",
+  "last_documented_operation": 26,
   "workstreams": [
     {
       "name": "MEMORY",
@@ -31,9 +29,9 @@
       "name": "AUTONOMY",
       "label": "الاستقلالية",
       "weight_percent": 15,
-      "completion_percent": 0,
-      "weighted_contribution": 0,
-      "evidence": "لا يوجد حتى الآن محرك تنسيق مهام ذاتي موثق ومتحقق."
+      "completion_percent": 25,
+      "weighted_contribution": 3.75,
+      "evidence": "Merged AYHEM_WEB PR #4 provides deterministic action policy, append-only audit ledger, memory schema, adversarial boundary tests, and an autonomy charter; no continuously running task orchestration engine is verified."
     },
     {
       "name": "GUARD",
@@ -74,6 +72,29 @@
       "completion_percent": 45,
       "weighted_contribution": 2.25,
       "evidence": "اختبارات Node وChromium ناجحة؛ فحوص Worker الحية وترحيل بيانات الإنتاج والتحقق الشامل للإصدار لم تكتمل."
+    }
+  ],
+  "recalibration_reason": "تم تصحيح التقدير الأولي 41% بعد مراجعة AYHEM_WEB PR #4 المدموج الذي أضاف أساس سياسة الاستقلالية وسجل التدقيق ومخطط الذاكرة واختبارات الحدود؛ AUTONOMY أصبح 25% بدلاً من 0%.",
+  "audit_repositories": [
+    "samiaymen107-rgb/AYHEM",
+    "samiaymen107-rgb/AYHEM_WEB",
+    "samiaymen107-rgb/astro-blog-starter-template"
+  ],
+  "latest_merged_changes": [
+    {
+      "repository": "samiaymen107-rgb/AYHEM",
+      "pull_request": 5,
+      "commit": "affd29ffe5bd5dd1d08c7230a73bfa874add9332"
+    },
+    {
+      "repository": "samiaymen107-rgb/AYHEM_WEB",
+      "pull_request": 13,
+      "commit": "04108836b39d0040ddad946eb34654c3d0d9ff91"
+    },
+    {
+      "repository": "samiaymen107-rgb/astro-blog-starter-template",
+      "pull_request": 1,
+      "commit": "7be0d049441fa1dbc1723d44f2cf71f1d3797f38"
     }
   ]
 }
