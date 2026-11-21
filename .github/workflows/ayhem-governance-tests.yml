@@ -1,4 +1,5 @@
 name: AYHEM Governance Tests
+# Scorecard validation is required for governance and progress-dashboard changes.
 
 on:
   pull_request:
