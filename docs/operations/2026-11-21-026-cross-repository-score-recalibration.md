@@ -81,7 +81,7 @@ The score is still provisional because production deployment, live gateway check
 - AYHEM_WEB GitHub Pages deployment: passed after PR #13 merge.
 - Astro PR #1 build and Wrangler dry-run: passed before merge.
 - Recalibrated scorecard CI: pending for this branch.
-- Astro post-merge build status: pending at report creation.
+- Astro post-merge Astro Build Validation workflow: **passed** on commit `7be0d049441fa1dbc1723d44f2cf71f1d3797f38`. No live Worker deployment is claimed.
 
 ## Production readiness and safety
 
