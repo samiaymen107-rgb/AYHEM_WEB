@@ -1,0 +1,28 @@
+name: AYHEM Black Box Tests
+
+on:
+  pull_request:
+    paths:
+      - "core/black-box/**"
+      - ".github/workflows/ayhem-black-box-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "core/black-box/**"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run foundation tests
+        working-directory: core/black-box
+        run: npm test
