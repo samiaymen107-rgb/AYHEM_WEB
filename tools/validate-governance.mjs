@@ -6,6 +6,7 @@ const scorecard = read("../docs/governance/FOUNDER_DIRECTIVES_AND_PROGRESS.md");
 const index = read("../docs/operations/README.md");
 const report = read("../docs/operations/2026-11-21-023-founder-directives-progress-reporting.md");
 const charter = read("../README.md");
+const home = read("../index.html");
 const scorecardData = JSON.parse(read("../docs/governance/progress-scorecard.json"));
 const dashboard = read("../AYHEM_PROGRESS_DASHBOARD.html");
 
@@ -45,6 +46,6 @@ assert.equal(scorecardData.workstreams.length, 8, "dashboard data must contain a
 assert.equal(scorecardData.workstreams.reduce((sum, item) => sum + Number(item.weight_percent), 0), 100, "dashboard data weights must total 100%");
 assert.ok(dashboard.includes("progress-scorecard.json"), "dashboard must load the authoritative scorecard JSON");
 assert.ok(dashboard.includes("production_readiness"), "dashboard must distinguish engineering progress from production readiness");
-assert.ok(index.includes("AYHEM_PROGRESS_DASHBOARD.html"), "main page must link to the progress dashboard");
+assert.ok(home.includes("AYHEM_PROGRESS_DASHBOARD.html"), "main page must link to the progress dashboard");
 
 console.log(`AYHEM governance validation passed: ${rows.length} workstreams, ${totalWeight}% total weight, ${declared}% overall progress.`);
