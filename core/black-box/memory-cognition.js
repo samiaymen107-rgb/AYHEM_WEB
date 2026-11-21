@@ -1,0 +1,222 @@
+/**
+ * AYHEM Cognition Engine v1.
+ *
+ * Deterministic, explainable lexical signals only. This module does not claim
+ * natural-language understanding, verify truth, call an LLM, or modify source
+ * records. Every emitted insight keeps both source record IDs and provenance.
+ */
+const VERSION = "ayhem-cognition-v1";
+const DERIVED_SOURCE = "ayhem-cognition:v1";
+const NEGATIONS = new Set([
+  "not", "no", "never", "without", "isnt", "wasnt", "cannot",
+  "لا", "ليس", "ليست", "ليسا", "ليسوا", "لم", "لن", "ما", "غير", "بدون", "عدم",
+]);
+
+function tokens(value) {
+  return (value.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) ?? []);
+}
+
+function sortedUnique(values) {
+  return [...new Set(values)].sort();
+}
+
+function sameSet(left, right) {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
+}
+
+function jaccard(left, right) {
+  const a = new Set(left);
+  const b = new Set(right);
+  const union = new Set([...a, ...b]);
+  if (!union.size) return 0;
+  let intersection = 0;
+  for (const token of a) if (b.has(token)) intersection++;
+  return intersection / union.size;
+}
+
+function fnv1a(value) {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < value.length; index++) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, "0");
+}
+
+function provenance(record) {
+  return Object.freeze({
+    recordId: record.id,
+    source: record.source,
+    status: record.status,
+    type: record.type,
+    createdAt: record.createdAt,
+    confidence: record.confidence,
+  });
+}
+
+function prepare(record) {
+  const all = tokens(record.content);
+  const negationCount = all.filter(token => NEGATIONS.has(token)).length;
+  const substantive = sortedUnique(all.filter(token => !NEGATIONS.has(token)));
+  const numbers = sortedUnique(all.filter(token => /^\p{N}+([.,]\p{N}+)?$/u.test(token)));
+  const words = substantive.filter(token => !/^\p{N}+([.,]\p{N}+)?$/u.test(token));
+  return { record, substantive, numbers, words, negated: negationCount % 2 === 1 };
+}
+
+/**
+ * Classifies exactly two source records. "Explicit contradiction" is reserved
+ * for identical lexical content except for a detected negation marker.
+ * Different numeric values are only a possible tension, never a fact conflict.
+ */
+export function classifyMemoryPair(leftRecord, rightRecord, { similarityThreshold = 0.72 } = {}) {
+  if (!leftRecord || !rightRecord || leftRecord.id === rightRecord.id ||
+      typeof leftRecord.content !== "string" || typeof rightRecord.content !== "string") {
+    throw new TypeError("cognition_pair_requires_two_distinct_memory_records");
+  }
+  if (!Number.isFinite(similarityThreshold) || similarityThreshold < 0.5 || similarityThreshold > 1) {
+    throw new RangeError("cognition_similarity_threshold_invalid");
+  }
+
+  const left = prepare(leftRecord);
+  const right = prepare(rightRecord);
+  const commonWords = left.words.filter(token => right.words.includes(token));
+  const overlap = jaccard(left.substantive, right.substantive);
+  let relation = "unknown";
+  let reason = "no_deterministic_relationship_signal";
+
+  if (sameSet(left.substantive, right.substantive) &&
+      left.negated !== right.negated && left.numbers.length === right.numbers.length &&
+      sameSet(left.numbers, right.numbers)) {
+    relation = "explicit_contradiction";
+    reason = "same_lexical_claim_with_opposite_explicit_negation";
+  } else if (sameSet(left.words, right.words) && left.numbers.length &&
+      right.numbers.length && !sameSet(left.numbers, right.numbers)) {
+    relation = "possible_tension";
+    reason = "same_lexical_frame_with_different_numeric_values_requires_time_unit_and_context_review";
+  } else if (overlap >= similarityThreshold) {
+    relation = "semantic_similarity";
+    reason = "high_lexical_overlap_only_not_semantic_equivalence";
+  }
+
+  const ordered = [leftRecord, rightRecord].sort((a, b) => a.id.localeCompare(b.id));
+  const recordIds = ordered.map(record => record.id);
+  const evidence = Object.freeze({
+    sharedWords: Object.freeze(commonWords),
+    lexicalOverlap: Number(overlap.toFixed(3)),
+    leftNegated: left.negated,
+    rightNegated: right.negated,
+    leftNumbers: Object.freeze(left.numbers),
+    rightNumbers: Object.freeze(right.numbers),
+  });
+  const fingerprintInput = [VERSION, relation, ...recordIds, reason].join("|");
+
+  return Object.freeze({
+    relation,
+    reason,
+    method: VERSION,
+    recordIds: Object.freeze(recordIds),
+    provenance: Object.freeze(ordered.map(provenance)),
+    evidence,
+    confidence: relation === "explicit_contradiction" ? 0.9
+      : relation === "possible_tension" ? 0.55
+      : relation === "semantic_similarity" ? 0.65 : 0.1,
+    fingerprint: fnv1a(fingerprintInput),
+  });
+}
+
+export function createMemoryCognition({ store, maxRecords = 200, similarityThreshold = 0.72 } = {}) {
+  if (!store || typeof store.list !== "function") {
+    throw new TypeError("cognition_store_with_list_required");
+  }
+  if (!Number.isInteger(maxRecords) || maxRecords < 2 || maxRecords > 1000) {
+    throw new RangeError("cognition_max_records_invalid");
+  }
+  if (!Number.isFinite(similarityThreshold) || similarityThreshold < 0.5 || similarityThreshold > 1) {
+    throw new RangeError("cognition_similarity_threshold_invalid");
+  }
+
+  return Object.freeze({
+    async analyze({ includeUnknown = false } = {}) {
+      const stored = await store.list();
+      const records = stored
+        .filter(record => record.source !== DERIVED_SOURCE)
+        .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
+      if (records.length > maxRecords) {
+        throw new RangeError("cognition_record_limit_exceeded");
+      }
+
+      const insights = [];
+      const counts = {
+        explicit_contradiction: 0,
+        possible_tension: 0,
+        semantic_similarity: 0,
+        unknown: 0,
+      };
+      for (let i = 0; i < records.length; i++) {
+        for (let j = i + 1; j < records.length; j++) {
+          const insight = classifyMemoryPair(records[i], records[j], { similarityThreshold });
+          counts[insight.relation]++;
+          if (includeUnknown || insight.relation !== "unknown") insights.push(insight);
+        }
+      }
+      return Object.freeze({
+        method: VERSION,
+        sourceRecordCount: records.length,
+        pairCount: records.length * (records.length - 1) / 2,
+        counts: Object.freeze(counts),
+        insights: Object.freeze(insights),
+        limitations: Object.freeze([
+          "Deterministic lexical heuristics only; no semantic language model is used.",
+          "A flagged relationship is a review signal, not a verified truth or correction.",
+          "Time, units, negation scope, dialect, sarcasm and domain context may require human review.",
+          "Source records are never changed by analysis.",
+        ]),
+      });
+    },
+
+    async persistInsights(insights) {
+      if (typeof store.append !== "function") throw new TypeError("cognition_store_append_required");
+      if (!Array.isArray(insights)) throw new TypeError("cognition_insights_must_be_array");
+      const existing = await store.list();
+      const known = new Set(existing.flatMap(record => record.tags ?? []));
+      const persisted = [];
+      const skipped = [];
+      for (const insight of insights) {
+        if (!insight || insight.method !== VERSION ||
+            !["explicit_contradiction", "possible_tension", "semantic_similarity"].includes(insight.relation) ||
+            !Array.isArray(insight.recordIds) || insight.recordIds.length !== 2 ||
+            !insight.provenance || typeof insight.fingerprint !== "string") {
+          throw new TypeError("cognition_insight_invalid");
+        }
+        const tag = `cognition:v1:${insight.fingerprint}`;
+        if (known.has(tag)) {
+          skipped.push(insight.fingerprint);
+          continue;
+        }
+        const content = JSON.stringify({
+          relation: insight.relation,
+          reason: insight.reason,
+          method: insight.method,
+          recordIds: insight.recordIds,
+          provenance: insight.provenance,
+          evidence: insight.evidence,
+          fingerprint: insight.fingerprint,
+        });
+        const record = await store.append({
+          type: "observation",
+          content,
+          status: "inference",
+          source: DERIVED_SOURCE,
+          confidence: Math.min(...insight.provenance.map(item => item.confidence)) * insight.confidence,
+          tags: ["derived", "cognition", tag],
+        });
+        known.add(tag);
+        persisted.push(record);
+      }
+      return Object.freeze({
+        persisted: Object.freeze(persisted),
+        skippedFingerprints: Object.freeze(skipped),
+      });
+    },
+  });
+}
