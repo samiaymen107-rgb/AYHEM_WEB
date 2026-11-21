@@ -35,3 +35,13 @@ Pending GitHub Actions. Both the Node foundation suite and the real Chromium sui
 ## Follow-up
 
 After verification, assess append-only behavior at the memory-store boundary and identify any remaining cross-tab deduplication guarantees that are not enforced by IndexedDB's unique primary key.
+
+
+## Status correction — 2026-11-21
+
+The original pending status above is preserved as the status at report creation. Subsequent verified result:
+- PR #11 merged into `main` at `0af55ede04aae8d42cc5ab0b2ae7f7b672f1fa8a`.
+- Node foundation tests and real Chromium IndexedDB tests passed on the PR branch.
+- Post-merge Black Box CI passed; GitHub Pages deployment passed.
+- Stage completion: **100%**.
+- Overall AYHEM engineering progress at the initial scorecard baseline: **41% (provisional)**.

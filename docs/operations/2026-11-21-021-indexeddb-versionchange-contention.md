@@ -35,3 +35,13 @@ Pending GitHub Actions for this branch. The existing Node foundation suite and C
 ## Follow-up
 
 After CI passes and this operation is merged, assess whether database versioning should be centralized before any production schema evolution. Do not introduce a data migration until backup and restore behavior is explicitly reviewed.
+
+
+## Status correction — 2026-11-21
+
+The original pending status above is preserved as the status at report creation. Subsequent verified result:
+- PR #10 merged into `main` at `0af55ede04aae8d42cc5ab0b2ae7f7b672f1fa8a`.
+- Node foundation tests and real Chromium IndexedDB tests passed on the PR branch.
+- Post-merge Black Box CI passed; GitHub Pages deployment passed.
+- Stage completion: **100%**.
+- Overall AYHEM engineering progress at the initial scorecard baseline: **41% (provisional)**.
