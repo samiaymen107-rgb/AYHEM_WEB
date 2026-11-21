@@ -29,6 +29,9 @@ test("outbox queues validated records and returns pending events", async () => {
   assert.equal(event.status, "pending"); assert.equal(event.recordId, record.id);
   assert.equal((await outbox.pending()).length, 1);
   assert.equal((await outbox.pending())[0].payload.content, record.content);
+  const repeated = await outbox.enqueue(record);
+  assert.equal(repeated.eventId, event.eventId, "re-enqueueing one record must reuse its stable event ID");
+  assert.equal((await outbox.pending()).length, 1, "the same memory record must not create a second outbox event");
 });
 
 test("outbox rejects invalid records and invalid limits", async () => {
