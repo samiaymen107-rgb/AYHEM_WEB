@@ -6,6 +6,8 @@
  * records. Callers must provide the source classification and trace ID.
  */
 const SOURCE_KINDS = new Set(["user_input", "service", "import", "system"]);
+const RECORD_TYPES = new Set(["event", "fact", "observation", "hypothesis", "inference", "decision", "correction"]);
+const RECORD_STATUSES = new Set(["confirmed", "context", "documented", "to_verify", "inference"]);
 const EVENT_TYPE = "org.ayhem.memory.record.appended.v1";
 const MEMORY_SCHEMA = "https://ayhem.local/schemas/memory-record.v1.schema.json";
 
@@ -51,8 +53,10 @@ export function createMemoryEventAdapter({
       }
       requiredString(record.id, "record_id", 128);
       requiredString(record.type, "record_type", 64);
+      if (!RECORD_TYPES.has(record.type)) throw new TypeError("record_type_invalid");
       requiredString(record.content, "record_content", 100_000);
       requiredString(record.status, "record_status", 64);
+      if (!RECORD_STATUSES.has(record.status)) throw new TypeError("record_status_invalid");
       requiredString(record.source, "record_source", 256);
       if (!canonicalUtc(record.createdAt)) throw new TypeError("record_created_at_invalid");
       if (!SOURCE_KINDS.has(sourceKind)) throw new TypeError("source_kind_invalid");
