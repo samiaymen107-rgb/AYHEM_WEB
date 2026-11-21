@@ -39,11 +39,16 @@ This directory introduces a small, auditable foundation for AYHEM's runtime. It 
 
 `memory-cognition.js` is an intentionally conservative first step. It uses deterministic lexical heuristics only. Explicit contradiction requires identical substantive tokens and numeric context with opposite detected negation. Different numeric values are marked as possible tension, not contradiction. Similarity is lexical overlap, not semantic equivalence. Every finding retains both source records and must be reviewed before operational use. The default scan ceiling is 200 source records; increase only with measured performance and tests.
 
-## Run tests
-From this directory with Node.js 20+:
-`npm test`
+## Test commands
 
-The snapshot restore contract tests verify that invalid snapshots do not reach the batch writer, valid multi-record snapshots use one batch call, and repeated imports remain idempotent. These adapter-contract tests do not replace real-browser IndexedDB transaction/rollback tests.
+From this directory with Node.js 20+:
+
+- `npm test` — deterministic foundation and adapter-contract tests.
+- `npm run test:browser` — real Chromium IndexedDB integration test (requires the Playwright package and Chromium browser).
+
+The real-browser test verifies that a duplicate-key failure aborts an entire multi-request IndexedDB transaction, that committed records survive closing and reopening the database, and that the memory store restores a snapshot once and treats the second import as idempotent. CI installs the browser runtime and runs this test separately from the fast Node suite.
+
+These tests use isolated, randomly named test databases. They do not open, inspect, migrate, or modify any founder browser data or legacy localStorage keys.
 
 ## Legacy memory audit
 The preview scans `AYHEM_MEMORY`, `AYHEM_LONG_MEMORY`, `ayhemPersistentMemory`, `AYHEM_ARCHIVE`, `AYHEM_ARCHIVE_BACKUP`, and `AYHEM_ARCHIVE_ADVANCED`. It is a read-only inventory only; volatile in-page globals are outside this scan. Review its report before designing any migration.

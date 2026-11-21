@@ -15,7 +15,10 @@ export function createIndexedDBMemoryAdapter({
 
   function openDatabase() {
     if (databasePromise) return databasePromise;
-    databasePromise = new Promise((resolve, reject) => {
+
+    let openingPromise;
+    openingPromise = new Promise((resolve, reject) => {
+      let settled = false;
       const request = indexedDBImpl.open(dbName, 1);
       request.onupgradeneeded = () => {
         const db = request.result;
@@ -28,22 +31,34 @@ export function createIndexedDBMemoryAdapter({
       };
       request.onsuccess = () => {
         const db = request.result;
+        // An open request may eventually succeed after onblocked already
+        // rejected its caller. Close that late connection to avoid a leak.
+        if (settled) {
+          db.close();
+          return;
+        }
         db.onversionchange = () => {
           db.close();
-          databasePromise = null;
+          if (databasePromise === openingPromise) databasePromise = null;
         };
+        settled = true;
         resolve(db);
       };
       request.onerror = () => {
-        databasePromise = null;
+        if (databasePromise === openingPromise) databasePromise = null;
+        if (settled) return;
+        settled = true;
         reject(request.error || new Error("indexeddb_open_failed"));
       };
       request.onblocked = () => {
-        databasePromise = null;
+        if (databasePromise === openingPromise) databasePromise = null;
+        if (settled) return;
+        settled = true;
         reject(new Error("indexeddb_open_blocked"));
       };
     });
-    return databasePromise;
+    databasePromise = openingPromise;
+    return openingPromise;
   }
 
   async function transact(mode, operation) {
@@ -102,9 +117,10 @@ export function createIndexedDBMemoryAdapter({
     },
     async close() {
       if (!databasePromise) return;
-      const db = await databasePromise;
+      const pending = databasePromise;
+      const db = await pending;
       db.close();
-      databasePromise = null;
+      if (databasePromise === pending) databasePromise = null;
     },
   });
 }
