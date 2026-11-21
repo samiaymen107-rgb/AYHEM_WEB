@@ -1,0 +1,28 @@
+name: AYHEM AI Network Client Tests
+
+on:
+  pull_request:
+    paths:
+      - "integrations/ai-network/**"
+      - ".github/workflows/ayhem-ai-network-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "integrations/ai-network/**"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run AI network client tests
+        working-directory: integrations/ai-network
+        run: npm test
