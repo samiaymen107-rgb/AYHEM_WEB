@@ -1,75 +1,179 @@
-// AYHEM_JS_Worker.js — مشروع أيهم الذكي
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-})
+import { verifyCloudflareAccessJWT } from "./integrations/ai-network/cloudflare-access.js";
 
-// مفتاح OpenAI مخفي تماما على الخادم
-const OPENAI_API_KEY = "cfut_UMiH3MJWzE4BjXPE3Gby6TSXqMQjwrSqZjujy3Laefccf624";
+/**
+ * AYHEM Cloudflare Worker — authenticated AI gateway.
+ * Required bindings/secrets:
+ * - OPENAI_API_KEY (Worker Secret)
+ * - CF_ACCESS_TEAM_DOMAIN (Worker variable)
+ * - CF_ACCESS_AUD (Worker variable)
+ * - AI_RATE_LIMITER (Cloudflare Rate Limiting binding)
+ * - ALLOWED_ORIGINS (exact comma-separated browser origins)
+ */
+const MAX_INPUT_LENGTH = 8000;
+const MAX_BODY_BYTES = 16000;
+const MODEL = "gpt-4o-mini";
 
-// الوحدات الذكية المدمجة
-const modules = [
-  {name:'CORE', desc:'تحميل النواة وربط المستودعات...'},
-  {name:'MEMORY', desc:'تحميل الذاكرة وربط الوركس...'},
-  {name:'AI', desc:'تنشيط الذكاء والتحليل وربطه بالتطبيقات...'},
-  {name:'UI', desc:'تهيئة الواجهة وربطها بالمستودعات...'}
-]
-
-// استدعاء OpenAI عبر API
-async function queryAI(prompt){
-  const res = await fetch('https://api.openai.com/v1/chat/completions',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'Authorization': `Bearer ${OPENAI_API_KEY}`
+function json(data, status = 200, headers = {}) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+      ...headers,
     },
-    body: JSON.stringify({
-      model:"gpt-4o-mini",
-      messages:[{role:"user", content: prompt}],
-      max_tokens:150
-    })
-  })
-  const data = await res.json()
-  return data.choices?.[0]?.message?.content || "تعذر الحصول على استجابة AI."
+  });
 }
 
-// إنشاء واجهة HTML ديناميكية
-async function handleRequest(request){
-  let moduleHTML = ""
-  for(let i=0;i<modules.length;i++){
-    const m = modules[i]
-    const recs = await queryAI(`اعطني توصيات ذكية لتشغيل وحدة ${m.name} في مشروع أيهم`)
-    moduleHTML += `<div class="log"><strong>${m.name}:</strong> ${m.desc}<br><em>توصيات AI:</em> ${recs}</div>`
+function allowedOrigin(request, env) {
+  const origin = request.headers.get("Origin");
+  if (!origin) return null;
+  const allowed = (env.ALLOWED_ORIGINS || "").split(",").map(v => v.trim()).filter(Boolean);
+  return allowed.includes(origin) ? origin : false;
+}
+
+function corsHeaders(origin) {
+  return origin ? {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Vary": "Origin",
+  } : {};
+}
+
+async function authorize(request, env) {
+  if (!env.CF_ACCESS_TEAM_DOMAIN || !env.CF_ACCESS_AUD) {
+    return { ok: false, status: 503, error: "gateway_auth_not_configured" };
   }
 
-  const html = `
-  <!DOCTYPE html>
-  <html lang="ar">
-  <head>
-  <meta charset="UTF-8">
-  <title>مشروع أيهم — أول عقل رقمي حي</title>
-  <style>
-  body{margin:0;font-family:Arial,sans-serif;background:#0b1020;color:#e8ecff;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;}
-  .app{background:#121a33;border-radius:20px;max-width:960px;width:100%;padding:25px;box-shadow:0 10px 30px rgba(0,0,0,0.35);}
-  h1,h2{margin:0 0 10px;}
-  button{padding:10px 20px;margin:5px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;}
-  .primary{background:#6ea8fe;color:#081022;}
-  .secondary{background:transparent;color:#e8ecff;border:1px solid #e8ecff;}
-  .panel{background:rgba(255,255,255,0.05);padding:15px;border-radius:15px;margin-top:20px;}
-  .log{margin-top:10px;font-size:0.95rem;color:#6efeb0;}
-  .footer{margin-top:20px;font-size:0.9rem;color:#9aa7d6;text-align:center;}
-  </style>
-  </head>
-  <body>
-    <div class="app">
-      <h1>مشروع أيهم — أول عقل رقمي حي</h1>
-      <p>دمج الوحدات الأساسية بطريقة ذكية متكاملة.</p>
-      <div class="panel">
-        ${moduleHTML}
-      </div>
-      <div class="footer">AYHEM WEB — نسخة ذكية للعقل الحياتي الرقمي</div>
-    </div>
-  </body>
-  </html>
-  `
-  return new Response(html, {headers: {'Content-Type':'text/html'}})
+  const token = request.headers.get("Cf-Access-Jwt-Assertion");
+  if (!token) return { ok: false, status: 401, error: "access_token_required" };
+
+  const result = await verifyCloudflareAccessJWT(token, {
+    teamDomain: env.CF_ACCESS_TEAM_DOMAIN,
+    audience: env.CF_ACCESS_AUD,
+  });
+
+  if (!result.ok) {
+    const unavailable = result.reason === "verification_unavailable";
+    return {
+      ok: false,
+      status: unavailable ? 503 : 401,
+      error: unavailable ? "access_verification_unavailable" : "access_token_invalid",
+    };
+  }
+
+  return { ok: true, claims: result.claims };
 }
+
+export default {
+  async fetch(request, env) {
+    const origin = allowedOrigin(request, env);
+    if (origin === false) return json({ error: "origin_not_allowed" }, 403);
+
+    const cors = corsHeaders(origin);
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: { ...cors, "Access-Control-Max-Age": "86400" },
+      });
+    }
+
+    const url = new URL(request.url);
+    const isHealth = request.method === "GET" && url.pathname === "/health";
+    const isAIRequest = request.method === "POST" && url.pathname === "/";
+    if (!isHealth && !isAIRequest) {
+      return json({ error: "route_not_found" }, 404, cors);
+    }
+
+    const auth = await authorize(request, env);
+    if (!auth.ok) return json({ error: auth.error }, auth.status, cors);
+
+    if (isHealth) {
+      const aiConfigured = Boolean(env.OPENAI_API_KEY);
+      const rateLimitConfigured = Boolean(env.AI_RATE_LIMITER && typeof env.AI_RATE_LIMITER.limit === "function");
+      const originConfigured = (env.ALLOWED_ORIGINS || "").split(",").some(value => value.trim());
+      return json({
+        service: "AYHEM",
+        status: "online",
+        mode: "authenticated-gateway",
+        aiConfigured,
+        rateLimitConfigured,
+        originConfigured,
+        ready: aiConfigured && rateLimitConfigured && originConfigured,
+      }, 200, cors);
+    }
+
+    if (!env.OPENAI_API_KEY) return json({ error: "ai_service_not_configured" }, 503, cors);
+    if (!env.AI_RATE_LIMITER || typeof env.AI_RATE_LIMITER.limit !== "function") {
+      return json({ error: "rate_limit_not_configured" }, 503, cors);
+    }
+
+    try {
+      const rate = await env.AI_RATE_LIMITER.limit({ key: auth.claims.sub });
+      if (!rate?.success) return json({ error: "rate_limit_exceeded" }, 429, cors);
+    } catch {
+      return json({ error: "rate_limit_unavailable" }, 503, cors);
+    }
+
+    const declaredLength = Number(request.headers.get("Content-Length") || 0);
+    if (declaredLength > MAX_BODY_BYTES) {
+      return json({ error: "request_body_too_large" }, 413, cors);
+    }
+
+    let body;
+    try {
+      const raw = await request.text();
+      if (new TextEncoder().encode(raw).byteLength > MAX_BODY_BYTES) {
+        return json({ error: "request_body_too_large" }, 413, cors);
+      }
+      body = JSON.parse(raw);
+    } catch {
+      return json({ error: "invalid_json" }, 400, cors);
+    }
+
+    const input = typeof body?.input === "string" ? body.input.trim() : "";
+    if (!input) return json({ error: "input_required" }, 400, cors);
+    if (input.length > MAX_INPUT_LENGTH) {
+      return json({ error: "input_too_long", maxLength: MAX_INPUT_LENGTH }, 413, cors);
+    }
+
+    try {
+      const upstream = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${env.OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [
+            {
+              role: "system",
+              content: "أنت مساعد مشروع أيهم. أجب بوضوح، وميّز الحقائق عن الافتراضات، ولا تدّع تنفيذ عمليات لم تنفذها.",
+            },
+            { role: "user", content: input },
+          ],
+          max_tokens: 700,
+        }),
+        signal: AbortSignal.timeout(25000),
+      });
+
+      const data = await upstream.json().catch(() => ({}));
+      if (!upstream.ok) {
+        return json({ error: "ai_upstream_error", status: upstream.status }, 502, cors);
+      }
+      const output = data.choices?.[0]?.message?.content;
+      if (typeof output !== "string" || !output.trim()) {
+        return json({ error: "empty_ai_response" }, 502, cors);
+      }
+      return json({
+        unit: "U01-Σ",
+        output,
+        requestId: crypto.randomUUID(),
+      }, 200, cors);
+    } catch {
+      return json({ error: "ai_service_unavailable" }, 502, cors);
+    }
+  },
+};

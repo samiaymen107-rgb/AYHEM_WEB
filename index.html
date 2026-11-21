@@ -116,6 +116,19 @@
       font-size: .92rem;
     }
 
+    .ai-panel { margin: 0 24px 24px; }
+    .ai-panel textarea {
+      width: 100%; min-height: 100px; resize: vertical;
+      padding: 12px; border-radius: 12px; border: 1px solid var(--border);
+      background: #0b1020; color: var(--text); font: inherit;
+    }
+    .ai-status { color: var(--muted); margin: 8px 0 14px; }
+    .ai-output {
+      min-height: 56px; margin-top: 14px; padding: 14px;
+      border: 1px solid var(--border); border-radius: 12px;
+      white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8;
+    }
+
     @media (max-width: 768px) {
       .content { grid-template-columns: 1fr; }
       .hero, .content, .footer { padding: 20px; }
@@ -157,6 +170,17 @@
       </div>
     </section>
 
+    <section class="panel ai-panel" aria-labelledby="aiTitle">
+      <h2 id="aiTitle">الاتصال بالذكاء الاصطناعي / AI Gateway</h2>
+      <p id="aiConnectionStatus" class="ai-status" role="status" aria-live="polite">جارٍ التحقق من إعداد الاتصال...</p>
+      <label for="aiPrompt">رسالتك إلى أيهم</label>
+      <textarea id="aiPrompt" placeholder="اكتب سؤالك هنا..." maxlength="8000"></textarea>
+      <div class="actions">
+        <button class="primary" id="aiSendBtn" type="button" disabled>إرسال إلى أيهم</button>
+      </div>
+      <div id="aiOutput" class="ai-output" role="status" aria-live="polite">لن يظهر الاتصال كجاهز إلا بعد نجاح فحص البوابة ومزوّد الذكاء الاصطناعي.</div>
+    </section>
+
     <div class="footer">
       AYHEM WEB — نسخة موحّدة ذكية للمشروع / Unified Smart Version
     </div>
@@ -182,5 +206,6 @@
       window.location.href = 'AYHEM_DASHBOARD.html';
     });
   </script>
+  <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js"></script>
 </body>
 </html>

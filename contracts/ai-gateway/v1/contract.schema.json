@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ayhem.dev/contracts/ai-gateway/v1/contract.schema.json",
+  "title": "AYHEM AI Gateway Contract V1",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "AIRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input"],
+      "properties": {
+        "input": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8000
+        }
+      }
+    },
+    "AIResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "output", "requestId"],
+      "properties": {
+        "unit": { "const": "U01-Σ" },
+        "output": { "type": "string", "minLength": 1 },
+        "requestId": { "type": "string", "format": "uuid" }
+      }
+    },
+    "HealthResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "service",
+        "status",
+        "mode",
+        "aiConfigured",
+        "rateLimitConfigured",
+        "originConfigured",
+        "ready"
+      ],
+      "properties": {
+        "service": { "const": "AYHEM" },
+        "status": { "const": "online" },
+        "mode": { "const": "authenticated-gateway" },
+        "aiConfigured": { "type": "boolean" },
+        "rateLimitConfigured": { "type": "boolean" },
+        "originConfigured": { "type": "boolean" },
+        "ready": { "type": "boolean" }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "required": ["error"],
+      "properties": {
+        "error": { "type": "string", "minLength": 1 },
+        "status": { "type": "integer" },
+        "maxLength": { "type": "integer" }
+      }
+    }
+  }
+}
