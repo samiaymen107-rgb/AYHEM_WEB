@@ -43,7 +43,8 @@
 
 ## الفهرس
 
-- [2026-11-21-047-post-merge-043-verification.md](./2026-11-21-047-post-merge-043-verification.md) — التحقق بعد الدمج والاختبارات والنشر للعملية 043.\n- [2026-11-21-043-indexed-existing-cognition-tags.md](./2026-11-21-043-indexed-existing-cognition-tags.md) — إزالة مسح القائمة في حفظ استنتاجات الإدراك (MERGED / POST-MERGE CI + PAGES VERIFIED).
+- [2026-11-21-047-post-merge-043-verification.md](./2026-11-21-047-post-merge-043-verification.md) — التحقق بعد الدمج والاختبارات والنشر للعملية 043.
+- [2026-11-21-043-indexed-existing-cognition-tags.md](./2026-11-21-043-indexed-existing-cognition-tags.md) — إزالة مسح القائمة في حفظ استنتاجات الإدراك (MERGED / POST-MERGE CI + PAGES VERIFIED).
 - [2026-11-21-044-consented-sensory-learning.md](./2026-11-21-044-consented-sensory-learning.md) — طبقة الحواس الرقمية والتعلّم التلقائي المصرّح به (MERGED / BLACK BOX + GOVERNANCE + PAGES VERIFIED).
 
 - [الفهرس الموضوعي والعناوين الرسمية لجميع التقارير](./REPORT_CATALOG.md): يضم العناوين العربية المصنفة والروابط الثابتة وتدقيق الترقيم.
