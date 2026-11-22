@@ -1,112 +1,142 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!doctype html>
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AYHEM Dashboard</title>
-<style>
-  body { font-family: Arial, sans-serif; background: #0f111a; color: #f0f0f0; margin:0; padding:0; }
-  header { background: #1e3a8a; padding: 15px; text-align:center; font-size:1.4em; font-weight:bold; }
-  main { padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-  .card { background:#1b1d2b; padding:15px; border-radius:10px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-  h2 { margin-top:0; }
-  button { padding:8px 12px; border:none; border-radius:5px; cursor:pointer; margin-top:5px; }
-  .btn-stop { background:#e63946; color:white; }
-  .btn-start { background:#2a9d8f; color:white; }
-  pre { background:#111222; padding:10px; border-radius:5px; max-height:300px; overflow:auto; }
-  ul { list-style:none; padding:0; }
-  li { padding:5px 0; border-bottom:1px solid #333; }
-  .loaded { color:#2a9d8f; }
-  .pending { color:#f4a261; }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1020">
+  <meta name="description" content="لوحة متابعة AYHEM">
+  <title>AYHEM — لوحة التحكم</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b1020;--panel:#121a33;--text:#e8ecff;--muted:#aab5d2;--line:rgba(255,255,255,.13);--gold:#d7b56d;--green:#68c69b;--orange:#f2b66d;--red:#ff7777}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;padding:clamp(12px,3vw,28px);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:radial-gradient(circle at top,#182447 0,var(--bg) 58%);color:var(--text)}
+    header,main,.toolbar{width:min(100%,1040px);margin-inline:auto}
+    header{padding:22px clamp(16px,3vw,28px);background:var(--panel);border:1px solid var(--line);border-radius:18px}
+    h1{font-size:clamp(1.25rem,4vw,1.8rem);margin:0 0 8px}
+    header p{margin:0;color:var(--muted);line-height:1.7}
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:16px auto}
+    a,button{font:inherit}
+    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border:1px solid var(--line);border-radius:12px;background:#1a2949;color:var(--text);text-decoration:none;cursor:pointer}
+    .btn.primary{background:var(--gold);color:#17130b;border-color:transparent;font-weight:700}
+    .btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+    main{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .card{min-width:0;padding:18px;background:rgba(18,26,51,.94);border:1px solid var(--line);border-radius:16px}
+    .card h2{font-size:1.08rem;margin:0 0 14px}
+    .wide{grid-column:1/-1}
+    .status{display:flex;align-items:flex-start;gap:10px;line-height:1.7}
+    .dot{flex:0 0 10px;width:10px;height:10px;margin-top:8px;border-radius:50%;background:var(--orange)}
+    .dot.ok{background:var(--green)}.dot.error{background:var(--red)}
+    .muted{color:var(--muted)}
+    ul{list-style:none;padding:0;margin:0}
+    li{padding:10px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+    li:last-child{border-bottom:0}
+    pre{margin:0;max-height:360px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;border-radius:12px;background:#080d19;color:#dce5ff;line-height:1.65;direction:ltr;text-align:left}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    footer{width:min(100%,1040px);margin:18px auto 0;color:var(--muted);font-size:.9rem}
+    @media(max-width:680px){main{grid-template-columns:1fr}.wide{grid-column:auto}.card{padding:15px}.toolbar .btn{flex:1 1 100%}body{padding:12px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
 </head>
 <body>
+  <header>
+    <h1>AYHEM — لوحة التحكم</h1>
+    <p>متابعة حالة الواجهة والوحدات المتاحة. لا تعرض اللوحة حالة «جاهز» إلا بعد التحقق الفعلي.</p>
+  </header>
 
-<header>AYHEM Dashboard — الحالة الحية للعقل الرقمي</header>
-<main>
-  <div class="card">
-    <h2>وحدات المشروع</h2>
-    <ul id="unitsList"></ul>
-    <button id="btn-refresh" class="btn-start">تحديث يدوي للوحدات</button>
-  </div>
-  <div class="card">
-    <h2>السجل الذكي</h2>
-    <pre id="logArea"></pre>
-    <button id="btn-export" class="btn-start">تصدير السجل</button>
-  </div>
-  <div class="card">
-    <h2>التحكم بالتحديث التلقائي</h2>
-    <button id="btn-toggle" class="btn-stop">إيقاف التحديث التلقائي</button>
-    <div style="margin-top:10px;">
-      <label>سرعة المسح (مللي ثانية): </label>
-      <input type="number" id="scanInterval" value="5000" style="width:80px;">
-      <button id="btn-setInterval" class="btn-start">تطبيق</button>
-    </div>
-  </div>
-</main>
+  <nav class="toolbar" aria-label="التنقل">
+    <a class="btn" href="./index.html">العودة إلى الواجهة الرئيسية</a>
+    <a class="btn" href="./AYHEM_PROGRESS_DASHBOARD.html">لوحة تقدم المشروع</a>
+    <button class="btn primary" id="refreshBtn" type="button">إعادة الفحص</button>
+  </nav>
 
-<script>
-(async function () {
-  const AYHEM = window.AYHEM_AI_CORE;
-  if (!AYHEM) {
-    console.error("AYHEM_AI_CORE غير موجود. تأكد من تحميل النواة قبل Dashboard.");
-    return;
-  }
+  <main>
+    <section class="card" aria-labelledby="systemHeading">
+      <h2 id="systemHeading">حالة النواة</h2>
+      <div class="status" role="status" aria-live="polite">
+        <span id="coreDot" class="dot"></span>
+        <span id="coreStatus">جارٍ فحص وجود النواة...</span>
+      </div>
+      <p class="muted" id="coreDetail">لن يتم تحميل ملفات تنفيذية خارجية تلقائياً من GitHub.</p>
+    </section>
 
-  const unitsListEl = document.getElementById("unitsList");
-  const logArea = document.getElementById("logArea");
-  const btnRefresh = document.getElementById("btn-refresh");
-  const btnExport = document.getElementById("btn-export");
-  const btnToggle = document.getElementById("btn-toggle");
-  const scanInput = document.getElementById("scanInterval");
-  const btnSetInterval = document.getElementById("btn-setInterval");
+    <section class="card" aria-labelledby="unitsHeading">
+      <h2 id="unitsHeading">الوحدات المتاحة</h2>
+      <ul id="unitsList"><li class="muted">جارٍ الفحص...</li></ul>
+    </section>
 
-  function renderUnits() {
-    unitsListEl.innerHTML = "";
-    AYHEM.units.forEach(u => {
-      const li = document.createElement("li");
-      li.textContent = u.path;
-      li.className = AYHEM.registry[u.path]?.loaded ? "loaded" : "pending";
-      unitsListEl.appendChild(li);
-    });
-  }
+    <section class="card wide" aria-labelledby="logHeading">
+      <h2 id="logHeading">سجل اللوحة</h2>
+      <pre id="logArea" role="status" aria-live="polite"></pre>
+      <div class="actions">
+        <button class="btn" id="exportBtn" type="button">تصدير السجل</button>
+      </div>
+    </section>
+  </main>
 
-  function renderLog() {
-    logArea.textContent = AYHEM.exportLog();
-    logArea.scrollTop = logArea.scrollHeight;
-  }
+  <footer>AYHEM — لوحة متابعة محلية. فحص الواجهة لا يعني أن الخدمات السحابية أو الذكاء الاصطناعي متصلان.</footer>
 
-  btnRefresh.onclick = async () => { await AYHEM.scanUnits(); renderUnits(); renderLog(); };
-  btnExport.onclick = () => { 
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(AYHEM.exportLog());
-    const a = document.createElement("a");
-    a.setAttribute("href", dataStr);
-    a.setAttribute("download", "AYHEM_log.json");
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  };
-
-  btnToggle.onclick = () => {
-    AYHEM.autoUpdate = !AYHEM.autoUpdate;
-    btnToggle.textContent = AYHEM.autoUpdate ? "إيقاف التحديث التلقائي" : "تشغيل التحديث التلقائي";
-    btnToggle.className = AYHEM.autoUpdate ? "btn-stop" : "btn-start";
-  };
-
-  btnSetInterval.onclick = () => {
-    const val = parseInt(scanInput.value);
-    if (!isNaN(val) && val > 0) {
-      AYHEM.scanInterval = val;
-      renderLog();
-      AYHEM.logAction(`تم تحديث سرعة المسح إلى ${val} مللي ثانية`);
-    }
-  };
-
-  // تحديث دوري للعرض
-  setInterval(() => { renderUnits(); renderLog(); }, 1000);
-
-})();
-</script>
-
+  <script>
+    (() => {
+      "use strict";
+      const byId = id => document.getElementById(id);
+      const knownModules = [
+        ["تسجيل الدخول السحابي", "./integrations/supabase/ayhem-auth-ui.js"],
+        ["الذاكرة السحابية", "./integrations/supabase/ayhem-memory-ui.js"],
+        ["مهام TinyFish", "./integrations/supabase/ayhem-tinyfish-ui.js"],
+        ["واجهة AI Gateway", "./integrations/ai-network/ayhem-ai-ui.js"],
+        ["طبقة تشغيل العقل", "./ayhem-glitch.html"]
+      ];
+      const events = [];
+      const log = message => {
+        const item = { at: new Date().toISOString(), message };
+        events.push(item);
+        byId("logArea").textContent = JSON.stringify(events, null, 2);
+      };
+      function render() {
+        const core = window.AYHEM_AI_CORE;
+        const available = Boolean(core && typeof core === "object");
+        byId("coreDot").className = "dot" + (available ? " ok" : "");
+        byId("coreStatus").textContent = available
+          ? "النواة موجودة في الصفحة."
+          : "النواة غير موصولة بلوحة التحكم حالياً.";
+        byId("coreDetail").textContent = available
+          ? "تم العثور على AYHEM_AI_CORE؛ لا يعني ذلك وحده أن كل وظائفها تعمل."
+          : "تعرض اللوحة حالة واضحة بدلاً من التوقف أو إظهار بيانات وهمية. لم نشغّل أي سكربت خارجي.";
+        const list = byId("unitsList");
+        list.replaceChildren();
+        knownModules.forEach(([name, path]) => {
+          const li = document.createElement("li");
+          li.textContent = name + " — " + path;
+          list.appendChild(li);
+        });
+        if (available && Array.isArray(core.units)) {
+          const li = document.createElement("li");
+          li.textContent = "وحدات مسجلة في النواة: " + core.units.length;
+          list.appendChild(li);
+        } else {
+          const li = document.createElement("li");
+          li.className = "muted";
+          li.textContent = "لا توجد قائمة وحدات حية متاحة من النواة.";
+          list.appendChild(li);
+        }
+        log("اكتمل فحص لوحة التحكم؛ النواة " + (available ? "موجودة" : "غير موصولة") + ".");
+      }
+      byId("refreshBtn").addEventListener("click", render);
+      byId("exportBtn").addEventListener("click", () => {
+        const data = JSON.stringify(events, null, 2);
+        const blob = new Blob([data], { type: "application/json;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "AYHEM-dashboard-log.json";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      });
+      render();
+    })();
+  </script>
 </body>
 </html>
