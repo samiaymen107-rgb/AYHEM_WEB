@@ -219,11 +219,12 @@ private fun MainShell(context: Context) {
         }
         Spacer(Modifier.height(20.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            listOf("الرئيسية", "الذاكرة", "الأمان", "الإعدادات").forEach { item ->
+            listOf("الرئيسية", "المساعد", "الذاكرة", "الأمان", "الإعدادات").forEach { item ->
                 TextButton(onClick = { selected = item }) { Text(item, color = if (selected == item) Cyan else Color(0xFF9CB9D2), fontSize = 12.sp) }
             }
         }
         when (selected) {
+            "المساعد" -> AssistantScreen(token != null, memories, busy)
             "الذاكرة" -> MemoryScreen(token, memories, busy, message,
                 onLogin = { email, password ->
                     scope.launch {
@@ -264,7 +265,7 @@ private fun MainShell(context: Context) {
                 Spacer(Modifier.height(12.dp))
                 FeatureCard("الحماية والخصوصية", "تشفير جلسة الدخول وعزل بيانات الحساب", Icons.Default.Security) { selected = "الأمان" }
                 Spacer(Modifier.height(12.dp))
-                FeatureCard("المساعد الذكي", "واجهة المساعد قيد الربط", Icons.Default.AutoAwesome) { message = "سيتم ربط المساعد في مرحلة لاحقة." }
+                FeatureCard("المساعد الذكي", "اسأل عن معلوماتك المحفوظة في الذاكرة", Icons.Default.AutoAwesome) { selected = "المساعد" }
                 Spacer(Modifier.weight(1f))
                 if (message.isNotBlank()) Text(message, color = Cyan, fontSize = 12.sp)
                 Text("AYHEM AI • الإصدار 1.1", color = Color(0xFF6F8DA8), fontSize = 11.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
@@ -336,5 +337,53 @@ private fun FeatureCard(title: String, subtitle: String, icon: androidx.compose.
             Spacer(Modifier.width(14.dp))
             Column { Text(title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp); Spacer(Modifier.height(3.dp)); Text(subtitle, color = Color(0xFFA9C7DF), fontSize = 12.sp) }
         }
+    }
+}
+
+
+@Composable
+private fun AssistantScreen(isSignedIn: Boolean, memories: List<MemoryItem>, busy: Boolean) {
+    data class ChatLine(val fromUser: Boolean, val text: String)
+    var question by remember { mutableStateOf("") }
+    var chat by remember {
+        mutableStateOf(listOf(ChatLine(false, "مرحباً! أنا مساعد AYHEM. أستطيع البحث في معلوماتك المحفوظة ومساعدتك في استرجاعها.")))
+    }
+    Column(Modifier.fillMaxSize()) {
+        Text("المساعد الذكي", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text(if (isSignedIn) "مرتبط بذاكرتك السحابية" else "سجّل الدخول إلى الذاكرة لتفعيل البحث في معلوماتك", color = Cyan, fontSize = 12.sp)
+        Spacer(Modifier.height(10.dp))
+        LazyColumn(Modifier.weight(1f).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(chat) { line ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = if (line.fromUser) Arrangement.End else Arrangement.Start) {
+                    Surface(color = if (line.fromUser) Color(0xFF124B78) else Panel, shape = RoundedCornerShape(16.dp)) {
+                        Text(line.text, color = Ice, modifier = Modifier.padding(12.dp))
+                    }
+                }
+            }
+        }
+        OutlinedTextField(value = question, onValueChange = { question = it }, modifier = Modifier.fillMaxWidth(), label = { Text("اكتب سؤالك") }, minLines = 1, maxLines = 3)
+        Button(
+            onClick = {
+                val q = question.trim()
+                if (q.isNotEmpty()) {
+                    val tokens = q.lowercase().split(Regex("[^\\p{L}\\p{N}]+")).filter { it.length >= 3 }
+                    val ranked = if (isSignedIn) memories.map { item ->
+                        val haystack = (item.title + " " + item.content + " " + item.category).lowercase()
+                        item to tokens.count { haystack.contains(it) }
+                    }.filter { it.second > 0 }.sortedByDescending { it.second } else emptyList()
+                    val answer = when {
+                        !isSignedIn -> "للبحث في ذاكرتك، افتح تبويب الذاكرة وسجّل الدخول أولاً."
+                        ranked.isNotEmpty() -> ranked.take(3).joinToString("\n\n") { (item, _) -> "وجدت في ذاكرتك: ${item.title}\n${item.content}" }
+                        tokens.isEmpty() -> "اكتب سؤالاً أو كلمة مفتاحية واضحة لأبحث عنها في ذاكرتك."
+                        else -> "لم أعثر على معلومة مطابقة في محفوظاتك الحالية. يمكنك حفظها أولاً من تبويب الذاكرة ثم سؤالي عنها."
+                    }
+                    chat = chat + ChatLine(true, q) + ChatLine(false, answer)
+                    question = ""
+                }
+            },
+            enabled = question.isNotBlank() && !busy,
+            modifier = Modifier.fillMaxWidth()
+        ) { Text("إرسال") }
+        Text("الإصدار الأول: بحث ذكي في محفوظاتك؛ التوليد الحواري الموسّع يحتاج ربط نموذج AI خادمي.", color = Color(0xFF7898B4), fontSize = 10.sp)
     }
 }
