@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <title>AYHEM — Glitch Layer</title>
@@ -7,8 +7,10 @@
 <style>
 body {
     margin:0;
-    background:#000;
+    background:#050914;
+    color:#e8ecff;
     overflow:hidden;
+    font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;
 }
 
 /* الحاوية */
@@ -22,12 +24,26 @@ body {
 }
 
 /* الصورة */
-.glitch-container img {
-    position:absolute;
-    width:100%;
-    height:100%;
-    object-fit:cover;
+.glitch-container {
+    background:
+      radial-gradient(ellipse at 50% 45%, rgba(20,72,115,.65), transparent 55%),
+      linear-gradient(135deg,#050914 0%,#101a35 50%,#03050c 100%);
 }
+.glitch-container::before,
+.glitch-container::after {
+    content:"";
+    position:absolute;
+    inset:-20%;
+    background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(90,180,255,.07) 4px,transparent 5px 8px);
+    animation:scan 7s linear infinite;
+    pointer-events:none;
+}
+.glitch-container::after {
+    background:linear-gradient(90deg,transparent 0 47%,rgba(0,240,255,.10) 49%,transparent 52%);
+    animation:drift 5s ease-in-out infinite alternate;
+}
+@keyframes scan { from { transform:translateY(-4%); } to { transform:translateY(4%); } }
+@keyframes drift { from { transform:translateX(-4%); } to { transform:translateX(4%); } }
 
 /* طبقات التشويه */
 .glitch-layer {
@@ -37,18 +53,20 @@ body {
     background-size:cover;
     mix-blend-mode:screen;
     opacity:0.7;
+    pointer-events:none;
 }
 
 /* النص */
 .overlay-text {
     position:absolute;
-    bottom:40px;
-    left:40px;
-    color:#00f0ff;
+    bottom:clamp(20px,6vh,60px);
+    right:clamp(20px,6vw,60px);
+    color:#d8f8ff;
     font-size:28px;
     max-width:400px;
     line-height:1.4;
     text-shadow:0 0 10px #00f0ff;
+    z-index:2;
 }
 </style>
 
@@ -93,7 +111,7 @@ function start() {
     ];
 
     layers.forEach((layer, i) => {
-        layer.style.backgroundImage = "url('image.jpg')";
+        layer.style.backgroundImage = "linear-gradient(135deg,rgba(0,240,255,.12),rgba(120,80,255,.08))";
         glitch(layer, (i+1)*20);
     });
 }
