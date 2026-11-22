@@ -9,11 +9,11 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "tn.ayhem.ai"
+        applicationId = "tn.ayhem.ai.unified"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.2.0"
         buildConfigField("String", "SUPABASE_URL", "\"https://qmasgqvfnjlticwmovpn.supabase.co\"")
         buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"sb_publishable_GB0GnqMhdTWnQTsTfL--AQ_boZuXaH3\"")
     }
