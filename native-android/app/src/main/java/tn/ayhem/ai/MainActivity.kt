@@ -256,7 +256,7 @@ private fun MainShell(context: Context) {
                 onLogout = { SecureTokenStore.clear(context); token = null; memories = emptyList(); message = "تم تسجيل الخروج." }
             )
             "الأمان" -> InfoScreen("الحماية والخصوصية", "تُحمى جلسة الدخول محلياً بتشفير Android Keystore. وتُقيّد سجلات الذاكرة بسياسات RLS في Supabase.")
-            "الإعدادات" -> InfoScreen("الإعدادات", "AYHEM AI 1.1 • خادم الذاكرة: Supabase • الاتصال يتطلب تسجيل الدخول.")
+            "الإعدادات" -> InfoScreen("الإعدادات", "AYHEM AI 1.2 • خادم الذاكرة: Supabase • الاتصال يتطلب تسجيل الدخول.")
             else -> {
                 Text("مرحباً بك", color = Color.White, fontSize = 29.sp, fontWeight = FontWeight.Bold)
                 Text("مساحتك الذكية لتنظيم المعرفة والأفكار", color = Color(0xFFB7D5EA), fontSize = 15.sp)
@@ -268,7 +268,7 @@ private fun MainShell(context: Context) {
                 FeatureCard("المساعد الذكي", "اسأل عن معلوماتك المحفوظة في الذاكرة", Icons.Default.AutoAwesome) { selected = "المساعد" }
                 Spacer(Modifier.weight(1f))
                 if (message.isNotBlank()) Text(message, color = Cyan, fontSize = 12.sp)
-                Text("AYHEM AI • الإصدار 1.1", color = Color(0xFF6F8DA8), fontSize = 11.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                Text("AYHEM AI • الإصدار 1.2", color = Color(0xFF6F8DA8), fontSize = 11.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
             }
         }
     }
