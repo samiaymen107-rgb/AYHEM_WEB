@@ -478,3 +478,5 @@ private fun ChatScreen(
         }
     }
 }
+
+// Build verification: latest AYHEM assistant source.
