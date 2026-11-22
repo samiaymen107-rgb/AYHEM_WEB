@@ -62,6 +62,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+private data class AuthSession(val accessToken: String, val refreshToken: String)
+
+private class HttpFailure(val status: Int, message: String) : IllegalStateException(message)
+
 private object SecureTokenStore {
     private const val PREFS = "ayhem_secure_session"
     private const val ALIAS = "ayhem_session_key"
@@ -80,22 +84,30 @@ private object SecureTokenStore {
         return generator.generateKey()
     }
 
-    fun save(context: Context, token: String) {
+    fun save(context: Context, session: AuthSession) {
+        val payload = JSONObject().put("access_token", session.accessToken)
+            .put("refresh_token", session.refreshToken).toString()
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.ENCRYPT_MODE, key(context))
-        val encrypted = cipher.doFinal(token.toByteArray(StandardCharsets.UTF_8))
+        val encrypted = cipher.doFinal(payload.toByteArray(StandardCharsets.UTF_8))
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         prefs.edit().putString("iv", android.util.Base64.encodeToString(cipher.iv, android.util.Base64.NO_WRAP))
             .putString("token", android.util.Base64.encodeToString(encrypted, android.util.Base64.NO_WRAP)).apply()
     }
 
-    fun read(context: Context): String? = try {
+    fun read(context: Context): AuthSession? = try {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val iv = android.util.Base64.decode(prefs.getString("iv", null), android.util.Base64.NO_WRAP)
         val data = android.util.Base64.decode(prefs.getString("token", null), android.util.Base64.NO_WRAP)
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.DECRYPT_MODE, key(context), GCMParameterSpec(128, iv))
-        String(cipher.doFinal(data), StandardCharsets.UTF_8)
+        val payload = String(cipher.doFinal(data), StandardCharsets.UTF_8)
+        try {
+            val json = JSONObject(payload)
+            AuthSession(json.getString("access_token"), json.optString("refresh_token"))
+        } catch (_: Exception) {
+            AuthSession(payload, "")
+        }
     } catch (_: Exception) { null }
 
     fun clear(context: Context) {
@@ -127,15 +139,37 @@ private object AyhemCloud {
         if (code !in 200..299) {
             val message = try { JSONObject(response).optString("msg", JSONObject(response).optString("message", "HTTP $code")) }
             catch (_: Exception) { "HTTP $code" }
-            throw IllegalStateException(message)
+            throw HttpFailure(code, message)
         }
         return response
     }
 
-    fun signIn(email: String, password: String): String {
+    private fun sessionFrom(response: String): AuthSession {
+        val result = JSONObject(response)
+        return AuthSession(result.getString("access_token"), result.getString("refresh_token"))
+    }
+
+    fun signIn(email: String, password: String): AuthSession {
         val body = JSONObject().put("email", email).put("password", password).toString()
-        val result = JSONObject(request("/auth/v1/token?grant_type=password", "POST", body))
-        return result.getString("access_token")
+        return sessionFrom(request("/auth/v1/token?grant_type=password", "POST", body))
+    }
+
+    private fun refresh(refreshToken: String): AuthSession {
+        val body = JSONObject().put("refresh_token", refreshToken).toString()
+        return sessionFrom(request("/auth/v1/token?grant_type=refresh_token", "POST", body))
+    }
+
+    data class CloudResult<T>(val value: T, val session: AuthSession)
+
+    fun <T> authenticated(context: Context, session: AuthSession, action: (String) -> T): CloudResult<T> {
+        try {
+            return CloudResult(action(session.accessToken), session)
+        } catch (error: HttpFailure) {
+            if (error.status != 401 || session.refreshToken.isBlank()) throw error
+            val renewed = refresh(session.refreshToken)
+            SecureTokenStore.save(context, renewed)
+            return CloudResult(action(renewed.accessToken), renewed)
+        }
     }
 
     fun listMemories(token: String): List<MemoryItem> {
@@ -203,8 +237,14 @@ private fun MainShell(context: Context) {
     LaunchedEffect(token) {
         if (token != null) {
             busy = true
-            try { memories = withContext(Dispatchers.IO) { AyhemCloud.listMemories(token!!) }; message = "" }
-            catch (e: Exception) { message = "تعذر تحميل الذاكرة: ${e.message}" }
+            try {
+                val result = withContext(Dispatchers.IO) {
+                    AyhemCloud.authenticated(context, token!!) { AyhemCloud.listMemories(it) }
+                }
+                token = result.session
+                memories = result.value
+                message = ""
+            } catch (e: Exception) { message = "تعذر تحميل الذاكرة: ${e.message}" }
             finally { busy = false }
         }
     }
@@ -240,16 +280,34 @@ private fun MainShell(context: Context) {
                 onAdd = { title, content, category ->
                     scope.launch {
                         busy = true; message = ""
-                        try { withContext(Dispatchers.IO) { AyhemCloud.addMemory(token!!, title, content, category) }; memories = withContext(Dispatchers.IO) { AyhemCloud.listMemories(token!!) }; message = "تم حفظ المعلومة في الذاكرة السحابية." }
-                        catch (e: Exception) { message = "لم يتم الحفظ: ${e.message}" }
+                        try {
+                            val saved = withContext(Dispatchers.IO) {
+                                AyhemCloud.authenticated(context, token!!) {
+                                    AyhemCloud.addMemory(it, title, content, category)
+                                }
+                            }
+                            token = saved.session
+                            val loaded = withContext(Dispatchers.IO) {
+                                AyhemCloud.authenticated(context, token!!) { AyhemCloud.listMemories(it) }
+                            }
+                            token = loaded.session
+                            memories = loaded.value
+                            message = "تم حفظ المعلومة في الذاكرة السحابية."
+                        } catch (e: Exception) { message = "لم يتم الحفظ: ${e.message}" }
                         finally { busy = false }
                     }
                 },
                 onDelete = { id ->
                     scope.launch {
                         busy = true
-                        try { withContext(Dispatchers.IO) { AyhemCloud.deleteMemory(token!!, id) }; memories = memories.filterNot { it.id == id }; message = "تم الحذف." }
-                        catch (e: Exception) { message = "تعذر الحذف: ${e.message}" }
+                        try {
+                            val result = withContext(Dispatchers.IO) {
+                                AyhemCloud.authenticated(context, token!!) { AyhemCloud.deleteMemory(it, id) }
+                            }
+                            token = result.session
+                            memories = memories.filterNot { it.id == id }
+                            message = "تم الحذف."
+                        } catch (e: Exception) { message = "تعذر الحذف: ${e.message}" }
                         finally { busy = false }
                     }
                 },
@@ -275,7 +333,7 @@ private fun MainShell(context: Context) {
 }
 
 @Composable
-private fun MemoryScreen(modifier: Modifier = Modifier, token: String?, memories: List<MemoryItem>, busy: Boolean, message: String,
+private fun MemoryScreen(modifier: Modifier = Modifier, token: AuthSession?, memories: List<MemoryItem>, busy: Boolean, message: String,
     onLogin: (String, String) -> Unit, onAdd: (String, String, String) -> Unit, onDelete: (String) -> Unit, onLogout: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
