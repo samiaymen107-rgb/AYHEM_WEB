@@ -12,11 +12,16 @@ android {
         applicationId = "tn.ayhem.ai"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
+        buildConfigField("String", "SUPABASE_URL", "\"https://qmasgqvfnjlticwmovpn.supabase.co\"")
+        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"sb_publishable_GB0GnqMhdTWnQTsTfL--AQ_boZuXaH3\"")
     }
 
-    buildFeatures {\n        compose = true\n        buildConfig = true\n    }\n\n    defaultConfig {\n        buildConfigField("String", "SUPABASE_URL", "\\\"https://qmasgqvfnjlticwmovpn.supabase.co\\\"")\n        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\\\"sb_publishable_GB0GnqMhdTWnQTsTfL--AQ_boZuXaH3\\\"")\n    }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
