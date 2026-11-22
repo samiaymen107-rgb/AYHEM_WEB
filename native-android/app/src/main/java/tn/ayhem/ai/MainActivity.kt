@@ -137,7 +137,7 @@ private object AyhemCloud {
         val response = stream?.bufferedReader()?.use { it.readText() } ?: ""
         connection.disconnect()
         if (code !in 200..299) {
-            val message = try { JSONObject(response).optString("msg", JSONObject(response).optString("message", "HTTP $code")) }
+            val message = try { JSONObject(response).optString("msg", JSONObject(response).optString("message", JSONObject(response).optString("error", "HTTP $code"))) }
             catch (_: Exception) { "HTTP $code" }
             throw HttpFailure(code, message)
         }
