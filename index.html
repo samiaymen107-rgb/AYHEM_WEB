@@ -176,6 +176,15 @@
       </div>
     </section>
 
+    <section class="panel auth-panel" aria-labelledby="memoryTitle">
+      <h2 id="memoryTitle">الذاكرة السحابية / Cloud Memory</h2>
+      <p id="memoryStatus" class="ai-status" role="status" aria-live="polite">سجّل الدخول ثم اعرض سجلات حسابك. هذه الواجهة للقراءة فقط.</p>
+      <div class="actions">
+        <button class="secondary" id="memoryLoadBtn" type="button" disabled>عرض الذاكرة السحابية</button>
+      </div>
+      <pre id="memoryOutput" class="ai-output" aria-live="polite"></pre>
+    </section>
+
     <section class="panel auth-panel" aria-labelledby="authTitle">
       <h2 id="authTitle">تسجيل الدخول إلى AYHEM / Supabase Auth</h2>
       <p id="authStatus" class="ai-status" role="status" aria-live="polite">جارٍ تهيئة تسجيل الدخول...</p>
@@ -240,6 +249,7 @@
     });
   </script>
   <script type="module" src="./integrations/supabase/ayhem-auth-ui.js"></script>
+  <script type="module" src="./integrations/supabase/ayhem-memory-ui.js"></script>
   <script type="module" src="./integrations/supabase/ayhem-tinyfish-ui.js"></script>
   <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js"></script>
 </body>
