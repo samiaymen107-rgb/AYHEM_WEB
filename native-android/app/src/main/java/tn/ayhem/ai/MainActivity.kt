@@ -192,8 +192,12 @@ private object AyhemCloud {
 
     fun askAssistant(token: String, prompt: String, memoryContext: String): String {
         val body = JSONObject().put("message", prompt).put("memory_context", memoryContext).toString()
-        return JSONObject(request("/functions/v1/ayhem-openai-chat", "POST", body, token))
-            .optString("reply").ifBlank { "لم يصل رد قابل للعرض من المساعد." }
+        val response = JSONObject(request("/functions/v1/ayhem-openai-chat", "POST", body, token))
+        val reply = response.optString("reply").trim()
+        if (reply.isNotEmpty()) return reply
+        val serverError = response.optString("error").trim()
+        if (serverError.isNotEmpty()) throw IllegalStateException(serverError)
+        return "لم يصل رد قابل للعرض من المساعد. حاول مرة أخرى."
     }
 }
 
