@@ -3,7 +3,7 @@
 Date: 2026-11-22
 Repository: `samiaymen107-rgb/AYHEM_WEB`
 Working branch: `integration/ayhem-app-foundation-v1`
-Base branch: `main`
+Base branch: `main`\nDraft pull request: [#45](https://github.com/samiaymen107-rgb/AYHEM_WEB/pull/45) — review only, not merged.
 
 ## Completed
 - Added browser Supabase Auth adapter using pinned Supabase JS 2.57.0.
