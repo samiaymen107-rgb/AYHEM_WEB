@@ -1,9 +1,10 @@
-name: AYHEM AI Native Android APK
+name: AYHEM AI Unified Debug Android APK
 on:
   push:
     branches:
       - native/ayhem-ai-kotlin-v1
       - native/ayhem-ai-v1.1-stable
+      - native/ayhem-ai-unified-debug
     paths:
       - 'native-android/**'
       - '.github/workflows/ayhem-native-android.yml'
@@ -37,7 +38,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AYHEM-AI-Native-debug
+          name: AYHEM-AI-Unified-Debug
           path: native-android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
