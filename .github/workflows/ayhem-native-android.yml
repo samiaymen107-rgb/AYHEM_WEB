@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - native/ayhem-ai-kotlin-v1
+      - native/ayhem-ai-v1.1-stable
     paths:
       - 'native-android/**'
       - '.github/workflows/ayhem-native-android.yml'
