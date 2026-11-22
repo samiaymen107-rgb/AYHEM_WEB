@@ -1,0 +1,15 @@
+<resources>
+    <style name="Theme.AYHEM" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#20CFFF</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">#06152D</item>
+        <item name="android:navigationBarColor">#06152D</item>
+        <item name="android:windowActionModeOverlay">true</item>
+    </style>
+    <style name="Theme.AYHEM.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#06152D</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_ayhem_brain</item>
+        <item name="postSplashScreenTheme">@style/Theme.AYHEM</item>
+    </style>
+</resources>
