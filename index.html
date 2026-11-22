@@ -116,7 +116,11 @@
       font-size: .92rem;
     }
 
-    .auth-panel { margin: 0 24px 24px; }\n    .auth-panel input { width: 100%; margin-top: 8px; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: #0b1020; color: var(--text); font: inherit; }\n    .auth-panel label { display: block; margin-top: 12px; }\n    .auth-panel [hidden] { display: none !important; }\n    .ai-panel { margin: 0 24px 24px; }
+    .auth-panel { margin: 0 24px 24px; }
+    .auth-panel input { width: 100%; margin-top: 8px; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: #0b1020; color: var(--text); font: inherit; }
+    .auth-panel label { display: block; margin-top: 12px; }
+    .auth-panel [hidden] { display: none !important; }
+    .ai-panel { margin: 0 24px 24px; }
     .ai-panel textarea {
       width: 100%; min-height: 100px; resize: vertical;
       padding: 12px; border-radius: 12px; border: 1px solid var(--border);
@@ -171,7 +175,34 @@
       </div>
     </section>
 
-    <section class="panel auth-panel" aria-labelledby="authTitle">\n      <h2 id="authTitle">تسجيل الدخول إلى AYHEM / Supabase Auth</h2>\n      <p id="authStatus" class="ai-status" role="status" aria-live="polite">جارٍ تهيئة تسجيل الدخول...</p>\n      <form id="authForm">\n        <label for="authEmail">البريد الإلكتروني</label>\n        <input id="authEmail" type="email" autocomplete="username" required />\n        <label for="authPassword">كلمة المرور</label>\n        <input id="authPassword" type="password" autocomplete="current-password" required />\n        <div class="actions"><button class="primary" id="authSubmit" type="submit">تسجيل الدخول</button></div>\n      </form>\n      <button class="secondary" id="authSignOut" type="button" hidden>تسجيل الخروج</button>\n    </section>\n\n    <section class="panel auth-panel" aria-labelledby="tinyfishTitle">\n      <h2 id="tinyfishTitle">مهام TinyFish</h2>\n      <p id="tinyfishStatus" class="ai-status" role="status" aria-live="polite">يتطلب تسجيل الدخول. التشغيل قد يستهلك رصيد TinyFish.</p>\n      <form id="tinyfishForm">\n        <label for="tinyfishUrl">رابط الصفحة (HTTPS)</label>\n        <input id="tinyfishUrl" type="url" inputmode="url" placeholder="https://example.com" required />\n        <label for="tinyfishGoal">المهمة المطلوبة</label>\n        <input id="tinyfishGoal" type="text" maxlength="4000" placeholder="صف ما تريد من أيهم تنفيذه..." required />\n        <label><input id="tinyfishConsent" type="checkbox" required /> أوافق على تشغيل المهمة وقد تستهلك رصيد TinyFish.</label>\n        <div class="actions"><button class="primary" id="tinyfishSubmit" type="submit">تشغيل المهمة</button></div>\n      </form>\n      <pre id="tinyfishOutput" class="ai-output" aria-live="polite"></pre>\n    </section>\n\n    <section class="panel ai-panel" aria-labelledby="aiTitle">
+    <section class="panel auth-panel" aria-labelledby="authTitle">
+      <h2 id="authTitle">تسجيل الدخول إلى AYHEM / Supabase Auth</h2>
+      <p id="authStatus" class="ai-status" role="status" aria-live="polite">جارٍ تهيئة تسجيل الدخول...</p>
+      <form id="authForm">
+        <label for="authEmail">البريد الإلكتروني</label>
+        <input id="authEmail" type="email" autocomplete="username" required />
+        <label for="authPassword">كلمة المرور</label>
+        <input id="authPassword" type="password" autocomplete="current-password" required />
+        <div class="actions"><button class="primary" id="authSubmit" type="submit">تسجيل الدخول</button></div>
+      </form>
+      <button class="secondary" id="authSignOut" type="button" hidden>تسجيل الخروج</button>
+    </section>
+
+    <section class="panel auth-panel" aria-labelledby="tinyfishTitle">
+      <h2 id="tinyfishTitle">مهام TinyFish</h2>
+      <p id="tinyfishStatus" class="ai-status" role="status" aria-live="polite">يتطلب تسجيل الدخول. التشغيل قد يستهلك رصيد TinyFish.</p>
+      <form id="tinyfishForm">
+        <label for="tinyfishUrl">رابط الصفحة (HTTPS)</label>
+        <input id="tinyfishUrl" type="url" inputmode="url" placeholder="https://example.com" required />
+        <label for="tinyfishGoal">المهمة المطلوبة</label>
+        <input id="tinyfishGoal" type="text" maxlength="4000" placeholder="صف ما تريد من أيهم تنفيذه..." required />
+        <label><input id="tinyfishConsent" type="checkbox" required /> أوافق على تشغيل المهمة وقد تستهلك رصيد TinyFish.</label>
+        <div class="actions"><button class="primary" id="tinyfishSubmit" type="submit">تشغيل المهمة</button></div>
+      </form>
+      <pre id="tinyfishOutput" class="ai-output" aria-live="polite"></pre>
+    </section>
+
+    <section class="panel ai-panel" aria-labelledby="aiTitle">
       <h2 id="aiTitle">الاتصال بالذكاء الاصطناعي / AI Gateway</h2>
       <p id="aiConnectionStatus" class="ai-status" role="status" aria-live="polite">جارٍ التحقق من إعداد الاتصال...</p>
       <label for="aiPrompt">رسالتك إلى أيهم</label>
@@ -207,6 +238,8 @@
       window.location.href = 'AYHEM_DASHBOARD.html';
     });
   </script>
-  <script type="module" src="./integrations/supabase/ayhem-auth-ui.js"></script>\n  <script type="module" src="./integrations/supabase/ayhem-tinyfish-ui.js"></script>\n  <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js"></script>
+  <script type="module" src="./integrations/supabase/ayhem-auth-ui.js"></script>
+  <script type="module" src="./integrations/supabase/ayhem-tinyfish-ui.js"></script>
+  <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js"></script>
 </body>
 </html>
