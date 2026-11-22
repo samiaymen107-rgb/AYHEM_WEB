@@ -189,6 +189,12 @@ private object AyhemCloud {
     fun deleteMemory(token: String, id: String) {
         request("/rest/v1/ayhem_memories?id=eq.$id", "DELETE", token = token)
     }
+
+    fun askAssistant(token: String, prompt: String, memoryContext: String): String {
+        val body = JSONObject().put("message", prompt).put("memory_context", memoryContext).toString()
+        return JSONObject(request("/functions/v1/ayhem-openai-chat", "POST", body, token))
+            .optString("reply").ifBlank { "لم يصل رد قابل للعرض من المساعد." }
+    }
 }
 
 @Composable
@@ -232,6 +238,7 @@ private fun MainShell(context: Context) {
     var memories by remember { mutableStateOf(emptyList<MemoryItem>()) }
     var busy by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
+    var chatMessages by remember { mutableStateOf(listOf(ChatMessage("assistant", "مرحباً، أنا AYHEM AI. كيف أستطيع مساعدتك اليوم؟"))) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(token) {
@@ -315,6 +322,34 @@ private fun MainShell(context: Context) {
             )
             "الأمان" -> InfoScreen("الحماية والخصوصية", "تُحمى جلسة الدخول محلياً بتشفير Android Keystore. وتُقيّد سجلات الذاكرة بسياسات RLS في Supabase.")
             "الإعدادات" -> InfoScreen("الإعدادات", "AYHEM AI 1.1 • خادم الذاكرة: Supabase • الاتصال يتطلب تسجيل الدخول.")
+            "المساعد" -> ChatScreen(
+                token = token, busy = busy, status = message, messages = chatMessages,
+                onGoMemory = { selected = "الذاكرة" },
+                onSend = { prompt ->
+                    val current = token
+                    if (current == null) {
+                        message = "سجّل الدخول أولاً من قسم الذاكرة."
+                    } else {
+                        chatMessages = chatMessages + ChatMessage("user", prompt)
+                        busy = true
+                        message = ""
+                        scope.launch {
+                            try {
+                                val contextText = memories.take(20).joinToString("\n") { "- " + it.title + ": " + it.content }.take(10000)
+                                val result = withContext(Dispatchers.IO) {
+                                    AyhemCloud.authenticated(context, current) {
+                                        AyhemCloud.askAssistant(it, prompt, contextText)
+                                    }
+                                }
+                                token = result.session
+                                chatMessages = chatMessages + ChatMessage("assistant", result.value)
+                            } catch (e: Exception) {
+                                message = "تعذر الحصول على الرد: " + e.message
+                            } finally { busy = false }
+                        }
+                    }
+                }
+            )
             else -> {
                 Text("مرحباً بك", color = Color.White, fontSize = 29.sp, fontWeight = FontWeight.Bold)
                 Text("مساحتك الذكية لتنظيم المعرفة والأفكار", color = Color(0xFFB7D5EA), fontSize = 15.sp)
@@ -323,7 +358,7 @@ private fun MainShell(context: Context) {
                 Spacer(Modifier.height(12.dp))
                 FeatureCard("الحماية والخصوصية", "تشفير جلسة الدخول وعزل بيانات الحساب", Icons.Default.Security) { selected = "الأمان" }
                 Spacer(Modifier.height(12.dp))
-                FeatureCard("المساعد الذكي", "واجهة المساعد قيد الربط", Icons.Default.AutoAwesome) { message = "سيتم ربط المساعد في مرحلة لاحقة." }
+                FeatureCard("المساعد الذكي", "محادثة ذكية متصلة بذاكرة AYHEM", Icons.Default.AutoAwesome) { selected = "المساعد" }
                 Spacer(Modifier.weight(1f))
                 if (message.isNotBlank()) Text(message, color = Cyan, fontSize = 12.sp)
                 Text("AYHEM AI • الإصدار 1.1", color = Color(0xFF6F8DA8), fontSize = 11.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
@@ -394,6 +429,52 @@ private fun FeatureCard(title: String, subtitle: String, icon: androidx.compose.
             Box(Modifier.size(46.dp).background(Color(0xFF103B68), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) { Icon(icon, contentDescription = null, tint = Cyan) }
             Spacer(Modifier.width(14.dp))
             Column { Text(title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp); Spacer(Modifier.height(3.dp)); Text(subtitle, color = Color(0xFFA9C7DF), fontSize = 12.sp) }
+        }
+    }
+}
+
+
+private data class ChatMessage(val role: String, val text: String)
+
+@Composable
+private fun ChatScreen(
+    token: AuthSession?,
+    busy: Boolean,
+    status: String,
+    messages: List<ChatMessage>,
+    onGoMemory: () -> Unit,
+    onSend: (String) -> Unit
+) {
+    var draft by remember { mutableStateOf("") }
+    Column(Modifier.fillMaxSize()) {
+        Text("المساعد الذكي", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text("مدعوم بمحرك OpenAI • يستفيد من ذاكرة AYHEM الخاصة بك", color = Cyan, fontSize = 12.sp)
+        if (token == null) {
+            Spacer(Modifier.height(18.dp))
+            Text("يلزم تسجيل الدخول حتى يتمكن المساعد من استخدام حسابك وذاكرتك.", color = Ice)
+            Button(onClick = onGoMemory) { Text("الانتقال إلى الذاكرة وتسجيل الدخول") }
+        } else {
+            Spacer(Modifier.height(10.dp))
+            LazyColumn(Modifier.weight(1f).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(messages) { item ->
+                    val fromUser = item.role == "user"
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = if (fromUser) Arrangement.End else Arrangement.Start) {
+                        Surface(color = if (fromUser) Color(0xFF124C75) else Panel, shape = RoundedCornerShape(16.dp)) {
+                            Text(item.text, color = Color.White, modifier = Modifier.padding(12.dp))
+                        }
+                    }
+                }
+            }
+            if (status.isNotBlank()) Text(status, color = Color(0xFFFFC66D), fontSize = 12.sp)
+            if (busy) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Cyan)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(value = draft, onValueChange = { draft = it }, modifier = Modifier.weight(1f), placeholder = { Text("اكتب رسالتك...") }, maxLines = 4)
+                Spacer(Modifier.width(8.dp))
+                Button(onClick = {
+                    val value = draft.trim()
+                    if (value.isNotEmpty() && !busy) { onSend(value); draft = "" }
+                }, enabled = draft.isNotBlank() && !busy) { Text("إرسال") }
+            }
         }
     }
 }
