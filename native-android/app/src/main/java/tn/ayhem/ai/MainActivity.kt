@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -224,7 +225,7 @@ private fun MainShell(context: Context) {
             }
         }
         when (selected) {
-            "الذاكرة" -> MemoryScreen(token, memories, busy, message,
+            "الذاكرة" -> MemoryScreen(Modifier.weight(1f), token, memories, busy, message,
                 onLogin = { email, password ->
                     scope.launch {
                         busy = true; message = ""
@@ -274,20 +275,20 @@ private fun MainShell(context: Context) {
 }
 
 @Composable
-private fun MemoryScreen(token: String?, memories: List<MemoryItem>, busy: Boolean, message: String,
+private fun MemoryScreen(modifier: Modifier = Modifier, token: String?, memories: List<MemoryItem>, busy: Boolean, message: String,
     onLogin: (String, String) -> Unit, onAdd: (String, String, String) -> Unit, onDelete: (String) -> Unit, onLogout: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("عام") }
-    Column(Modifier.fillMaxSize()) {
+    Column(modifier.fillMaxWidth()) {
         Text("الذاكرة الرقمية", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         if (token == null) {
             Text("سجّل الدخول إلى حسابك لحفظ معلوماتك بشكل خاص.", color = Color(0xFFB7D5EA), fontSize = 13.sp)
             Spacer(Modifier.height(12.dp))
             OutlinedTextField(email, { email = it }, label = { Text("البريد الإلكتروني") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(password, { password = it }, label = { Text("كلمة المرور") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(password, { password = it }, label = { Text("كلمة المرور") }, singleLine = true, visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth())
             Button(onClick = { onLogin(email.trim(), password) }, enabled = !busy && email.contains("@") && password.isNotBlank(), modifier = Modifier.fillMaxWidth()) { Text(if (busy) "جارٍ الاتصال..." else "تسجيل الدخول") }
         } else {
             Text("متصل بالذاكرة السحابية الخاصة بحسابك", color = Cyan, fontSize = 12.sp)
