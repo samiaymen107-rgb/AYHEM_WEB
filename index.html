@@ -116,7 +116,7 @@
       font-size: .92rem;
     }
 
-    .ai-panel { margin: 0 24px 24px; }
+    .auth-panel { margin: 0 24px 24px; }\n    .auth-panel input { width: 100%; margin-top: 8px; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: #0b1020; color: var(--text); font: inherit; }\n    .auth-panel label { display: block; margin-top: 12px; }\n    .auth-panel [hidden] { display: none !important; }\n    .ai-panel { margin: 0 24px 24px; }
     .ai-panel textarea {
       width: 100%; min-height: 100px; resize: vertical;
       padding: 12px; border-radius: 12px; border: 1px solid var(--border);
@@ -171,7 +171,7 @@
       </div>
     </section>
 
-    <section class="panel ai-panel" aria-labelledby="aiTitle">
+    <section class="panel auth-panel" aria-labelledby="authTitle">\n      <h2 id="authTitle">تسجيل الدخول إلى AYHEM / Supabase Auth</h2>\n      <p id="authStatus" class="ai-status" role="status" aria-live="polite">جارٍ تهيئة تسجيل الدخول...</p>\n      <form id="authForm">\n        <label for="authEmail">البريد الإلكتروني</label>\n        <input id="authEmail" type="email" autocomplete="username" required />\n        <label for="authPassword">كلمة المرور</label>\n        <input id="authPassword" type="password" autocomplete="current-password" required />\n        <div class="actions"><button class="primary" id="authSubmit" type="submit">تسجيل الدخول</button></div>\n      </form>\n      <button class="secondary" id="authSignOut" type="button" hidden>تسجيل الخروج</button>\n    </section>\n\n    <section class="panel ai-panel" aria-labelledby="aiTitle">
       <h2 id="aiTitle">الاتصال بالذكاء الاصطناعي / AI Gateway</h2>
       <p id="aiConnectionStatus" class="ai-status" role="status" aria-live="polite">جارٍ التحقق من إعداد الاتصال...</p>
       <label for="aiPrompt">رسالتك إلى أيهم</label>
@@ -207,6 +207,6 @@
       window.location.href = 'AYHEM_DASHBOARD.html';
     });
   </script>
-  <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js"></script>
+  <script type="module" src="./integrations/supabase/ayhem-auth-ui.js"></script>\n  <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js"></script>
 </body>
 </html>
