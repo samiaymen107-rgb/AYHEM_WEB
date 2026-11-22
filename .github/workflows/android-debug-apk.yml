@@ -1,0 +1,58 @@
+name: AYHEM Android Debug APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - integration/ayhem-app-foundation-v1
+    paths:
+      - "**.html"
+      - "**.js"
+      - "**.css"
+      - "integrations/**"
+      - "scripts/prepare-web.mjs"
+      - "package.json"
+      - "capacitor.config.json"
+      - ".github/workflows/android-debug-apk.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build-debug-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Prepare web assets
+        run: npm run android:prepare
+      - name: Add Android platform
+        run: npx cap add android
+      - name: Sync Android project
+        run: npx cap sync android
+      - name: Build debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AYHEM-Android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
