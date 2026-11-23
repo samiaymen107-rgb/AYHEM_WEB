@@ -3,7 +3,8 @@ name: AYHEM AI Network Client Tests
 on:
   pull_request:
     paths:
-      - "integrations/ai-network/**"\n      - "integrations/supabase/**"
+      - "integrations/ai-network/**"
+      - "integrations/supabase/**"
       - "index.html"
       - "ayhem-fix-send.js"
       - "AYHEM_JS_Worker.js"
@@ -13,6 +14,7 @@ on:
     branches: [main, integration/ayhem-unified-cloud-runtime-v1]
     paths:
       - "integrations/ai-network/**"
+      - "integrations/supabase/**"
 
 permissions:
   contents: read
@@ -31,3 +33,9 @@ jobs:
       - name: Run AI network client tests
         working-directory: integrations/ai-network
         run: npm test
+      - name: Check Supabase integration modules
+        run: |
+          node --check integrations/supabase/ayhem-auth-ui.js
+          node --check integrations/supabase/ayhem-memory-ui.js
+          node --check integrations/supabase/ayhem-tinyfish-ui.js
+          node --check integrations/ai-network/ayhem-supabase-ai-ui.js
