@@ -10,7 +10,7 @@ on:
       - "contracts/ai-gateway/**"
       - ".github/workflows/ayhem-ai-network-tests.yml"
   push:
-    branches: [main]
+    branches: [main, integration/ayhem-unified-cloud-runtime-v1]
     paths:
       - "integrations/ai-network/**"
 
