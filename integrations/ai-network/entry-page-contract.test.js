@@ -8,7 +8,7 @@ test("main entry page loads the AI gateway UI and required controls", async () =
   assert.match(html, /id="aiConnectionStatus"/);
   assert.match(html, /id="aiPrompt"/);
   assert.match(html, /id="aiSendBtn"[^>]*disabled/);
-  assert.match(html, /id="aiOutput"/);
+  assert.match(html, /id="aiOutput"/);\n  assert.match(html, /id="aiMemoryConsent"/);
 });
 
 test("main entry page does not embed an AI provider key", async () => {
