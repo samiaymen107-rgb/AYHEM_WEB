@@ -3,7 +3,7 @@ name: AYHEM AI Network Client Tests
 on:
   pull_request:
     paths:
-      - "integrations/ai-network/**"
+      - "integrations/ai-network/**"\n      - "integrations/supabase/**"
       - "index.html"
       - "ayhem-fix-send.js"
       - "AYHEM_JS_Worker.js"
