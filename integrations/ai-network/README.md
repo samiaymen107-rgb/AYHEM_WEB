@@ -30,6 +30,8 @@
 
 ## TinyFish
 
+- The browser health check uses the JWT-protected GET/OPTIONS function; its CORS preflight is handled server-side and does not start an automation run.
+
 يظل TinyFish مساراً مستقلاً عبر `ayhem-tinyfish-run`. يتطلب جلسة Supabase وموافقة صريحة لكل مهمة قد تستهلك الرصيد. وجود اتصال TinyFish لدى ChatGPT لا يعني أن `TINYFISH_API_KEY` موجود في أسرار Supabase؛ يجب التحقق منه عبر وظيفة الصحة قبل إعلان تكامل التطبيق جاهزاً.
 
 ## مسار Cloudflare القديم
