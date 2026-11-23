@@ -1,10 +1,11 @@
-<a href="ayhem-glitch.html">تشغيل العقل</a><!doctype html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AYHEM WEB — العقل الرقمي الحي</title>
   <meta name="description" content="موقع مشروع أيهم — أول عقل رقمي حي" />
+  <meta name="ayhem-worker-url" content="" />
   <style>
     :root {
       --bg: #0b1020;
@@ -116,6 +117,10 @@
       font-size: .92rem;
     }
 
+    .auth-panel { margin: 0 24px 24px; }
+    .auth-panel input { width: 100%; margin-top: 8px; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: #0b1020; color: var(--text); font: inherit; }
+    .auth-panel label { display: block; margin-top: 12px; }
+    .auth-panel [hidden] { display: none !important; }
     .ai-panel { margin: 0 24px 24px; }
     .ai-panel textarea {
       width: 100%; min-height: 100px; resize: vertical;
@@ -146,6 +151,7 @@
 
       <div class="actions">
         <button class="primary" id="startBtn">بدء النظام / Start System</button>
+        <a class="button secondary" href="ayhem-glitch.html">تشغيل العقل</a>
         <button class="secondary" id="dashboardBtn">فتح لوحة التحكم / Dashboard</button>
         <a class="button secondary" href="AYHEM_PROGRESS_DASHBOARD.html">متابعة نسبة الإنجاز / Progress</a>
       </div>
@@ -169,6 +175,42 @@
           <li>UI: الواجهة والتحكم / Interface & Controls</li>
         </ul>
       </div>
+    </section>
+
+    <section class="panel auth-panel" aria-labelledby="memoryTitle">
+      <h2 id="memoryTitle">الذاكرة السحابية / Cloud Memory</h2>
+      <p id="memoryStatus" class="ai-status" role="status" aria-live="polite">سجّل الدخول ثم اعرض سجلات حسابك. هذه الواجهة للقراءة فقط.</p>
+      <div class="actions">
+        <button class="secondary" id="memoryLoadBtn" type="button" disabled>عرض الذاكرة السحابية</button>
+      </div>
+      <pre id="memoryOutput" class="ai-output" aria-live="polite"></pre>
+    </section>
+
+    <section class="panel auth-panel" aria-labelledby="authTitle">
+      <h2 id="authTitle">تسجيل الدخول إلى AYHEM / Supabase Auth</h2>
+      <p id="authStatus" class="ai-status" role="status" aria-live="polite">جارٍ تهيئة تسجيل الدخول...</p>
+      <form id="authForm">
+        <label for="authEmail">البريد الإلكتروني</label>
+        <input id="authEmail" type="email" autocomplete="username" required />
+        <label for="authPassword">كلمة المرور</label>
+        <input id="authPassword" type="password" autocomplete="current-password" required />
+        <div class="actions"><button class="primary" id="authSubmit" type="submit">تسجيل الدخول</button></div>
+      </form>
+      <button class="secondary" id="authSignOut" type="button" hidden>تسجيل الخروج</button>
+    </section>
+
+    <section class="panel auth-panel" aria-labelledby="tinyfishTitle">
+      <h2 id="tinyfishTitle">مهام TinyFish</h2>
+      <p id="tinyfishStatus" class="ai-status" role="status" aria-live="polite">يتطلب تسجيل الدخول. التشغيل قد يستهلك رصيد TinyFish.</p>
+      <form id="tinyfishForm">
+        <label for="tinyfishUrl">رابط الصفحة (HTTPS)</label>
+        <input id="tinyfishUrl" type="url" inputmode="url" placeholder="https://example.com" required />
+        <label for="tinyfishGoal">المهمة المطلوبة</label>
+        <input id="tinyfishGoal" type="text" maxlength="4000" placeholder="صف ما تريد من أيهم تنفيذه..." required />
+        <label><input id="tinyfishConsent" type="checkbox" required /> أوافق على تشغيل المهمة وقد تستهلك رصيد TinyFish.</label>
+        <div class="actions"><button class="primary" id="tinyfishSubmit" type="submit">تشغيل المهمة</button></div>
+      </form>
+      <pre id="tinyfishOutput" class="ai-output" aria-live="polite"></pre>
     </section>
 
     <section class="panel ai-panel" aria-labelledby="aiTitle">
@@ -207,6 +249,9 @@
       window.location.href = 'AYHEM_DASHBOARD.html';
     });
   </script>
+  <script type="module" src="./integrations/supabase/ayhem-auth-ui.js"></script>
+  <script type="module" src="./integrations/supabase/ayhem-memory-ui.js"></script>
+  <script type="module" src="./integrations/supabase/ayhem-tinyfish-ui.js"></script>
   <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js"></script>
 </body>
 </html>

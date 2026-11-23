@@ -1,0 +1,9 @@
+{
+  "appId": "tn.ayhem.app",
+  "appName": "AYHEM",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": false
+  }
+}
