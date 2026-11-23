@@ -31,7 +31,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: false
       - name: Run AI network client tests
         working-directory: integrations/ai-network
         run: npm test
