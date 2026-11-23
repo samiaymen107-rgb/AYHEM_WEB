@@ -1,86 +1,53 @@
 # AYHEM AI Network
 
-طبقة الاتصال الموحدة بين واجهات AYHEM وبوابة الذكاء الاصطناعي.
+طبقة الاتصال بين واجهات AYHEM وخدمات الذكاء الاصطناعي.
 
-## البنية
+## المسار النشط لواجهة AYHEM WEB
 
-- `ayhem-ai-client.js`: عميل HTTPS موحد.
-- `ayhem-ai-ui.js`: ربط صفحة الدخول الرئيسية بالبوابة.
-- `legacy-compat.js`: توافق آمن مع الواجهات القديمة.
-- `cloudflare-access.js`: التحقق من JWT الخاص بـ Cloudflare Access.
-- `AYHEM_JS_Worker.js` في جذر المستودع: بوابة الخادم إلى مزود AI.
+- `ayhem-supabase-ai-ui.js`: واجهة المحادثة الحالية.
+- تستدعي وظيفة Supabase Edge Function `ayhem-openai-chat` عبر جلسة مستخدم مصادق عليها.
+- تحفظ المحادثات الناجحة في `ayhem_conversations` و`ayhem_messages` وفق سياسات RLS.
+- لا ترسل سياق الذاكرة السحابية إلى OpenAI إلا إذا فعّل المستخدم مربع الموافقة في الواجهة.
+- لا تنقل أو تستورد بيانات `localStorage` أو IndexedDB تلقائياً.
+- مفتاح OpenAI يبقى في Supabase Edge Function Secrets باسم `OPENAI_API_KEY`، ولا يدخل المتصفح أو GitHub.
 
-## الإعدادات المطلوبة على Cloudflare
+## إعداد OpenAI
 
-- Worker Secret: `OPENAI_API_KEY`.
-- Worker Variable: `CF_ACCESS_TEAM_DOMAIN`.
-- Worker Variable: `CF_ACCESS_AUD`.
-- Worker Variable: `ALLOWED_ORIGINS` بقيم origins الدقيقة.
-- Rate Limiting binding: `AI_RATE_LIMITER` ويُستخدم subject الموثق كمفتاح.
+1. أنشئ مفتاح API لمشروع AYHEM AI من OpenAI Platform.
+2. أضف المفتاح في Supabase Dashboard > Edge Functions > Secrets باسم `OPENAI_API_KEY`.
+3. لا ترسل المفتاح داخل المحادثة، ولا تضفه إلى ملفات المصدر أو إعدادات الواجهة.
+4. اختبر المحادثة بعد تسجيل الدخول. إذا لم يكن السر موجوداً، تعرض الواجهة خطأ إعداد ولا تدّعي نجاح الاتصال.
 
-احمِ نطاق Worker بتطبيق Cloudflare Access. يتحقق Worker من ترويسة `Cf-Access-Jwt-Assertion` ولا يقبل طلبات AI مجهولة. لا تضع مفاتيح أو Service Tokens في المتصفح.
+تستخدم الوظيفة الحالية OpenAI Responses API مع النموذج `gpt-6.2-astra`.
 
-## جلسات Access وطلبات CORS العابرة للنطاق
+## المصادقة والذاكرة
 
-- يرسل عميل المتصفح `credentials: "include"` افتراضياً حتى تصل Cookie جلسة `CF_Authorization` إلى نطاق Worker عند السماح بذلك من إعدادات المتصفح.
-- يعيد Worker `Access-Control-Allow-Credentials: true` مع `Access-Control-Allow-Origin` الدقيق من قائمة السماح؛ لا تستخدم `*` مع الطلبات المعتمدة على Cookies.
-- طلب `POST` مع `Content-Type: application/json` يسبب CORS preflight. Cloudflare Access قد يرفض `OPTIONS` قبل وصوله إلى Worker ما لم تُضبط CORS في تطبيق Access.
-- في Cloudflare Zero Trust > Access > Applications > التطبيق الخاص بالبوابة > Advanced settings > CORS، اضبط استجابة preflight لتطابق origin والطرق `GET, POST, OPTIONS` والرأس `Content-Type` و`Access-Control-Allow-Credentials: true`، أو اسمح لـ OPTIONS فقط بالوصول إلى Worker. لا تتجاوز Access على POST أو GET.
-- يظل Worker مسؤولاً عن التحقق من JWT وتطابق origin وحدود الاستخدام. قد تمنع سياسات المتصفح Cookies الطرف الثالث؛ يفضّل نطاق API مخصصاً من نفس الموقع أو مساراً خلفياً موحد الأصل.
+- يجب تسجيل الدخول عبر Supabase Auth قبل تفعيل المحادثة.
+- يتم تمرير سياق الذاكرة فقط عند موافقة المستخدم الصريحة.
+- تُحفظ رسائل المستخدم والمساعد في جداول المحادثات المخصصة للحساب المصادق عليه.
+- جداول الذاكرة والمحادثات والرسائل محمية بسياسات RLS على `auth.uid()`.
+- لم تُنفّذ مزامنة تلقائية للذاكرة المحلية. يلزم مسار استيراد/استعادة مستقل قابل للتحقق قبل نقل السجلات القديمة.
 
-مرجع: [Cloudflare Access CORS](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/cors/) و[Authorization cookies](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/).
+## TinyFish
 
-## إعداد عنوان البوابة في الواجهة
+يظل TinyFish مساراً مستقلاً عبر `ayhem-tinyfish-run`. يتطلب جلسة Supabase وموافقة صريحة لكل مهمة قد تستهلك الرصيد. وجود اتصال TinyFish لدى ChatGPT لا يعني أن `TINYFISH_API_KEY` موجود في أسرار Supabase؛ يجب التحقق منه عبر وظيفة الصحة قبل إعلان تكامل التطبيق جاهزاً.
 
-بعد نشر Worker وتأمينه، اضبط `window.AYHEM_WORKER_URL` في إعداد نشر الواجهة إلى عنوان HTTPS الفعلي. لا تضع عنواناً تخمينياً أو عنوان Worker قديم.
+## مسار Cloudflare القديم
 
-## فحص الجاهزية
+تبقى الملفات التالية متاحة للتوافق أو النشر المنفصل، لكنها ليست مسار المحادثة الذي تحمّله صفحة الدخول الحالية:
 
-يتطلب العميل استجابة `GET /health` ذات:
-- `service: "AYHEM"`
-- `ready: true`
-- `aiConfigured: true`
-- `rateLimitConfigured: true`
-- `originConfigured: true`
-- `status: "online"` and `mode: "authenticated-gateway"`
+- `ayhem-ai-client.js`
+- `ayhem-ai-ui.js`
+- `AYHEM_JS_Worker.js`
 
-The client also requires a UUID-formatted `requestId` in every successful AI response.
-
-لا تفعّل الواجهة الإرسال قبل تحقق الجاهزية. لا يعني نجاح الاختبارات المحلية أو CI أن Worker منشور أو متصل فعلياً بمزود AI.
-
-## استخدام العميل
-
-```js
-import { createAyhemAIClient } from "./ayhem-ai-client.js";
-
-const ai = createAyhemAIClient({
-  endpoint: window.AYHEM_WORKER_URL,
-});
-
-const health = await ai.health();
-if (health.ready !== true) {
-  throw new Error("AYHEM AI gateway is not ready.");
-}
-
-const result = await ai.ask("حلل هذه المعلومة");
-console.log(result.output);
-```
-
-## التوافق القديم
-
-```js
-import { talkToAyhem } from "./legacy-compat.js";
-
-const result = await talkToAyhem("سؤال");
-console.log(result.output);
-```
+تحتاج بوابة Cloudflare القديمة إلى Worker URL وAccess وRate Limiting و`OPENAI_API_KEY` في بيئة Cloudflare. لا تخلط إعداداتها مع أسرار Supabase.
 
 ## الاختبارات
 
-Node.js 20 أو أحدث:
+من هذا المجلد باستخدام Node.js 20 أو أحدث:
 
 ```sh
 npm test
 ```
 
-التقارير التشغيلية في `../../docs/operations/`.
+نجاح الاختبارات المحلية لا يثبت وحده أن مفاتيح الخدمة مضبوطة أو أن تسجيل الدخول والاتصال الخارجي يعملان على جهاز المستخدم.
