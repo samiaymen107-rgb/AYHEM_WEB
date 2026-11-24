@@ -92,13 +92,16 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     send.disabled = true;
     return Object.freeze({ state: "offline" });
   }
-  send.addEventListener("click", async () => {
+  const handleSend = async () => {
     const prompt = typeof input.value === "string" ? input.value.trim() : "";
     if (!prompt) { output.textContent = "اكتب سؤالاً أولاً."; return; }
-    if (!authenticated || sending) return;
+    if (!authenticated || sending) {
+      if (!authenticated) output.textContent = "انتهت جلسة الدخول. سجّل الدخول مجدداً ثم أعد المحاولة.";
+      return;
+    }
     sending = true;
     send.disabled = true;
-    status.textContent = "الجلسة موثّقة؛ جارٍ اختبار بوابة OpenAI الحية...";
+    status.textContent = "تم الضغط؛ جارٍ الاتصال ببوابة OpenAI...";
     output.textContent = "جارٍ إرسال الرسالة إلى AYHEM...";
     try {
       const result = await client.ask(prompt);
@@ -112,7 +115,10 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       sending = false;
       send.disabled = !authenticated;
     }
-  });
+  };
+  send.addEventListener("click", handleSend);
+  send.addEventListener("pointerup", handleSend);
+
   return Object.freeze({ state: authenticated ? "authenticated" : "not-authenticated" });
 }
 
