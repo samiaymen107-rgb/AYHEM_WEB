@@ -1,5 +1,3 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, apikey, x-client-info, content-type, x-supabase-api-version, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
@@ -15,7 +13,7 @@ function reply(body: unknown, status = 200) {
   });
 }
 
-Deno.serve(async (req: Request) => {
+export async function handler(req: Request) {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "GET") return reply({ ok: false, error: "method_not_allowed" }, 405);
 
@@ -38,4 +36,6 @@ Deno.serve(async (req: Request) => {
   } catch {
     return reply({ ok: false, stage: "network", error: "Could not reach TinyFish API" }, 502);
   }
-});
+}
+
+if (import.meta.main) Deno.serve(handler);

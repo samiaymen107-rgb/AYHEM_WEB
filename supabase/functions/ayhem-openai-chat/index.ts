@@ -1,5 +1,3 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, apikey, x-client-info, content-type, x-supabase-api-version, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
@@ -83,7 +81,7 @@ async function openaiReply(apiKey: string, input: string, signal: AbortSignal) {
   return reply;
 }
 
-Deno.serve(async (req: Request) => {
+export async function handler(req: Request) {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "طريقة الطلب غير مدعومة." }, 405);
 
@@ -125,4 +123,6 @@ Deno.serve(async (req: Request) => {
   } finally {
     clearTimeout(timeout);
   }
-});
+}
+
+if (import.meta.main) Deno.serve(handler);
