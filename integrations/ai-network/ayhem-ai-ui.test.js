@@ -18,7 +18,7 @@ test("keeps chat disabled when no authenticated session exists", async () => {
     documentRef,
     clientFactory: () => ({ health: async () => ({ ready: false, message: "يلزم تسجيل الدخول." }) }),
   });
-  assert.equal(result.state, "awaiting-auth");
+  assert.equal(result.state, "not-authenticated");
   assert.equal(documentRef.elements.aiSendBtn.disabled, true);
   assert.match(documentRef.elements.aiConnectionStatus.textContent, /تسجيل الدخول/);
 });
