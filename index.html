@@ -230,19 +230,24 @@
   </main>
 
   <!-- سكربت ذكي متطور لتشغيل المشروع -->
-  <script src="AYHEM_MASTER_ORCHESTRATOR.js"></script>
+  <script type="module" src="AYHEM_MASTER_ORCHESTRATOR.js"></script>
 
   <script>
     const view = document.getElementById('view');
 
-    document.getElementById('startBtn').addEventListener('click', () => {
-      view.innerHTML = `
-        <div>
-          <strong>تم تشغيل نقطة الدخول الرئيسية / Main Entry Activated.</strong><br>
-          تحميل النواة ثم الذاكرة ثم الواجهة بشكل تدريجي...<br>
-          Loading core, memory, and interface progressively...
-        </div>
-      `;
+    document.getElementById('startBtn').addEventListener('click', async () => {
+      const button = document.getElementById('startBtn');
+      button.disabled = true;
+      view.textContent = 'جارٍ تشغيل وفحص وحدات AYHEM الفعلية...';
+      try {
+        const report = await window.AYHEM_ORCHESTRATOR.start();
+        const lines = report.modules.map(item => (item.status === 'ready' ? '✓ ' : '⚠ ') + item.name + ': ' + item.detail);
+        view.textContent = 'حالة التشغيل: ' + report.state + ' (' + report.ready + '/' + report.total + ')\n' + lines.join('\n');
+      } catch (error) {
+        view.textContent = 'تعذر بدء النظام: ' + (error?.message || error);
+      } finally {
+        button.disabled = false;
+      }
     });
 
     document.getElementById('dashboardBtn').addEventListener('click', () => {

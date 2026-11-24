@@ -1,9 +1,6 @@
 /**
- * Browser AI panel backed by the authenticated Supabase Edge Function.
- * Provider credentials remain server-side in Supabase secrets.
- *
- * Keep Supabase browser modules lazy-loaded so the UI can be tested in Node
- * without attempting to import the browser-only esm.sh URL.
+ * Authenticated AYHEM AI panel. Session state follows Supabase auth events.
+ * Provider readiness is only confirmed by a successful real Edge Function reply.
  */
 async function createSupabaseAIClient() {
   await import("../supabase/public-config.js");
@@ -13,21 +10,17 @@ async function createSupabaseAIClient() {
     async health() {
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
-      return {
-        ready: Boolean(data.session?.access_token),
-        message: data.session?.access_token
-          ? "تم التحقق من جلسة الحساب."
-          : "يلزم تسجيل الدخول قبل استخدام المساعد.",
-      };
+      return { ready: Boolean(data.session?.access_token), session: data.session || null };
+    },
+    onAuthStateChange(callback) {
+      const { data } = supabase.auth.onAuthStateChange((event, session) => callback(event, session));
+      return () => data.subscription.unsubscribe();
     },
     async ask(prompt) {
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError) throw sessionError;
       if (!sessionData.session?.access_token) throw new Error("authentication_required");
-
-      const { data, error } = await supabase.functions.invoke("ayhem-openai-chat", {
-        body: { message: prompt, memory_context: "" },
-      });
+      const { data, error } = await supabase.functions.invoke("ayhem-openai-chat", { body: { message: prompt, memory_context: "" } });
       if (error) throw error;
       const reply = typeof data?.reply === "string" ? data.reply.trim() : "";
       if (!reply) throw new Error(data?.error || "empty_ai_response");
@@ -36,58 +29,58 @@ async function createSupabaseAIClient() {
   });
 }
 
-export async function mountAyhemAIUI({
-  documentRef = globalThis.document,
-  clientFactory = createSupabaseAIClient,
-} = {}) {
+export async function mountAyhemAIUI({ documentRef = globalThis.document, clientFactory = createSupabaseAIClient } = {}) {
   const status = documentRef?.getElementById("aiConnectionStatus");
   const input = documentRef?.getElementById("aiPrompt");
   const send = documentRef?.getElementById("aiSendBtn");
   const output = documentRef?.getElementById("aiOutput");
-
-  if (!status || !input || !send || !output) {
-    return Object.freeze({ state: "not-mounted" });
-  }
-
+  if (!status || !input || !send || !output) return Object.freeze({ state: "not-mounted" });
   let client;
+  let authenticated = false;
+  let sending = false;
+  const renderAuth = signedIn => {
+    authenticated = Boolean(signedIn);
+    send.disabled = !authenticated || sending;
+    status.textContent = authenticated
+      ? "جلسة AYHEM موثّقة. سيتم التحقق من OpenAI عند إرسال رسالة فعلية."
+      : "يلزم تسجيل الدخول لاستخدام مساعد AYHEM.";
+    if (!sending) output.textContent = authenticated ? "أرسل رسالة لاختبار بوابة OpenAI الحية." : "الاتصال بمزوّد OpenAI لم يُختبر بعد.";
+  };
   try {
     client = await clientFactory();
     const health = await client.health();
-    if (health.ready !== true) {
-      status.textContent = health.message || "غير متصل — سجّل الدخول أولاً.";
-      send.disabled = true;
-      return Object.freeze({ state: "not-authenticated" });
+    if (health.ready !== true) renderAuth(false);
+    else renderAuth(true);
+    if (typeof client.onAuthStateChange === "function") {
+      client.onAuthStateChange((_event, session) => renderAuth(Boolean(session?.access_token)));
     }
   } catch {
-    status.textContent = "تعذر التحقق من جلسة AYHEM. سجّل الدخول ثم أعد المحاولة.";
+    status.textContent = "تعذر تهيئة اتصال AYHEM/Supabase.";
     send.disabled = true;
     return Object.freeze({ state: "offline" });
   }
-
-  status.textContent = "تم التحقق من الجلسة. يمكنك اختبار محادثة AYHEM.";
-  send.disabled = false;
-
   send.addEventListener("click", async () => {
     const prompt = typeof input.value === "string" ? input.value.trim() : "";
-    if (!prompt) {
-      output.textContent = "اكتب سؤالاً أولاً.";
-      return;
-    }
-
+    if (!prompt) { output.textContent = "اكتب سؤالاً أولاً."; return; }
+    if (!authenticated || sending) return;
+    sending = true;
     send.disabled = true;
-    output.textContent = "جارٍ إرسال الطلب إلى محرك AYHEM...";
+    status.textContent = "الجلسة موثّقة؛ جارٍ اختبار بوابة OpenAI الحية...";
+    output.textContent = "جارٍ إرسال الرسالة إلى AYHEM...";
     try {
       const result = await client.ask(prompt);
       output.textContent = result.output;
+      status.textContent = "اتصال OpenAI الحي ناجح — تم استلام رد من AYHEM.";
       input.value = "";
-    } catch {
-      output.textContent = "تعذر إكمال المحادثة. تحقق من إعداد OPENAI_API_KEY في أسرار Supabase ومن صلاحية الجلسة.";
+    } catch (error) {
+      output.textContent = "فشل طلب الذكاء الاصطناعي: " + String(error?.message || error).slice(0, 240);
+      status.textContent = "الجلسة متاحة، لكن استجابة OpenAI لم تنجح. راجع إعدادات Edge Function والسجلات.";
     } finally {
-      send.disabled = false;
+      sending = false;
+      send.disabled = !authenticated;
     }
   });
-
-  return Object.freeze({ state: "authenticated" });
+  return Object.freeze({ state: authenticated ? "authenticated" : "not-authenticated" });
 }
 
 if (typeof document !== "undefined") {
