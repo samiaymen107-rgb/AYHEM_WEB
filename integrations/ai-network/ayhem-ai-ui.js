@@ -1,5 +1,5 @@
 /**
- * Authenticated AYHEM AI panel. Session state follows Supabase auth events.
+ * Authenticated AYHEM AI panel. Session state follows shared Supabase auth events.
  * Provider readiness is only confirmed by a successful real Edge Function reply.
  */
 async function createSupabaseAIClient() {
@@ -69,10 +69,14 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       : "يلزم تسجيل الدخول لاستخدام مساعد AYHEM.";
     if (!sending) output.textContent = authenticated ? "أرسل رسالة لاختبار بوابة OpenAI الحية." : "الاتصال بمزوّد OpenAI لم يُختبر بعد.";
   };
+
+  // Receive the same authenticated state rendered by the account panel.
+  window.addEventListener("ayhem:auth-session", event => {
+    renderAuth(event?.detail?.authenticated === true);
+  });
+
   try {
     client = await clientFactory();
-    // Subscribe before reading the session to avoid missing a sign-in/refresh
-    // event that occurs while getSession() is resolving.
     if (typeof client.onAuthStateChange === "function") {
       client.onAuthStateChange((_event, session) => renderAuth(Boolean(session?.access_token)));
     }
