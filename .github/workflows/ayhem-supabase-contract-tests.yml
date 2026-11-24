@@ -1,0 +1,38 @@
+name: AYHEM Supabase Contract Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "supabase/functions/**"
+      - "supabase/tests/**"
+      - "integrations/supabase/**"
+      - ".github/workflows/ayhem-supabase-contract-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "supabase/functions/**"
+      - "supabase/tests/**"
+      - "integrations/supabase/**"
+      - ".github/workflows/ayhem-supabase-contract-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ayhem-supabase-contract-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Run Supabase security contract tests
+        run: deno test --allow-read=supabase/functions,integrations/supabase supabase/tests/contract.test.ts
