@@ -15,7 +15,7 @@ function reply(body: unknown, status = 200) {
   });
 }
 
-Deno.serve(async (req: Request) => {
+export async function handler(req: Request) {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "GET") return reply({ ok: false, error: "method_not_allowed" }, 405);
 
@@ -38,4 +38,6 @@ Deno.serve(async (req: Request) => {
   } catch {
     return reply({ ok: false, stage: "network", error: "Could not reach TinyFish API" }, 502);
   }
-});
+}
+
+if (import.meta.main) Deno.serve(handler);
