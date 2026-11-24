@@ -218,6 +218,8 @@
       <p id="aiConnectionStatus" class="ai-status" role="status" aria-live="polite">جارٍ التحقق من إعداد الاتصال...</p>
       <label for="aiPrompt">رسالتك إلى أيهم</label>
       <textarea id="aiPrompt" placeholder="اكتب سؤالك هنا..." maxlength="8000"></textarea>
+      <label class="ai-memory-consent"><input id="aiMemoryConsent" type="checkbox" /> أسمح باستخدام الذاكرة السحابية ذات الصلة ضمن هذا الطلب وإرسالها إلى OpenAI لمعالجته.</label>
+      <p class="ai-status">تُحفظ المحادثات الناجحة في سجل حسابك السحابي. لا تُرسل الذاكرة إلى OpenAI إلا عند تفعيل الخيار أعلاه.</p>
       <div class="actions">
         <button class="primary" id="aiSendBtn" type="button" disabled>إرسال إلى أيهم</button>
       </div>
@@ -252,6 +254,6 @@
   <script type="module" src="./integrations/supabase/ayhem-auth-ui.js"></script>
   <script type="module" src="./integrations/supabase/ayhem-memory-ui.js"></script>
   <script type="module" src="./integrations/supabase/ayhem-tinyfish-ui.js"></script>
-  <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js"></script>
+  <script type="module" src="./integrations/ai-network/ayhem-supabase-ai-ui.js"></script>
 </body>
 </html>
