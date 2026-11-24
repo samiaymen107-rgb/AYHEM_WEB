@@ -25,10 +25,13 @@ test("Worker implementation matches request and response contract", () => {
   }
 });
 
-test("client and UI refuse to operate before gateway readiness", () => {
+test("legacy worker client keeps its contract while the Supabase UI mounts safely", () => {
   assert.match(client, /maxInputLength = 8000/);
   assert.match(client, /result\.unit !== "U01-Σ"/);
   assert.match(client, /validRequestId/);
   assert.match(client, /originConfigured/);
-  assert.match(ui, /health\.ready !== true/);
+  assert.match(ui, /supabase\.functions\.invoke\("ayhem-openai-chat"/);
+  assert.match(ui, /send\.addEventListener\("click", handleSend\)/);
+  assert.match(ui, /health\.ready === true/);
+  assert.doesNotMatch(ui, /send\.disabled = !authenticated/);
 });
