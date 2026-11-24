@@ -4,6 +4,7 @@ import { handler as aiHandler } from "../ayhem-openai-chat/index.ts";
 import { handler as tinyfishRunHandler } from "../ayhem-tinyfish-run/index.ts";
 import { handler as tinyfishHealthHandler } from "../ayhem-tinyfish-health/index.ts";
 import { createAyhemRemoteMemoryStore } from "../../../integrations/supabase/ayhem-remote-memory-core.js";
+import { buildRelevantMemoryContext } from "../../../integrations/ai-network/ayhem-ai-ui.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -302,4 +303,60 @@ Deno.test("Cloud memory adapter: read-only RLS isolation diagnostic uses verifie
   const exposed = await store.verifyIsolation();
   equal(exposed.foreign_visible_count, 2, "foreign rows are detected");
   equal(exposed.isolation_passed, false, "foreign rows fail isolation check");
+});
+
+
+Deno.test("AYHEM memory-to-inference pipeline: relevant memory context reaches mocked Groq without paid fallback", async () => {
+  await isolated(async () => {
+    const records = [
+      {
+        id: "memory-owned-1",
+        title: "اختبار الذاكرة السحابية",
+        content: "نتيجة اختبار التكامل: AYHEM_MEMORY_PIPELINE_MARKER. مستوى الدليل غير موثق.",
+        source: "ayhem-roundtrip-test",
+        evidence_level: "unverified",
+        created_at: "2026-11-24T22:51:14.000Z",
+        tags: ["ذاكرة", "تكامل"],
+      },
+      {
+        id: "memory-unrelated-2",
+        title: "موضوع غير مرتبط",
+        content: "معلومة لا تتعلق بسؤال المستخدم.",
+        source: "test",
+        evidence_level: "verified",
+        created_at: "2026-11-24T22:50:00.000Z",
+        tags: [],
+      },
+    ];
+    const prompt = "ما مستوى الدليل في اختبار الذاكرة السحابية؟";
+    const memoryContext = buildRelevantMemoryContext(prompt, records);
+    assert(memoryContext.includes("AYHEM_MEMORY_PIPELINE_MARKER"), "relevant memory must be selected");
+    assert(memoryContext.includes("مستوى الدليل: unverified"), "evidence provenance must be preserved");
+    assert(!memoryContext.includes("موضوع غير مرتبط"), "unrelated memory must not be selected");
+
+    Deno.env.set("GROQ_API_KEY", "test-only-groq-key");
+    Deno.env.delete("OPENAI_API_KEY");
+    Deno.env.delete("AYHEM_AI_PROVIDER");
+    let upstreamCalls = 0;
+    globalThis.fetch = async (input, init) => {
+      upstreamCalls++;
+      equal(String(input), "https://api.groq.com/openai/v1/chat/completions", "pipeline provider endpoint");
+      const payload = JSON.parse(String(init?.body));
+      const userMessage = payload.messages.find((item: { role: string }) => item.role === "user")?.content || "";
+      assert(userMessage.includes("AYHEM_MEMORY_PIPELINE_MARKER"), "selected memory must reach inference input");
+      assert(userMessage.includes("مستوى الدليل: unverified"), "evidence level must reach inference input");
+      assert(userMessage.includes(prompt), "original user prompt must reach inference input");
+      return Response.json({ choices: [{ message: { content: "AYHEM_MEMORY_INFERENCE_PIPELINE_PASS" } }] });
+    };
+
+    const response = await aiHandler(request("https://local.test/ai", "POST", {
+      message: prompt,
+      memory_context: memoryContext,
+    }));
+    equal(response.status, 200, "memory-to-inference handler status");
+    const body = await response.json();
+    equal(body.provider, "groq", "pipeline uses Groq");
+    equal(body.reply, "AYHEM_MEMORY_INFERENCE_PIPELINE_PASS", "pipeline inference response");
+    equal(upstreamCalls, 1, "pipeline upstream call count");
+  });
 });
