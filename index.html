@@ -265,6 +265,19 @@
   <script type="module" src="./integrations/supabase/ayhem-auth-ui.js"></script>
   <script type="module" src="./integrations/supabase/ayhem-memory-ui.js"></script>
   <script type="module" src="./integrations/supabase/ayhem-tinyfish-ui.js"></script>
-  <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js"></script>
+  <script>
+    // Immediate tap feedback: distinguishes a loaded AI handler from a dead button.
+    document.addEventListener("click", event => {
+      const button = event.target?.closest?.("#aiSendBtn");
+      if (!button) return;
+      const status = document.getElementById("aiConnectionStatus");
+      const output = document.getElementById("aiOutput");
+      if (!window.__AYHEM_AI_UI_MOUNTED) {
+        if (status) status.textContent = "تم التقاط الضغط، لكن وحدة AI لم تُحمّل بعد. أعد تحميل الصفحة بعد اكتمال التحديث.";
+        if (output) output.textContent = "تعذر تشغيل معالج الإرسال: وحدة AI Gateway غير مركّبة.";
+      }
+    }, true);
+  </script>
+  <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=f5af5d1"></script>
 </body>
 </html>
