@@ -71,7 +71,7 @@ forgotButton?.addEventListener("click", async () => {
   showStatus("جارٍ إرسال طلب استعادة كلمة المرور...");
   try {
     const client = getAyhemSupabaseClient();
-    const redirectTo = window.location.href.split(/[?#]/)[0];
+    const redirectTo = "https://samiaymen107-rgb.github.io/AYHEM_WEB/";
     const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
     if (error) throw error;
     showStatus("إذا كان البريد مرتبطاً بحساب في AYHEM، فستصلك رسالة استعادة. تحقق من الوارد والرسائل غير المرغوب فيها.");
