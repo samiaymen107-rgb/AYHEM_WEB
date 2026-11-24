@@ -3,6 +3,16 @@
  * Mounts its click handler before any network initialization so the UI never
  * becomes inert while Supabase or the module CDN is loading.
  */
+function withTimeout(promise, label, ms = 10000) {
+  let timer;
+  return Promise.race([
+    Promise.resolve(promise),
+    new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(label + "_timeout_" + ms + "ms")), ms);
+    }),
+  ]).finally(() => clearTimeout(timer));
+}
+
 async function createSupabaseAIClient() {
   await import("../supabase/public-config.js");
   const { getAyhemSupabaseClient } = await import("../supabase/ayhem-supabase-auth.js");
@@ -134,11 +144,11 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   output.textContent = "زر الإرسال يعمل؛ سيعرض سبب التعذر بدلاً من تجاهل الضغط.";
 
   try {
-    client = await clientFactory();
+    client = await withTimeout(clientFactory(), "supabase_client_init", 12000);
     if (typeof client.onAuthStateChange === "function") {
       client.onAuthStateChange((_event, session) => renderAuth(Boolean(session?.access_token)));
     }
-    const health = await client.health();
+    const health = await withTimeout(client.health(), "supabase_session_check", 10000);
     initialized = true;
     renderAuth(health.ready === true);
     return Object.freeze({ state: authenticated ? "authenticated" : "not-authenticated" });
