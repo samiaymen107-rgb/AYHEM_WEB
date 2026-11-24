@@ -3,6 +3,7 @@
 import { handler as aiHandler } from "../ayhem-openai-chat/index.ts";
 import { handler as tinyfishRunHandler } from "../ayhem-tinyfish-run/index.ts";
 import { handler as tinyfishHealthHandler } from "../ayhem-tinyfish-health/index.ts";
+import { createAyhemRemoteMemoryStore } from "../../../integrations/supabase/ayhem-remote-memory-core.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -143,4 +144,106 @@ Deno.test("AYHEM Edge handlers: authenticated runtime paths with mocked upstream
     const response = await tinyfishHealthHandler(request("https://local.test/health", "GET"));
     equal(response.status, 502, "TinyFish health network error status");
   });
+});
+
+
+Deno.test("Cloud memory adapter: append/list behavior with an injected isolated client", async () => {
+  const inserted: Record<string, unknown>[] = [];
+  const rows = [{
+    id: "db-memory-test-1",
+    title: "adapter test",
+    content: "memory adapter runtime test",
+    evidence_level: "unverified",
+    metadata: { canonical_id: "canonical-memory-test-1" },
+    created_at: "2026-11-25T00:00:00.000Z",
+  }];
+  let selectedTable = "";
+  let selectedColumns = "";
+  let orderedBy = "";
+  let orderAscending: boolean | undefined;
+  let requestedLimit = 0;
+  const client = {
+    from(table: string) {
+      selectedTable = table;
+      return {
+        insert(row: Record<string, unknown>) {
+          inserted.push(row);
+          return {
+            select(columns: string) {
+              selectedColumns = columns;
+              return { single: async () => ({ data: { id: "db-memory-test-1", ...row }, error: null }) };
+            },
+          };
+        },
+        select(columns: string) {
+          selectedColumns = columns;
+          return {
+            order(column: string, options: { ascending: boolean }) {
+              orderedBy = column;
+              orderAscending = options.ascending;
+              return {
+                limit: async (limit: number) => {
+                  requestedLimit = limit;
+                  return { data: rows, error: null };
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+  const store = createAyhemRemoteMemoryStore({
+    client,
+    getSession: async () => ({ user: { id: "test-owner-id" } }),
+  });
+  const saved = await store.append({
+    id: "canonical-memory-test-1",
+    title: " adapter test ",
+    content: "memory adapter runtime test",
+    status: "unverified",
+    source: "runtime-test",
+    tags: ["test", 17],
+    confidence: 0.75,
+    createdAt: "2026-11-25T00:00:00.000Z",
+  });
+  equal(selectedTable, "ayhem_memories", "memory adapter table");
+  equal(saved.id, "db-memory-test-1", "memory adapter returned row");
+  equal(inserted.length, 1, "memory adapter insert count");
+  equal(inserted[0].title, "adapter test", "memory title trimming");
+  equal(inserted[0].evidence_level, "unverified", "memory evidence level");
+  const metadata = inserted[0].metadata as Record<string, unknown>;
+  equal(metadata.canonical_id, "canonical-memory-test-1", "memory canonical ID");
+  const listed = await store.list({ limit: 900 });
+  equal(selectedTable, "ayhem_memories", "memory list table");
+  equal(orderedBy, "created_at", "memory sort column");
+  equal(orderAscending, false, "memory newest-first order");
+  equal(requestedLimit, 500, "memory list maximum clamp");
+  equal(listed.length, 1, "memory list row count");
+});
+
+Deno.test("Cloud memory adapter: refuses writes without an authenticated user", async () => {
+  let insertCalls = 0;
+  const client = {
+    from(_table: string) {
+      return {
+        insert(_row: Record<string, unknown>) {
+          insertCalls++;
+          return { select: (_columns: string) => ({ single: async () => ({ data: null, error: null }) }) };
+        },
+      };
+    },
+  };
+  const store = createAyhemRemoteMemoryStore({
+    client,
+    getSession: async () => ({ user: null }),
+  });
+  let rejected = false;
+  try {
+    await store.append({ id: "canonical-no-session", title: "should not write" });
+  } catch (error) {
+    rejected = error instanceof Error && error.message === "authentication_required";
+  }
+  assert(rejected, "memory adapter must reject unauthenticated writes");
+  equal(insertCalls, 0, "unauthenticated memory insert count");
 });

@@ -44,10 +44,12 @@ Deno.test("TinyFish health: is read-only and authenticated", async () => {
 });
 
 Deno.test("Cloud memory adapter: requires a session and canonical record ID", async () => {
-  const source = await read("integrations/supabase/ayhem-remote-memory.js");
+  const source = await read("integrations/supabase/ayhem-remote-memory-core.js");
+  const adapter = await read("integrations/supabase/ayhem-remote-memory.js");
   includes(source, 'typeof record.id !== "string" || !record.id', "Memory writes must require a canonical ID");
   includes(source, "if (!session?.user?.id)", "Memory writes must require an authenticated user session");
   includes(source, '.from("ayhem_memories")', "Memory adapter must use the intended table");
+  includes(adapter, "getAyhemSession", "Production adapter must use the authenticated Supabase session");
   includes(source, '.order("created_at", { ascending: false })', "Memory listing must remain newest-first");
   includes(source, "Math.min(500, Math.max(1", "Memory listing limit must remain bounded");
   assert(!/^\s{4}(?:update|delete)\s*\(/m.test(source), "Memory adapter must not expose update/delete methods");
