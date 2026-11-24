@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mountAyhemAIUI } from "./ayhem-ai-ui.js";
+import { buildRelevantMemoryContext, mountAyhemAIUI } from "./ayhem-ai-ui.js";
 
 function fakeDocument() {
   const elements = Object.fromEntries(
@@ -11,6 +11,33 @@ function fakeDocument() {
   );
   return { elements, getElementById(id) { return elements[id] || null; } };
 }
+
+test("retrieves only relevant memories and preserves their provenance", () => {
+  const context = buildRelevantMemoryContext("مشروع الزيتون في جلمة", [
+    { id: "m1", title: "مشروع الزيتون", content: "غراسة الزيتون في جلمة", source: "founder-note", evidence_level: "documented", created_at: "2026-11-24T10:00:00Z", tags: ["agriculture"] },
+    { id: "m2", title: "معلومة غير مرتبطة", content: "موسيقى وسفر", source: "other", evidence_level: "unverified", created_at: "2026-11-24T11:00:00Z", tags: [] },
+  ]);
+  assert.match(context, /مشروع الزيتون/);
+  assert.match(context, /founder-note/);
+  assert.match(context, /documented/);
+  assert.doesNotMatch(context, /موسيقى وسفر/);
+});
+
+test("returns an empty context when no memory matches the prompt", () => {
+  assert.equal(buildRelevantMemoryContext("سؤال عن الكواكب", [
+    { title: "مشروع الزيتون", content: "غراسة الزيتون", tags: [], source: "note" },
+  ]), "");
+});
+
+test("bounds memory context size and selected record count", () => {
+  const records = Array.from({ length: 20 }, (_, i) => ({
+    id: String(i), title: "AYHEM project", content: "AYHEM project " + "x".repeat(2000),
+    source: "test", evidence_level: "unverified", tags: [],
+  }));
+  const context = buildRelevantMemoryContext("AYHEM project", records);
+  assert.ok(context.length <= 8000);
+  assert.ok((context.match(/\\[سجل ذاكرة مرجعي\\]/g) || []).length <= 8);
+});
 
 test("keeps send tappable and explains that sign-in is required", async () => {
   const documentRef = fakeDocument();
@@ -32,7 +59,7 @@ test("enables chat after session check and renders returned text safely", async 
     documentRef,
     clientFactory: () => ({
       health: async () => ({ ready: true }),
-      ask: async prompt => { received = prompt; return { output: "<script>not HTML</script>" }; },
+      ask: async prompt => { received = prompt; return { output: "<script>not HTML</script>", memoryRecordsUsed: 2 }; },
     }),
   });
   assert.equal(result.state, "authenticated");
@@ -43,6 +70,21 @@ test("enables chat after session check and renders returned text safely", async 
   assert.equal(documentRef.elements.aiOutput.textContent, "<script>not HTML</script>");
   assert.equal(documentRef.elements.aiPrompt.value, "");
   assert.match(documentRef.elements.aiConnectionStatus.textContent, /نجح الاتصال الحي/);
+  assert.match(documentRef.elements.aiConnectionStatus.textContent, /2 سجلات ذاكرة/);
+});
+
+test("reports memory degradation without blocking the AI response", async () => {
+  const documentRef = fakeDocument();
+  await mountAyhemAIUI({
+    documentRef,
+    clientFactory: () => ({
+      health: async () => ({ ready: true }),
+      ask: async () => ({ output: "رد", provider: "groq", memoryReadError: true }),
+    }),
+  });
+  documentRef.elements.aiPrompt.value = "اختبار";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  assert.match(documentRef.elements.aiConnectionStatus.textContent, /دون سياق ذاكرة/);
 });
 
 test("retains a working click handler when Supabase initialization fails", async () => {
