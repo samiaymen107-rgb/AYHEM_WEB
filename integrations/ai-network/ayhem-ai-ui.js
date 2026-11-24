@@ -15,7 +15,7 @@ function withTimeout(promise, label, ms = 10000) {
 
 async function createSupabaseAIClient() {
   await import("../supabase/public-config.js");
-  const { getAyhemSupabaseClient, getAyhemSession } = await import("../supabase/ayhem-supabase-auth.js");
+  const { getAyhemSupabaseClient, getAyhemSession } = await import("../supabase/ayhem-supabase-auth.js?v=20261124-2");
   const supabase = getAyhemSupabaseClient();
   return Object.freeze({
     async health() {
