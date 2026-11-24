@@ -64,7 +64,7 @@ class AYHEM_ORCHESTRATOR {
       }),
       attempt("AUTH", async () => {
         await import("./integrations/supabase/public-config.js");
-        const m = await import("./integrations/supabase/ayhem-supabase-auth.js");
+        const m = await import("./integrations/supabase/ayhem-supabase-auth.js?v=20261124-2");
         const session = await bounded(m.getAyhemSession(), "auth_session", 10000);
         return { signedIn: Boolean(session?.user) };
       }, m => m.signedIn ? "authenticated session present" : "module ready; sign-in required"),
