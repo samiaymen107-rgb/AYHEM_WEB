@@ -1,9 +1,12 @@
 name: AYHEM Black Box Tests
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "core/black-box/**"
+      - "integrations/ai-network/**"
+      - "integrations/supabase/ayhem-remote-memory.js"
       - "tools/legacy-memory-audit.html"
       - ".github/workflows/ayhem-black-box-tests.yml"
   push:
