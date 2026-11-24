@@ -62,3 +62,27 @@ form?.addEventListener("submit", async event => {
     submit.disabled = false;
   }
 });
+
+const healthButton = document.getElementById("tinyfishHealthBtn");
+
+healthButton?.addEventListener("click", async () => {
+  healthButton.disabled = true;
+  show("جارٍ التحقق من جلسة AYHEM ثم قراءة حالة محفظة TinyFish دون تشغيل مهمة...");
+  try {
+    const client = getAyhemSupabaseClient();
+    const session = await getAyhemSession();
+    if (!session?.access_token) throw new Error("يجب تسجيل الدخول أولاً.");
+    const { data, error } = await client.functions.invoke("ayhem-tinyfish-health", {
+      method: "GET",
+    });
+    if (error) {
+      const detail = data?.error || error.message;
+      throw new Error(detail || "تعذّر قراءة حالة المحفظة.");
+    }
+    show(data?.ok ? "نجح فحص محفظة TinyFish (قراءة فقط). لم يتم تشغيل مهمة." : "لم ينجح فحص المحفظة؛ راجع التفاصيل.", data);
+  } catch (error) {
+    show("تعذّر فحص محفظة TinyFish: " + (error?.message || "خطأ غير معروف"));
+  } finally {
+    healthButton.disabled = false;
+  }
+});
