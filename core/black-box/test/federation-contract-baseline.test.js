@@ -11,7 +11,7 @@ const manifest = JSON.parse(await readFile(
 
 test("federation manifest covers all eight existing repositories exactly once", () => {
   assert.equal(manifest.contract_set, "AYHEM_FEDERATION_V1");
-  assert.equal(manifest.manifest_version, "1.0.0");
+  assert.equal(manifest.manifest_version, "1.1.0");
   assert.equal(manifest.federation_size, 8);
   assert.deepEqual(
     manifest.repositories.map(repository => repository.name).sort(),
