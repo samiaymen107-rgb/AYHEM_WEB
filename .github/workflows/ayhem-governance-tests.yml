@@ -2,6 +2,7 @@ name: AYHEM Governance Tests
 # Scorecard validation is required for governance and progress-dashboard changes.
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "docs/governance/**"
