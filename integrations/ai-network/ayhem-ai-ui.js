@@ -117,7 +117,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     }
   };
   send.addEventListener("click", handleSend);
-  send.addEventListener("pointerup", handleSend);
+  if (typeof window !== "undefined") window.__AYHEM_AI_UI_MOUNTED = true;
 
   return Object.freeze({ state: authenticated ? "authenticated" : "not-authenticated" });
 }
