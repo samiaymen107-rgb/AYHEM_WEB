@@ -68,6 +68,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   let authenticated = false;
   let sending = false;
   let initialized = false;
+  let initializationError = null;
 
   const renderAuth = signedIn => {
     authenticated = Boolean(signedIn);
@@ -92,6 +93,11 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       return;
     }
     if (sending) return;
+    if (initializationError) {
+      output.textContent = "تعذر تهيئة خدمة المصادقة: " + initializationError;
+      status.textContent = "فشل إعداد اتصال AYHEM/Supabase.";
+      return;
+    }
     if (!client || !initialized) {
       output.textContent = "ما زالت وحدة الاتصال تتهيأ. انتظر لحظة ثم أعد المحاولة.";
       status.textContent = "جارٍ تهيئة اتصال AYHEM/Supabase...";
@@ -139,8 +145,9 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   } catch (error) {
     initialized = false;
     authenticated = false;
+    initializationError = String(error?.message || error).slice(0, 180);
     send.disabled = false;
-    status.textContent = "تعذر تهيئة اتصال AYHEM/Supabase: " + String(error?.message || error).slice(0, 180);
+    status.textContent = "تعذر تهيئة اتصال AYHEM/Supabase: " + initializationError;
     output.textContent = "واجهة الإرسال محمّلة، لكن خدمة المصادقة لم تتهيأ. تحقق من اتصال الشبكة ثم أعد تحميل الصفحة.";
     return Object.freeze({ state: "offline" });
   }
