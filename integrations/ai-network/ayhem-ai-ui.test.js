@@ -55,7 +55,7 @@ test("retains a working click handler when Supabase initialization fails", async
   assert.equal(documentRef.elements.aiSendBtn.disabled, false);
   documentRef.elements.aiPrompt.value = "اختبار";
   await documentRef.elements.aiSendBtn.handlers.click();
-  assert.match(documentRef.elements.aiOutput.textContent, /خدمة المصادقة لم تتهيأ/);
+  assert.match(documentRef.elements.aiOutput.textContent, /تعذر تهيئة خدمة المصادقة/);
 });
 
 test("does not attach duplicate click listeners to the same button", async () => {
