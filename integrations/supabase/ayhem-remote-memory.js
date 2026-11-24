@@ -1,4 +1,4 @@
-import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js";
+import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-2";
 
 /**
  * Explicit remote-memory adapter.
