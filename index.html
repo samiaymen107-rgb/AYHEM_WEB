@@ -195,6 +195,14 @@
         <label for="authPassword">كلمة المرور</label>
         <input id="authPassword" type="password" autocomplete="current-password" required />
         <div class="actions"><button class="primary" id="authSubmit" type="submit">تسجيل الدخول</button></div>
+        <div class="actions"><button class="secondary" id="authForgotPassword" type="button">نسيت كلمة المرور؟ / Forgot password</button></div>
+      </form>
+      <form id="authRecoveryForm" hidden>
+        <label for="authNewPassword">كلمة المرور الجديدة</label>
+        <input id="authNewPassword" type="password" autocomplete="new-password" minlength="8" required />
+        <label for="authConfirmPassword">تأكيد كلمة المرور الجديدة</label>
+        <input id="authConfirmPassword" type="password" autocomplete="new-password" minlength="8" required />
+        <div class="actions"><button class="primary" id="authRecoverySubmit" type="submit">حفظ كلمة المرور الجديدة</button></div>
       </form>
       <button class="secondary" id="authSignOut" type="button" hidden>تسجيل الخروج</button>
     </section>
