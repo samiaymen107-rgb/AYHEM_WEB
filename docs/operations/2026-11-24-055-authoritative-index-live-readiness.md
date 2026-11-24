@@ -61,6 +61,8 @@ This contradicts reports 052–054, which still say PR #45 was not merged / shou
 - Supabase Security Advisor: one WARN, `auth_leaked_password_protection` — leaked-password protection is disabled. It was not changed.
 - Function logs query for the 24-hour window ending `2026-11-24T15:05:00Z` returned no `function_edge_logs` rows. This is not evidence that functions cannot work; it means no successful invocation was established by that log query.
 - Repository-wide code search found the Supabase table reference in the AYHEM_WEB remote-memory adapter and documentation, but did not identify the Android-native caller that produced the Dalvik request. The source needed to fix the stale-token caller is not yet located in the eight repositories.
+- The deployed `ayhem-openai-chat` Edge Function has no client reference in the current AYHEM_WEB code search. The visible AI panel instead requires a Cloudflare Worker URL; the `ayhem-worker-url` meta value in `index.html` is empty, so the panel cannot pass its health readiness check.
+- TinyFish UI checks a consent checkbox locally but does not send a consent flag in the request body. The deployed `ayhem-tinyfish-run` handler does not enforce that flag. JWT verification is enabled, but this is not a server-enforced consent boundary; do not use the paid endpoint until this is hardened.
 
 ## Supabase live snapshot
 
@@ -95,14 +97,15 @@ The browser Supabase adapter enables `persistSession`, `autoRefreshToken`, and `
 2. The TinyFish production function can start a billable browser automation. Keep it uninvoked unless the user separately approves a specific paid run.
 3. The TinyFish dry-run function is coded to return `executed:false` and `billable:false`, but its deployed endpoint has not yet been invoked in this audit.
 4. CORS currently uses wildcard origins in the inspected Edge Function sources. Do not guess an allowlist; first establish the real production UI origins, then review and tighten CORS.
-5. The OpenAI Edge Function is deployed but its provider key, model availability, CORS policy, and successful runtime response have not been verified here.
-6. Cloudflare Worker URL, Access configuration, secrets, rate-limit binding, Android build artifact, and on-device rendering remain separate verification items.
+5. The deployed OpenAI Edge Function is not wired to the visible AI panel. The panel points to an empty Cloudflare Worker URL; provider key, model availability, CORS policy, and successful runtime response have not been verified.
+6. TinyFish checkbox consent is enforced only in the browser; the paid Edge Function does not require a server-side consent field. Harden the backend before enabling any paid run.
+7. Cloudflare Worker URL, Access configuration, secrets, rate-limit binding, Android build artifact, and on-device rendering remain separate verification items.
 
 ## Evidence classification
 
 - VERIFIED: eight repository tree counts; 57 operation documents across AYHEM_WEB and AYHEM; duplicate labels scoped by repository and duplicate 052 within AYHEM_WEB; missing global standalone numbers 045/046/049; PR #45 merged state and merge commit; Supabase project ACTIVE_HEALTHY; four ACTIVE JWT-protected Edge Functions; Android 401/PGRST303 log; TinyFish wallet snapshot; one Auth security warning; no function-edge log rows in the queried 24-hour window.
 - IMPLEMENTED / NOT E2E VERIFIED: browser Supabase auth adapter, remote-memory adapter, cloud-memory read UI, Edge Function source code.
-- PENDING: successful refreshed-session read from the user's Android app; legacy-memory-to-cloud integration; OpenAI invocation; TinyFish dry-run invocation; Cloudflare AI gateway; Android build and device test.
+- PENDING: successful refreshed-session read from the user's Android app; locating native caller source; legacy-memory-to-cloud integration; OpenAI invocation and UI wiring; TinyFish backend consent enforcement and dry-run invocation; Cloudflare AI gateway; Android build and device test.
 - NOT DONE: paid TinyFish browser execution in this audit.
 
 ## Next operation sequence
