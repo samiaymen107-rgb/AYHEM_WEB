@@ -36,7 +36,7 @@ test("bounds memory context size and selected record count", () => {
   }));
   const context = buildRelevantMemoryContext("AYHEM project", records);
   assert.ok(context.length <= 8000);
-  assert.ok((context.match(/\\[سجل ذاكرة مرجعي\\]/g) || []).length <= 8);
+  assert.ok((context.match(/\[سجل ذاكرة مرجعي\]/g) || []).length <= 8);
 });
 
 test("keeps send tappable and explains that sign-in is required", async () => {
