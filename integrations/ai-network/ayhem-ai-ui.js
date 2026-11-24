@@ -71,9 +71,11 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   };
 
   // Receive the same authenticated state rendered by the account panel.
-  window.addEventListener("ayhem:auth-session", event => {
-    renderAuth(event?.detail?.authenticated === true);
-  });
+  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    window.addEventListener("ayhem:auth-session", event => {
+      renderAuth(event?.detail?.authenticated === true);
+    });
+  }
 
   try {
     client = await clientFactory();
