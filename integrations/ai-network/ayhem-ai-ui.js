@@ -80,7 +80,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       send.disabled = !authenticated;
     }
   });
-  return Object.freeze({ state: authenticated ? "authenticated" : "awaiting-auth" });
+  return Object.freeze({ state: authenticated ? "authenticated" : "not-authenticated" });
 }
 
 if (typeof document !== "undefined") {
