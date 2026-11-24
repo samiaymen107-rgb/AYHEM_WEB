@@ -1,4 +1,4 @@
-import { getAyhemSupabaseClient } from "./ayhem-supabase-auth.js";
+import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-2";
 
 const form = document.getElementById("tinyfishForm");
 const status = document.getElementById("tinyfishStatus");
@@ -39,9 +39,8 @@ form?.addEventListener("submit", async event => {
   show("جارٍ التحقق من جلسة AYHEM وموافقتك...");
   try {
     const client = getAyhemSupabaseClient();
-    const { data: sessionData, error: sessionError } = await client.auth.getSession();
-    if (sessionError) throw sessionError;
-    if (!sessionData.session?.access_token) throw new Error("يجب تسجيل الدخول أولاً.");
+    const session = await getAyhemSession();
+    if (!session?.access_token) throw new Error("يجب تسجيل الدخول أولاً.");
 
     show("تم التحقق من الجلسة والموافقة. جارٍ إرسال المهمة إلى TinyFish؛ قد تستهلك رصيداً.");
     const { data, error } = await client.functions.invoke("ayhem-tinyfish-run", {
