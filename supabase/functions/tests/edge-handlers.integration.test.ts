@@ -3,7 +3,7 @@
 import { handler as aiHandler } from "../ayhem-openai-chat/index.ts";
 import { handler as tinyfishRunHandler } from "../ayhem-tinyfish-run/index.ts";
 import { handler as tinyfishHealthHandler } from "../ayhem-tinyfish-health/index.ts";
-import { createAyhemRemoteMemoryStore } from "../../../integrations/supabase/ayhem-remote-memory.js";
+import { createAyhemRemoteMemoryStore } from "../../../integrations/supabase/ayhem-remote-memory-core.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
