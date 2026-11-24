@@ -31,13 +31,18 @@ These are current file counts, not a claim that all 692 file contents have been 
 
 ## Operation report inventory
 
-A recursive tree scan of `AYHEM_WEB/docs/operations` found **51 pre-existing report files** before this report was created. With operation 055, the current total is **52 report files** representing **51 distinct operation numbers**, because number 052 appears twice under different dates:
-- `2026-11-21-052-explicit-consent-sync-transport.md`
-- `2026-11-22-052-supabase-auth-tinyfish.md`
+Repository-wide scan across the eight repositories found:
 
-Missing standalone operation numbers in the inspected range 001–054: **025, 045, 046, 049**. Number 049 is referenced by post-merge report 050, but no standalone 049 report was found. The numbering collision and gaps are preserved rather than silently renaming historical files.
+- `AYHEM_WEB/docs/operations`: **52 numbered report files** after adding 055, representing **51 distinct operation numbers**. Number 052 appears twice under different dates:
+  - `2026-11-21-052-explicit-consent-sync-transport.md`
+  - `2026-11-22-052-supabase-auth-tinyfish.md`
+- `AYHEM/docs/operations`: **4 numbered reports** (001, 002, 003, 025) plus **1 dated but unnumbered database-hardening/AI-activation audit**.
+- Other six repositories: no dated operation reports under paths named `operations` were found in their current trees.
+- **Total: 56 numbered report files + 1 unnumbered dated audit = 57 operation documents** across the inspected repositories. There are 52 distinct numeric labels when labels are compared globally; the first three labels are independently reused by the two repositories, and 052 is duplicated within AYHEM_WEB. Repository scope must therefore accompany every operation number.
 
-Latest existing reports before this audit: 051, 052 (two files), 053, 054. This report is 055; the resulting inventory is 52 report files / 51 distinct operation numbers.
+Number 025 exists in the AYHEM repository (`2026-11-21-025-repository-path-integrity-repair.md`) but is not merged according to its report. It was absent only from AYHEM_WEB's local numbering. Missing standalone numbers across the inspected repositories: **045, 046, 049**. Number 049 is referenced by AYHEM_WEB report 050 but no standalone 049 report was found. Historical numbers are not silently renamed.
+
+Latest AYHEM_WEB reports before this audit: 051, 052 (two files), 053, 054. This report is 055. The AYHEM repository also has its own 001–003 and 025 report stream.
 
 ## Merge-history reconciliation
 
@@ -49,6 +54,13 @@ GitHub API confirms PR #45:
 - base: `main`
 
 This contradicts reports 052–054, which still say PR #45 was not merged / should remain draft. The reports are historical snapshots and are not rewritten; this operation records the later authoritative merge evidence. Their status text and the operation index require reconciliation.
+
+## Additional live evidence — 2026-11-24
+
+- TinyFish wallet read-only snapshot: **USD 10.952** available at `2026-11-24T15:01:58.023Z`; auto-reload is unconfigured and there is no pending top-up. This was a balance read only; no task was run.
+- Supabase Security Advisor: one WARN, `auth_leaked_password_protection` — leaked-password protection is disabled. It was not changed.
+- Function logs query for the 24-hour window ending `2026-11-24T15:05:00Z` returned no `function_edge_logs` rows. This is not evidence that functions cannot work; it means no successful invocation was established by that log query.
+- Repository-wide code search found the Supabase table reference in the AYHEM_WEB remote-memory adapter and documentation, but did not identify the Android-native caller that produced the Dalvik request. The source needed to fix the stale-token caller is not yet located in the eight repositories.
 
 ## Supabase live snapshot
 
@@ -88,14 +100,14 @@ The browser Supabase adapter enables `persistSession`, `autoRefreshToken`, and `
 
 ## Evidence classification
 
-- VERIFIED: eight repository tree counts; 51 operation report files; duplicate operation number 052; missing numbers 025/045/046/049; PR #45 merged state and merge commit; Supabase project ACTIVE_HEALTHY; four ACTIVE JWT-protected Edge Functions; the cited Android 401/PGRST303 log.
+- VERIFIED: eight repository tree counts; 57 operation documents across AYHEM_WEB and AYHEM; duplicate labels scoped by repository and duplicate 052 within AYHEM_WEB; missing global standalone numbers 045/046/049; PR #45 merged state and merge commit; Supabase project ACTIVE_HEALTHY; four ACTIVE JWT-protected Edge Functions; Android 401/PGRST303 log; TinyFish wallet snapshot; one Auth security warning; no function-edge log rows in the queried 24-hour window.
 - IMPLEMENTED / NOT E2E VERIFIED: browser Supabase auth adapter, remote-memory adapter, cloud-memory read UI, Edge Function source code.
 - PENDING: successful refreshed-session read from the user's Android app; legacy-memory-to-cloud integration; OpenAI invocation; TinyFish dry-run invocation; Cloudflare AI gateway; Android build and device test.
 - NOT DONE: paid TinyFish browser execution in this audit.
 
 ## Next operation sequence
 
-1. Trace the Android caller producing `GET /rest/v1/ayhem_memories` and identify how it obtains, refreshes, and retries the access token.
+1. Locate the Android-native source/APK or its repository; the caller producing `GET /rest/v1/ayhem_memories` was not found in the eight inspected repositories. Then trace how it obtains, refreshes, and retries the access token.
 2. Fix the caller/session lifecycle without weakening RLS; add tests for expired access token, refresh success, refresh failure, and one safe retry.
 3. Establish the canonical memory integration boundary and conflict/restore policy before enabling dual-write or migration.
 4. Verify the deployed dry-run endpoint without invoking the paid runner.
@@ -106,7 +118,7 @@ The browser Supabase adapter enables `persistSession`, `autoRefreshToken`, and `
 
 ## Progress measurement
 
-- **Stage completion: 100%** for the defined audit/index scope: all eight repository trees were counted, operation reports were enumerated, duplicate/gap numbering was identified, PR #45 merge state was checked, the Supabase project/functions were inspected, and the index/report files were committed to the review branch. This does not include code repair or end-to-end runtime validation.
+- **Stage completion: 100% for the defined audit/index scope: all eight repository trees were counted, operation reports were enumerated, duplicate/gap numbering was identified, PR #45 merge state was checked, the Supabase project/functions were inspected, and the index/report files were committed to the review branch. This does not include code repair or end-to-end runtime validation.
 - **Overall AYHEM engineering progress: 44.75% provisional**, carried forward from the last authoritative weighted scorecard dated 2026-11-21. No percentage is added for this documentation-only operation. The 2026-11-23 merge and current cloud deployment evidence require a full workstream acceptance review before recalibration.
 
 | Workstream | Weight | Last authoritative estimate | Weighted contribution |
