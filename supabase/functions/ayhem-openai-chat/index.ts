@@ -120,7 +120,8 @@ Deno.serve(async (req: Request) => {
     return json({ reply, provider });
   } catch (error) {
     if (controller.signal.aborted) return json({ error: "انتهت مهلة الاتصال بعد 25 ثانية. أعد المحاولة." }, 504);
-    return json({ error: String(error?.message || "تعذّر إكمال طلب الذكاء الاصطناعي.").slice(0, 400) }, 502);
+    const message = error instanceof Error ? error.message : String(error || "تعذّر إكمال طلب الذكاء الاصطناعي.");
+    return json({ error: message.slice(0, 400) }, 502);
   } finally {
     clearTimeout(timeout);
   }
