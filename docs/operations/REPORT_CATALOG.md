@@ -1,8 +1,8 @@
 # AYHEM — الفهرس الشامل وعناوين التقارير
 
-- تاريخ الفهرسة: 2026-11-21
+- تاريخ الفهرسة: 2026-11-24
 - المستودع: `samiaymen107-rgb/AYHEM_WEB`
-- العدد: **47 تقريراً موجوداً** (يشمل تقارير 043 و044 و047 و048 و050 و052؛ الأرقام 025 و045 و046 و051 غير مستخدمة كتقارير مستقلة).
+- العدد قبل العملية 055: **51 تقريراً موجوداً**؛ وبعد إضافة 055 أصبح **52 تقريراً** تمثل **51 رقماً تشغيلياً فريداً** بسبب تكرار الرقم 052 في ملفين بتاريخين مختلفين. الأرقام 045 و046 و049 لا تملك تقارير مستقلة على مستوى المستودعين؛ الرقم 025 موجود في مستودع AYHEM لا AYHEM_WEB.
 - يثبت عمود «العنوان الأصلي» نص عنوان H1 كما ظهر في أول أسطر الملف؛ وعمود «عنوان الفهرسة» ترجمة/وصف عربي لتسهيل التصفح. الروابط تستخدم أسماء الملفات الأصلية دون إعادة تسمية.
 
 ## شبكة AI والربط
@@ -125,3 +125,44 @@
 | 037 | AYHEM 037 — Reconciliation of operation 036 evidence | تسوية أدلة العملية 036 | [فتح التقرير](./2026-11-21-037-operation-036-reconciliation.md) |
 | 038 | AYHEM 038 — Indexed tag lookup for atomic cognition de-duplication | تسريع منع تكرار الاستنتاجات بفهرس الوسوم | [فتح التقرير](./2026-11-21-038-indexed-tag-deduplication.md) |
 | 039 | AYHEM 039 — Post-merge verification for indexed cognition de-duplication | التحقق بعد دمج العملية 038 | [فتح التقرير](./2026-11-21-039-post-merge-038-verification.md) |
+
+
+## تحديث الفهرس المرجعي — 2026-11-24
+
+| العملية | الملف | وصف الفهرسة |
+|---:|---|---|
+| 051 | [2026-11-22-051-ayhem-app-foundation.md](./2026-11-22-051-ayhem-app-foundation.md) | أساس التطبيق والربط الأولي |
+| 052-A | [2026-11-21-052-explicit-consent-sync-transport.md](./2026-11-21-052-explicit-consent-sync-transport.md) | نقل المزامنة HTTPS بموافقة صريحة |
+| 052-B | [2026-11-22-052-supabase-auth-tinyfish.md](./2026-11-22-052-supabase-auth-tinyfish.md) | Supabase Auth وTinyFish والموصل السحابي |
+| 053 | [2026-11-22-053-repair-auth-tinyfish-markup-and-memory-schema.md](./2026-11-22-053-repair-auth-tinyfish-markup-and-memory-schema.md) | إصلاح ترميز الواجهة وتدقيق مخطط الذاكرة |
+| 054 | [2026-11-22-054-cloud-memory-glitch-ai-android-foundation.md](./2026-11-22-054-cloud-memory-glitch-ai-android-foundation.md) | واجهة الذاكرة السحابية وأساس Android |
+| 055 | [2026-11-24-055-authoritative-index-live-readiness.md](./2026-11-24-055-authoritative-index-live-readiness.md) | جرد 692 ملفاً، مطابقة التقارير، حالة PR #45، وفحص جاهزية الخدمات الحية |
+
+### تصحيح الأعداد والدمج
+
+- العدد الفعلي بعد العملية 055: **52 ملف تقرير**، **51 رقم عملية فريداً**.
+- الرقم 052 مكرر في ملفين تاريخيين؛ لا يُعاد ترقيمهما حفاظاً على الروابط.
+- الأرقام غير الموجودة كتقارير مستقلة: 025 و045 و046 و049.
+- PR #45 مدمج في main بتاريخ 2026-11-23T16:22:05Z؛ تقارير 052–054 تمثل حالة ما قبل الدمج ولا تُعامل كحالة حالية.
+- مرجع الحالة الحالية هو تقرير 055، ولا تعني أعداد الملفات أو دمج PR اكتمال التشغيل الحي.
+
+
+## تقارير مستودع AYHEM الأساسي — نطاق مستقل
+
+هذه التقارير تنتمي إلى مستودع `samiaymen107-rgb/AYHEM`، وأرقامها مستقلة عن سلسلة AYHEM_WEB:
+
+| العملية | الملف | وصف الفهرسة |
+|---:|---|---|
+| 001 | [AYHEM / 2026-11-21-001-ai-gateway-contract.md](https://github.com/samiaymen107-rgb/AYHEM/blob/main/docs/operations/2026-11-21-001-ai-gateway-contract.md) | عقد AI Gateway V1 |
+| 002 | [AYHEM / 2026-11-21-002-ai-gateway-contract-validation.md](https://github.com/samiaymen107-rgb/AYHEM/blob/main/docs/operations/2026-11-21-002-ai-gateway-contract-validation.md) | التحقق من عقد AI Gateway |
+| 003 | [AYHEM / 2026-11-21-003-web-contract-sync.md](https://github.com/samiaymen107-rgb/AYHEM/blob/main/docs/operations/2026-11-21-003-web-contract-sync.md) | مزامنة العقد مع AYHEM_WEB |
+| 025 | [AYHEM / 2026-11-21-025-repository-path-integrity-repair.md](https://github.com/samiaymen107-rgb/AYHEM/blob/main/docs/operations/2026-11-21-025-repository-path-integrity-repair.md) | إصلاح سلامة مسارات المستودع؛ التقرير يسجل CI والدمج كحالة معلقة |
+
+### تدقيق وثائق العمليات عبر المستودعات الثمانية
+
+- AYHEM_WEB: 52 تقريراً مرقماً بعد إضافة 055.
+- AYHEM: 4 تقارير مرقمة + تقرير واحد مؤرخ غير مرقم لتدقيق قاعدة البيانات وتفعيل AI.
+- المستودعات الستة الأخرى: لا توجد تقارير مؤرخة تحت مسارات باسم operations في شجرة الملفات الحالية.
+- الإجمالي: **56 تقريراً مرقماً + وثيقة واحدة غير مرقمة = 57 وثيقة عمليات**.
+- يجب كتابة اسم المستودع بجانب رقم العملية دائماً؛ أرقام 001–003 مستخدمة في المستودعين كسلسلتين مستقلتين.
+- على المستوى العالمي، توجد أرقام مستقلة 045 و046 و049 غير موثقة بتقارير منفصلة؛ الرقم 025 موثق في AYHEM فقط.
