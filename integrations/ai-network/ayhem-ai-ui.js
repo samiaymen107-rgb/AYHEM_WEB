@@ -70,7 +70,6 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     if (!sending) output.textContent = authenticated ? "أرسل رسالة لاختبار بوابة OpenAI الحية." : "الاتصال بمزوّد OpenAI لم يُختبر بعد.";
   };
 
-  // Receive the same authenticated state rendered by the account panel.
   if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
     window.addEventListener("ayhem:auth-session", event => {
       renderAuth(event?.detail?.authenticated === true);
@@ -83,7 +82,11 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       client.onAuthStateChange((_event, session) => renderAuth(Boolean(session?.access_token)));
     }
     const health = await client.health();
-    renderAuth(health.ready === true);
+    if (health.ready !== true) {
+      renderAuth(false);
+    } else {
+      renderAuth(true);
+    }
   } catch (error) {
     status.textContent = "تعذر تهيئة اتصال AYHEM/Supabase: " + String(error?.message || error).slice(0, 120);
     send.disabled = true;
