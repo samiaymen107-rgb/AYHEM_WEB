@@ -48,8 +48,9 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   };
   try {
     client = await clientFactory();
-    const initial = await client.health();
-    renderAuth(initial.ready);
+    const health = await client.health();
+    if (health.ready !== true) renderAuth(false);
+    else renderAuth(true);
     if (typeof client.onAuthStateChange === "function") {
       client.onAuthStateChange((_event, session) => renderAuth(Boolean(session?.access_token)));
     }
