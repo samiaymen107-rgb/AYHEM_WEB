@@ -7,7 +7,9 @@ test("main entry page loads the AI gateway UI and required controls", async () =
   assert.match(html, /integrations\/ai-network\/ayhem-ai-ui\.js/);
   assert.match(html, /id="aiConnectionStatus"/);
   assert.match(html, /id="aiPrompt"/);
-  assert.match(html, /id="aiSendBtn"[^>]*disabled/);
+  assert.match(html, /id="aiSendBtn" type="button"/);
+  assert.doesNotMatch(html, /id="aiSendBtn"[^>]*disabled/);
+  assert.match(html, /src="\.\/integrations\/ai-network\/ayhem-ai-ui\.js"/);
   assert.match(html, /id="aiOutput"/);
 });
 
