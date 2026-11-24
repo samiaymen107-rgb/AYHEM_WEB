@@ -5,15 +5,17 @@ import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.j
  * It never reads/writes localStorage or IndexedDB and never migrates legacy data.
  * Only append and list are exposed; no update/delete methods are provided.
  */
-export function createAyhemRemoteMemoryStore() {
-  const client = getAyhemSupabaseClient();
+export function createAyhemRemoteMemoryStore(options = {}) {
+  // Optional dependency injection is for isolated tests; production callers keep the default session/client.
+  const client = options.client || getAyhemSupabaseClient();
+  const getSession = options.getSession || getAyhemSession;
 
   return Object.freeze({
     async append(record) {
       if (!record || typeof record !== "object" || typeof record.id !== "string" || !record.id) {
         throw new TypeError("canonical_memory_record_with_id_required");
       }
-      const session = await getAyhemSession();
+      const session = await getSession();
       if (!session?.user?.id) throw new Error("authentication_required");
 
       const title = typeof record.title === "string" && record.title.trim()
