@@ -1,4 +1,4 @@
-import { getAyhemSupabaseClient } from "./ayhem-supabase-auth.js";
+import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js";
 
 /**
  * Explicit remote-memory adapter.
@@ -13,9 +13,8 @@ export function createAyhemRemoteMemoryStore() {
       if (!record || typeof record !== "object" || typeof record.id !== "string" || !record.id) {
         throw new TypeError("canonical_memory_record_with_id_required");
       }
-      const { data: sessionData, error: sessionError } = await client.auth.getSession();
-      if (sessionError) throw sessionError;
-      if (!sessionData.session?.user?.id) throw new Error("authentication_required");
+      const session = await getAyhemSession();
+      if (!session?.user?.id) throw new Error("authentication_required");
 
       const title = typeof record.title === "string" && record.title.trim()
         ? record.title.trim()
