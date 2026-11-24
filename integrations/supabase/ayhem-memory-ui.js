@@ -1,4 +1,4 @@
-import { getAyhemSupabaseClient } from "./ayhem-supabase-auth.js";
+import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js";
 import { createAyhemRemoteMemoryStore } from "./ayhem-remote-memory.js";
 
 const button = document.getElementById("memoryLoadBtn");
@@ -15,9 +15,8 @@ async function loadCloudMemory() {
   output.textContent = "جارٍ التحقق من الجلسة...";
   try {
     const client = getAyhemSupabaseClient();
-    const { data, error } = await client.auth.getSession();
-    if (error) throw error;
-    if (!data.session?.user?.id) {
+    const session = await getAyhemSession();
+    if (!session?.user?.id) {
       throw new Error("يلزم تسجيل الدخول أولاً.");
     }
 
@@ -48,10 +47,9 @@ try {
       showStatus("تم التحقق من الجلسة. يمكنك عرض الذاكرة السحابية.");
     }
   });
-  client.auth.getSession().then(({ data, error }) => {
-    if (error) throw error;
-    if (button) button.disabled = !data.session?.user;
-    if (data.session?.user) showStatus("تم التحقق من الجلسة. يمكنك عرض الذاكرة السحابية.");
+  getAyhemSession().then(session => {
+    if (button) button.disabled = !session?.user;
+    if (session?.user) showStatus("تم التحقق من الجلسة. يمكنك عرض الذاكرة السحابية.");
   }).catch(error => showStatus("تعذر التحقق من الجلسة: " + (error?.message || "خطأ")));
 } catch (error) {
   showStatus("تعذر تهيئة الذاكرة السحابية: " + (error?.message || "خطأ"));
