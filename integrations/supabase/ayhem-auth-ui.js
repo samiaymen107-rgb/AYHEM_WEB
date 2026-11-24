@@ -18,6 +18,9 @@ function renderSession(session) {
   if (form) form.hidden = signedIn || recoveryMode;
   if (recoveryForm) recoveryForm.hidden = !recoveryMode;
   if (signOut) signOut.hidden = !signedIn || recoveryMode;
+  window.dispatchEvent(new CustomEvent("ayhem:auth-session", {
+    detail: { authenticated: signedIn }
+  }));
   if (!recoveryMode) showStatus(signedIn
     ? "متصل بحساب AYHEM: " + (session.user.email || "مستخدم موثّق")
     : "يرجى تسجيل الدخول بحسابك الحالي.");
