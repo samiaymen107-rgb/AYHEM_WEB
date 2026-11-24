@@ -1,6 +1,7 @@
 /**
- * Authenticated AYHEM AI panel. Session state follows shared Supabase auth events.
- * Provider readiness is only confirmed by a successful real Edge Function reply.
+ * AYHEM AI Gateway UI.
+ * Mounts its click handler before any network initialization so the UI never
+ * becomes inert while Supabase or the module CDN is loading.
  */
 async function createSupabaseAIClient() {
   await import("../supabase/public-config.js");
@@ -58,23 +59,73 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   const send = documentRef?.getElementById("aiSendBtn");
   const output = documentRef?.getElementById("aiOutput");
   if (!status || !input || !send || !output) return Object.freeze({ state: "not-mounted" });
-  let client;
+
+  // A stable script URL plus this guard prevents duplicate listeners.
+  if (send.dataset?.ayhemAiMounted === "true") return Object.freeze({ state: "already-mounted" });
+  if (send.dataset) send.dataset.ayhemAiMounted = "true";
+
+  let client = null;
   let authenticated = false;
   let sending = false;
+  let initialized = false;
+
   const renderAuth = signedIn => {
     authenticated = Boolean(signedIn);
-    send.disabled = !authenticated || sending;
+    // Keep the button tappable while signed out or while initialization runs;
+    // the handler returns a useful explanation instead of silently ignoring taps.
+    send.disabled = sending;
     status.textContent = authenticated
-      ? "جلسة AYHEM موثّقة. سيتم التحقق من OpenAI عند إرسال رسالة فعلية."
-      : "يلزم تسجيل الدخول لاستخدام مساعد AYHEM.";
-    if (!sending) output.textContent = authenticated ? "أرسل رسالة لاختبار بوابة OpenAI الحية." : "الاتصال بمزوّد OpenAI لم يُختبر بعد.";
+      ? "جلسة AYHEM موثّقة. أرسل رسالة لاختبار اتصال OpenAI الحي."
+      : "يلزم تسجيل الدخول إلى AYHEM لاستخدام مساعد الذكاء الاصطناعي.";
+    if (!sending && initialized) {
+      output.textContent = authenticated
+        ? "اكتب رسالتك ثم اضغط إرسال."
+        : "سجّل الدخول من قسم Supabase Auth أولاً، ثم أرسل رسالتك.";
+    }
   };
 
-  if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
-    window.addEventListener("ayhem:auth-session", event => {
-      renderAuth(event?.detail?.authenticated === true);
-    });
-  }
+  const handleSend = async () => {
+    const prompt = typeof input.value === "string" ? input.value.trim() : "";
+    if (!prompt) {
+      output.textContent = "اكتب سؤالاً أولاً.";
+      status.textContent = "بانتظار رسالتك.";
+      return;
+    }
+    if (sending) return;
+    if (!client || !initialized) {
+      output.textContent = "ما زالت وحدة الاتصال تتهيأ. انتظر لحظة ثم أعد المحاولة.";
+      status.textContent = "جارٍ تهيئة اتصال AYHEM/Supabase...";
+      return;
+    }
+    if (!authenticated) {
+      output.textContent = "لم يتم العثور على جلسة دخول. سجّل الدخول من القسم أعلاه ثم أعد المحاولة.";
+      status.textContent = "تسجيل الدخول مطلوب قبل إرسال الرسائل.";
+      return;
+    }
+
+    sending = true;
+    send.disabled = true;
+    status.textContent = "تم التقاط الضغط؛ جارٍ إرسال الطلب إلى Supabase ثم OpenAI...";
+    output.textContent = "جارٍ الاتصال ببوابة AYHEM. لن نعلن النجاح قبل استلام رد فعلي.";
+    try {
+      const result = await client.ask(prompt);
+      output.textContent = result.output;
+      status.textContent = "نجح الاتصال الحي — تم استلام رد فعلي من OpenAI.";
+      input.value = "";
+    } catch (error) {
+      output.textContent = String(error?.message || error || "حدث خطأ غير معروف.").slice(0, 500);
+      status.textContent = "فشل طلب AI Gateway. التفاصيل معروضة أدناه.";
+    } finally {
+      sending = false;
+      send.disabled = false;
+    }
+  };
+
+  // Install interaction first, before imports, auth checks, or network waits.
+  send.addEventListener("click", handleSend);
+  if (typeof window !== "undefined") window.__AYHEM_AI_UI_MOUNTED = true;
+  status.textContent = "تم تحميل واجهة AI. جارٍ تهيئة جلسة Supabase...";
+  output.textContent = "زر الإرسال يعمل؛ سيعرض سبب التعذر بدلاً من تجاهل الضغط.";
 
   try {
     client = await clientFactory();
@@ -82,49 +133,24 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       client.onAuthStateChange((_event, session) => renderAuth(Boolean(session?.access_token)));
     }
     const health = await client.health();
-    if (health.ready !== true) {
-      renderAuth(false);
-    } else {
-      renderAuth(true);
-    }
+    initialized = true;
+    renderAuth(health.ready === true);
+    return Object.freeze({ state: authenticated ? "authenticated" : "not-authenticated" });
   } catch (error) {
-    status.textContent = "تعذر تهيئة اتصال AYHEM/Supabase: " + String(error?.message || error).slice(0, 120);
-    send.disabled = true;
+    initialized = false;
+    authenticated = false;
+    send.disabled = false;
+    status.textContent = "تعذر تهيئة اتصال AYHEM/Supabase: " + String(error?.message || error).slice(0, 180);
+    output.textContent = "واجهة الإرسال محمّلة، لكن خدمة المصادقة لم تتهيأ. تحقق من اتصال الشبكة ثم أعد تحميل الصفحة.";
     return Object.freeze({ state: "offline" });
   }
-  const handleSend = async () => {
-    const prompt = typeof input.value === "string" ? input.value.trim() : "";
-    if (!prompt) { output.textContent = "اكتب سؤالاً أولاً."; return; }
-    if (!authenticated || sending) {
-      if (!authenticated) output.textContent = "انتهت جلسة الدخول. سجّل الدخول مجدداً ثم أعد المحاولة.";
-      return;
-    }
-    sending = true;
-    send.disabled = true;
-    status.textContent = "تم الضغط؛ جارٍ الاتصال ببوابة OpenAI...";
-    output.textContent = "جارٍ إرسال الرسالة إلى AYHEM...";
-    try {
-      const result = await client.ask(prompt);
-      output.textContent = result.output;
-      status.textContent = "اتصال OpenAI الحي ناجح — تم استلام رد من AYHEM.";
-      input.value = "";
-    } catch (error) {
-      output.textContent = String(error?.message || error || "حدث خطأ غير معروف.").slice(0, 300);
-      status.textContent = "تعذّر إكمال طلب الذكاء الاصطناعي. راجع الرسالة أعلاه ثم أعد المحاولة.";
-    } finally {
-      sending = false;
-      send.disabled = !authenticated;
-    }
-  };
-  send.addEventListener("click", handleSend);
-  if (typeof window !== "undefined") window.__AYHEM_AI_UI_MOUNTED = true;
-
-  return Object.freeze({ state: authenticated ? "authenticated" : "not-authenticated" });
 }
 
 if (typeof document !== "undefined") {
-  mountAyhemAIUI().catch(() => {
+  mountAyhemAIUI().catch(error => {
     const status = document.getElementById("aiConnectionStatus");
-    if (status) status.textContent = "تعذر تهيئة اتصال AYHEM.";
+    const output = document.getElementById("aiOutput");
+    if (status) status.textContent = "تعذر تركيب واجهة AI: " + String(error?.message || error).slice(0, 160);
+    if (output) output.textContent = "أعد تحميل الصفحة بعد اكتمال التحديث.";
   });
 }
