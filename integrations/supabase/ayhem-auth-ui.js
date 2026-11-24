@@ -1,5 +1,5 @@
 import "./public-config.js";
-import { getAyhemSupabaseClient, signInAyhem, signOutAyhem, getAyhemSession } from "./ayhem-supabase-auth.js";
+import { getAyhemSupabaseClient, signInAyhem, signOutAyhem, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-2";
 
 const byId = id => document.getElementById(id);
 const status = byId("authStatus");
