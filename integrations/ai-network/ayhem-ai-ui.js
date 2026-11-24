@@ -7,9 +7,7 @@ function withTimeout(promise, label, ms = 10000) {
   let timer;
   return Promise.race([
     Promise.resolve(promise),
-    new Promise((_, reject) => {
-      timer = setTimeout(() => reject(new Error(label + "_timeout_" + ms + "ms")), ms);
-    }),
+    new Promise((_, reject) => { timer = setTimeout(() => reject(new Error(label + "_timeout_" + ms + "ms")), ms); }),
   ]).finally(() => clearTimeout(timer));
 }
 
@@ -50,7 +48,7 @@ async function createSupabaseAIClient() {
         }
         const reply = typeof data?.reply === "string" ? data.reply.trim() : "";
         if (!reply) throw new Error(data?.error || "لم يصل رد نصي من AYHEM.");
-        return { output: reply };
+        return { output: reply, provider: data.provider || "unknown" };
       } catch (error) {
         if (controller.signal.aborted) throw new Error("انتهت مهلة الواجهة بعد 30 ثانية. أعد المحاولة.");
         throw error;
@@ -67,8 +65,6 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   const send = documentRef?.getElementById("aiSendBtn");
   const output = documentRef?.getElementById("aiOutput");
   if (!status || !input || !send || !output) return Object.freeze({ state: "not-mounted" });
-
-  // A stable script URL plus this guard prevents duplicate listeners.
   if (send.dataset?.ayhemAiMounted === "true") return Object.freeze({ state: "already-mounted" });
   if (send.dataset) send.dataset.ayhemAiMounted = "true";
 
@@ -80,11 +76,9 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
 
   const renderAuth = signedIn => {
     authenticated = Boolean(signedIn);
-    // Keep the button tappable while signed out or while initialization runs;
-    // the handler returns a useful explanation instead of silently ignoring taps.
     send.disabled = sending;
     status.textContent = authenticated
-      ? "جلسة AYHEM موثّقة. أرسل رسالة لاختبار اتصال OpenAI الحي."
+      ? "جلسة AYHEM موثّقة. مزوّد الذكاء يُحدّد من إعداد الخادم."
       : "يلزم تسجيل الدخول إلى AYHEM لاستخدام مساعد الذكاء الاصطناعي.";
     if (!sending && initialized) {
       output.textContent = authenticated
@@ -95,11 +89,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
 
   const handleSend = async () => {
     const prompt = typeof input.value === "string" ? input.value.trim() : "";
-    if (!prompt) {
-      output.textContent = "اكتب سؤالاً أولاً.";
-      status.textContent = "بانتظار رسالتك.";
-      return;
-    }
+    if (!prompt) { output.textContent = "اكتب سؤالاً أولاً."; status.textContent = "بانتظار رسالتك."; return; }
     if (sending) return;
     if (initializationError) {
       output.textContent = "تعذر تهيئة خدمة المصادقة: " + initializationError;
@@ -116,15 +106,15 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       status.textContent = "تسجيل الدخول مطلوب قبل إرسال الرسائل.";
       return;
     }
-
     sending = true;
     send.disabled = true;
-    status.textContent = "تم التقاط الضغط؛ جارٍ إرسال الطلب إلى Supabase ثم OpenAI...";
-    output.textContent = "جارٍ الاتصال ببوابة AYHEM. لن نعلن النجاح قبل استلام رد فعلي.";
+    status.textContent = "جارٍ إرسال الطلب إلى بوابة AYHEM الآمنة...";
+    output.textContent = "جارٍ الاتصال بمزوّد الذكاء. لن نعلن النجاح قبل استلام رد فعلي.";
     try {
       const result = await client.ask(prompt);
       output.textContent = result.output;
-      status.textContent = "نجح الاتصال الحي — تم استلام رد فعلي من OpenAI.";
+      const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
+      status.textContent = "نجح الاتصال الحي — تم استلام رد فعلي من " + providerLabel + ".";
       input.value = "";
     } catch (error) {
       output.textContent = String(error?.message || error || "حدث خطأ غير معروف.").slice(0, 500);
@@ -135,7 +125,6 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     }
   };
 
-  // Install interaction first, before imports, auth checks, or network waits.
   send.addEventListener("click", handleSend);
   if (typeof window !== "undefined") window.__AYHEM_AI_UI_MOUNTED = true;
   status.textContent = "تم تحميل واجهة AI. جارٍ تهيئة جلسة Supabase...";
