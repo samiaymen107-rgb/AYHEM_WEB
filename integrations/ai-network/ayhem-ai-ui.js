@@ -15,22 +15,20 @@ function withTimeout(promise, label, ms = 10000) {
 
 async function createSupabaseAIClient() {
   await import("../supabase/public-config.js");
-  const { getAyhemSupabaseClient } = await import("../supabase/ayhem-supabase-auth.js");
+  const { getAyhemSupabaseClient, getAyhemSession } = await import("../supabase/ayhem-supabase-auth.js");
   const supabase = getAyhemSupabaseClient();
   return Object.freeze({
     async health() {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      return { ready: Boolean(data.session?.access_token), session: data.session || null };
+      const session = await getAyhemSession();
+      return { ready: Boolean(session?.access_token), session: session || null };
     },
     onAuthStateChange(callback) {
       const { data } = supabase.auth.onAuthStateChange((event, session) => callback(event, session));
       return () => data.subscription.unsubscribe();
     },
     async ask(prompt) {
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) throw sessionError;
-      if (!sessionData.session?.access_token) throw new Error("authentication_required");
+      const session = await getAyhemSession();
+      if (!session?.access_token) throw new Error("authentication_required");
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 30000);
       try {
