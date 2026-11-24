@@ -71,14 +71,15 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   };
   try {
     client = await clientFactory();
-    const health = await client.health();
-    if (health.ready !== true) renderAuth(false);
-    else renderAuth(true);
+    // Subscribe before reading the session to avoid missing a sign-in/refresh
+    // event that occurs while getSession() is resolving.
     if (typeof client.onAuthStateChange === "function") {
       client.onAuthStateChange((_event, session) => renderAuth(Boolean(session?.access_token)));
     }
-  } catch {
-    status.textContent = "تعذر تهيئة اتصال AYHEM/Supabase.";
+    const health = await client.health();
+    renderAuth(health.ready === true);
+  } catch (error) {
+    status.textContent = "تعذر تهيئة اتصال AYHEM/Supabase: " + String(error?.message || error).slice(0, 120);
     send.disabled = true;
     return Object.freeze({ state: "offline" });
   }
