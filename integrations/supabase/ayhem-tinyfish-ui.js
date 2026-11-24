@@ -24,20 +24,39 @@ form?.addEventListener("submit", async event => {
     show("أدخل رابط HTTPS ووصف المهمة.");
     return;
   }
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password) {
+      show("يُسمح بروابط HTTPS فقط، دون بيانات دخول داخل الرابط.");
+      return;
+    }
+  } catch {
+    show("الرابط غير صالح.");
+    return;
+  }
 
   submit.disabled = true;
-  show("جارٍ إرسال المهمة إلى TinyFish. قد تستهلك هذه العملية رصيداً.");
+  show("جارٍ التحقق من جلسة AYHEM وموافقتك...");
   try {
     const client = getAyhemSupabaseClient();
     const { data: sessionData, error: sessionError } = await client.auth.getSession();
     if (sessionError) throw sessionError;
-    if (!sessionData.session) throw new Error("يجب تسجيل الدخول أولاً.");
+    if (!sessionData.session?.access_token) throw new Error("يجب تسجيل الدخول أولاً.");
 
+    show("تم التحقق من الجلسة والموافقة. جارٍ إرسال المهمة إلى TinyFish؛ قد تستهلك رصيداً.");
     const { data, error } = await client.functions.invoke("ayhem-tinyfish-run", {
-      body: { url, goal, max_duration_seconds: 30 },
+      body: {
+        url,
+        goal,
+        consent: true,
+        max_duration_seconds: 30,
+      },
     });
-    if (error) throw error;
-    show(data?.ok ? "اكتملت استجابة TinyFish." : "لم تنجح المهمة.", data);
+    if (error) {
+      const detail = data?.error || error.message;
+      throw new Error(detail || "تعذّر تنفيذ المهمة.");
+    }
+    show(data?.ok ? "اكتملت استجابة TinyFish." : "لم تنجح المهمة؛ راجع التفاصيل.", data);
   } catch (error) {
     show("تعذر تنفيذ المهمة: " + (error?.message || "خطأ غير معروف"));
   } finally {
