@@ -1,0 +1,48 @@
+name: AYHEM Supabase Live Edge Smoke Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/ayhem-supabase-live-smoke.yml"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/ayhem-supabase-live-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ayhem-supabase-live-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  live-edge-auth-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify deployed Edge Functions reject unauthenticated requests
+        env:
+          SUPABASE_PROJECT_REF: qmasgqvfnjlticwmovpn
+        run: |
+          node --input-type=module <<'NODE'
+          const base = `https://${process.env.SUPABASE_PROJECT_REF}.supabase.co/functions/v1`;
+          const checks = [
+            ["ayhem-openai-chat", "POST"],
+            ["ayhem-tinyfish-run", "POST"],
+            ["ayhem-tinyfish-health", "GET"],
+          ];
+          let failed = false;
+          for (const [slug, method] of checks) {
+            const response = await fetch(`${base}/${slug}`, {
+              method,
+              headers: { "content-type": "application/json" },
+              ...(method === "POST" ? { body: JSON.stringify({ message: "smoke-test", goal: "smoke-test", url: "https://example.com" }) } : {}),
+            });
+            const passed = response.status === 401;
+            console.log(`${passed ? "PASS" : "FAIL"} ${slug} ${method}: HTTP ${response.status} (expected 401)`);
+            if (!passed) failed = true;
+          }
+          if (failed) process.exit(1);
+          NODE
