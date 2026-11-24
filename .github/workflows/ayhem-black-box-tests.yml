@@ -13,6 +13,10 @@ on:
     branches: [main]
     paths:
       - "core/black-box/**"
+      - "integrations/ai-network/**"
+      - "integrations/supabase/ayhem-remote-memory.js"
+      - "tools/legacy-memory-audit.html"
+      - ".github/workflows/ayhem-black-box-tests.yml"
 
 permissions:
   contents: read
