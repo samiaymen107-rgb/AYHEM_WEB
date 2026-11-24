@@ -31,13 +31,13 @@ These are current file counts, not a claim that all 692 file contents have been 
 
 ## Operation report inventory
 
-A recursive tree scan of `AYHEM_WEB/docs/operations` found **51 report files**. They represent **50 distinct operation numbers**, because number 052 appears twice under different dates:
+A recursive tree scan of `AYHEM_WEB/docs/operations` found **51 pre-existing report files** before this report was created. With operation 055, the current total is **52 report files** representing **51 distinct operation numbers**, because number 052 appears twice under different dates:
 - `2026-11-21-052-explicit-consent-sync-transport.md`
 - `2026-11-22-052-supabase-auth-tinyfish.md`
 
 Missing standalone operation numbers in the inspected range 001–054: **025, 045, 046, 049**. Number 049 is referenced by post-merge report 050, but no standalone 049 report was found. The numbering collision and gaps are preserved rather than silently renaming historical files.
 
-Latest existing reports: 051, 052 (two files), 053, 054. This report is 055.
+Latest existing reports before this audit: 051, 052 (two files), 053, 054. This report is 055; the resulting inventory is 52 report files / 51 distinct operation numbers.
 
 ## Merge-history reconciliation
 
