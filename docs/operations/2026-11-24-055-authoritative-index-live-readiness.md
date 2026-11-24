@@ -5,7 +5,7 @@ Repository: `samiaymen107-rgb/AYHEM_WEB`
 Baseline branch: `main`
 Baseline commit: `2f683db4ee39c10a45d30e3eaa355630db8c4da9`
 Working branch: `audit/operation-index-055-2026-11-24`
-Status: AUDIT RECORDED / INDEX UPDATE IN PROGRESS / LIVE RUNTIME NOT VERIFIED
+Status: AUDIT AND INDEX UPDATE COMMITTED ON REVIEW BRANCH / LIVE RUNTIME NOT VERIFIED
 
 ## Purpose
 
@@ -106,7 +106,22 @@ The browser Supabase adapter enables `persistSession`, `autoRefreshToken`, and `
 
 ## Progress measurement
 
-This audit does not calculate a percentage from file counts. Engineering progress, CI status, deployment status, and live end-to-end readiness must remain separate metrics. A new weighted score requires the authoritative scorecard and its criteria to be fetched and recalculated; no new percentage is invented here.
+- **Stage completion: 100%** for the defined audit/index scope: all eight repository trees were counted, operation reports were enumerated, duplicate/gap numbering was identified, PR #45 merge state was checked, the Supabase project/functions were inspected, and the index/report files were committed to the review branch. This does not include code repair or end-to-end runtime validation.
+- **Overall AYHEM engineering progress: 44.75% provisional**, carried forward from the last authoritative weighted scorecard dated 2026-11-21. No percentage is added for this documentation-only operation. The 2026-11-23 merge and current cloud deployment evidence require a full workstream acceptance review before recalibration.
+
+| Workstream | Weight | Last authoritative estimate | Weighted contribution |
+|---|---:|---:|---:|
+| MEMORY | 25% | 70% | 17.50 |
+| COGNITION | 15% | 25% | 3.75 |
+| AUTONOMY | 15% | 25% | 3.75 |
+| GUARD | 10% | 25% | 2.50 |
+| LINK | 10% | 35% | 3.50 |
+| INTERFACE | 10% | 40% | 4.00 |
+| OPERATIONS | 10% | 75% | 7.50 |
+| VALIDATION & RELEASE | 5% | 45% | 2.25 |
+| **Total** | **100%** |  | **44.75%** |
+
+CI: no application test suite was run because this operation changes only audit/index Markdown. Deployment: no deployment was performed. Security: no production settings or data were changed. Production readiness: **not yet rated**. Live AI/service availability: not verified.
 
 ## Preservation
 
