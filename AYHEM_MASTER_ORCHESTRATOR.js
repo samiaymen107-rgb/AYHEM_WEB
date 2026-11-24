@@ -65,10 +65,8 @@ class AYHEM_ORCHESTRATOR {
       attempt("AUTH", async () => {
         await import("./integrations/supabase/public-config.js");
         const m = await import("./integrations/supabase/ayhem-supabase-auth.js");
-        const client = m.getAyhemSupabaseClient();
-        const { data, error } = await bounded(client.auth.getSession(), "auth_session", 7000);
-        if (error) throw error;
-        return { client, signedIn: Boolean(data.session?.user) };
+        const session = await bounded(m.getAyhemSession(), "auth_session", 10000);
+        return { signedIn: Boolean(session?.user) };
       }, m => m.signedIn ? "authenticated session present" : "module ready; sign-in required"),
       attempt("CLOUD_MEMORY", async () => {
         const m = await import("./integrations/supabase/ayhem-remote-memory.js");
