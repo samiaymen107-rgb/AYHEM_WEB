@@ -119,3 +119,73 @@ test("freezes the complete event envelope and nested memory payload", async () =
   assert.equal(Object.isFrozen(event.data.payload.tags), true);
   assert.throws(() => event.data.payload.tags.push("mutation"), TypeError);
 });
+
+
+function stableFixture(value) {
+  if (Array.isArray(value)) return "[" + value.map(stableFixture).join(",") + "]";
+  if (value && typeof value === "object") {
+    return "{" + Object.keys(value).sort().map(key =>
+      JSON.stringify(key) + ":" + stableFixture(value[key])
+    ).join(",") + "}";
+  }
+  return JSON.stringify(value);
+}
+
+test("integrity digest matches the canonical wire payload before integrity metadata", async () => {
+  const adapter = createMemoryEventAdapter({
+    digest: webcrypto.subtle,
+    idFactory: () => "event-integrity-check-0001",
+    now: () => "2026-11-21T15:00:00.000Z",
+  });
+  const event = await adapter.toEvent(record, {
+    sourceKind: "user_input",
+    traceId: "trace-integrity-check-0001",
+  });
+  const { integrity, ...unsignedPayload } = event.data;
+  const expected = await webcrypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(stableFixture(unsignedPayload)),
+  );
+  const expectedHex = [...new Uint8Array(expected)]
+    .map(value => value.toString(16).padStart(2, "0"))
+    .join("");
+
+  assert.equal(integrity.algorithm, "sha-256");
+  assert.equal(integrity.digest, expectedHex);
+});
+
+test("rejects invalid producer and event identifiers before emitting an envelope", async () => {
+  assert.throws(() => createMemoryEventAdapter({
+    digest: webcrypto.subtle,
+    producer: " ".repeat(101),
+  }), /producer_invalid/);
+
+  const adapter = createMemoryEventAdapter({
+    digest: webcrypto.subtle,
+    idFactory: () => "event id contains spaces",
+  });
+  await assert.rejects(adapter.toEvent(record, {
+    sourceKind: "user_input",
+    traceId: "trace-integrity-check-0002",
+  }), /event_id_invalid/);
+});
+
+test("rejects a non-canonical event clock and propagates digest failures", async () => {
+  const invalidClockAdapter = createMemoryEventAdapter({
+    digest: webcrypto.subtle,
+    now: () => "2026-11-21",
+  });
+  await assert.rejects(invalidClockAdapter.toEvent(record, {
+    sourceKind: "user_input",
+    traceId: "trace-integrity-check-0003",
+  }), /event_time_invalid/);
+
+  const digestFailure = new Error("synthetic_digest_failure");
+  const failingAdapter = createMemoryEventAdapter({
+    digest: { digest: async () => { throw digestFailure; } },
+  });
+  await assert.rejects(failingAdapter.toEvent(record, {
+    sourceKind: "user_input",
+    traceId: "trace-integrity-check-0004",
+  }), error => error === digestFailure);
+});
