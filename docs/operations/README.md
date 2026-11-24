@@ -43,7 +43,7 @@
 
 ## الفهرس
 
-- [2026-11-24-055-authoritative-index-live-readiness.md](./2026-11-24-055-authoritative-index-live-readiness.md) — جرد مرجعي جديد: 692 ملفاً عبر 8 مستودعات، 52 تقريراً بعد إضافة 055، تدقيق دمج PR #45، وحالة Supabase الحية؛ لا يعني اكتمال التشغيل.
+- [2026-11-24-055-authoritative-index-live-readiness.md](./2026-11-24-055-authoritative-index-live-readiness.md) — جرد مرجعي جديد: 692 ملفاً عبر 8 مستودعات، 57 وثيقة إجراءات عبر AYHEM_WEB وAYHEM (56 مرقمة + 1 غير مرقمة)، تدقيق دمج PR #45 وحالة الخدمات الحية؛ لا يعني اكتمال التشغيل.
 - تصحيح زمني: PR #45 دُمج فعلياً في main بتاريخ 2026-11-23T16:22:05Z (merge commit `9caf6a43bff0f3a814944d168cd5826adfa3e991`)؛ التقارير 052–054 كانت تقول قبل الدمج إنه لم يُدمج، ويُحفظ هذا التناقض التاريخي في تقرير 055 دون إعادة كتابة السجلات القديمة.
 
 - [2026-11-21-052-explicit-consent-sync-transport.md](./2026-11-21-052-explicit-consent-sync-transport.md) — عميل دفع HTTPS بموافقة صريحة، مع SHA-256 وحدود payload والتحقق بعد الدمج (Node وChromium وPages SUCCESS).
