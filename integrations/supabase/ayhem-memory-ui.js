@@ -153,6 +153,7 @@ try {
   getAyhemSession().then(session => {
     if (button) button.disabled = !session?.user;
     if (testButton) testButton.disabled = !session?.user;
+    if (isolationButton) isolationButton.disabled = !session?.user;
     if (session?.user) showStatus("تم التحقق من الجلسة. يمكنك عرض الذاكرة أو تشغيل اختبار حفظ واسترجاع مستقل.");
   }).catch(error => showStatus("تعذر التحقق من الجلسة: " + (error?.message || "خطأ")));
 } catch (error) {
