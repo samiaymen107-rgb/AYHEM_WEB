@@ -20,11 +20,34 @@ async function createSupabaseAIClient() {
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError) throw sessionError;
       if (!sessionData.session?.access_token) throw new Error("authentication_required");
-      const { data, error } = await supabase.functions.invoke("ayhem-openai-chat", { body: { message: prompt, memory_context: "" } });
-      if (error) throw error;
-      const reply = typeof data?.reply === "string" ? data.reply.trim() : "";
-      if (!reply) throw new Error(data?.error || "empty_ai_response");
-      return { output: reply };
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+      try {
+        const { data, error } = await supabase.functions.invoke("ayhem-openai-chat", {
+          body: { message: prompt, memory_context: "" },
+          signal: controller.signal,
+        });
+        if (error) {
+          const context = error.context;
+          if (context && typeof context.json === "function") {
+            try {
+              const payload = await context.clone().json();
+              if (typeof payload?.error === "string") throw new Error(payload.error);
+            } catch (parseError) {
+              if (parseError instanceof Error && parseError.message !== "Unexpected end of JSON input") throw parseError;
+            }
+          }
+          throw new Error(error.message || "تعذّر الوصول إلى بوابة AYHEM.");
+        }
+        const reply = typeof data?.reply === "string" ? data.reply.trim() : "";
+        if (!reply) throw new Error(data?.error || "لم يصل رد نصي من AYHEM.");
+        return { output: reply };
+      } catch (error) {
+        if (controller.signal.aborted) throw new Error("انتهت مهلة الواجهة بعد 30 ثانية. أعد المحاولة.");
+        throw error;
+      } finally {
+        clearTimeout(timeout);
+      }
     },
   });
 }
@@ -73,8 +96,8 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       status.textContent = "اتصال OpenAI الحي ناجح — تم استلام رد من AYHEM.";
       input.value = "";
     } catch (error) {
-      output.textContent = "فشل طلب الذكاء الاصطناعي: " + String(error?.message || error).slice(0, 240);
-      status.textContent = "الجلسة متاحة، لكن استجابة OpenAI لم تنجح. راجع إعدادات Edge Function والسجلات.";
+      output.textContent = String(error?.message || error || "حدث خطأ غير معروف.").slice(0, 300);
+      status.textContent = "تعذّر إكمال طلب الذكاء الاصطناعي. راجع الرسالة أعلاه ثم أعد المحاولة.";
     } finally {
       sending = false;
       send.disabled = !authenticated;
