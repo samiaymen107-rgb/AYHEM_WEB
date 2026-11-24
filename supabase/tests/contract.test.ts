@@ -66,7 +66,7 @@ Deno.test("Cloud memory UI: round-trip verification must not mutate prior record
   includes(source, "restored.metadata?.canonical_id === canonicalId", "Round-trip test must verify canonical ID");
   includes(source, "evidence_level: restored.evidence_level", "Round-trip output must preserve evidence classification");
   includes(source, "memoryIsolationBtn", "Cloud memory UI must expose the authenticated isolation diagnostic");
-  includes(source, "store.verifyIsolation()", "Cloud memory UI must invoke the read-only isolation diagnostic");
+  includes(source, "createAyhemRemoteMemoryStore().verifyIsolation()", "Cloud memory UI must invoke the read-only isolation diagnostic");
   assert(!/\.from\(["']ayhem_memories["']\)\s*\.update\(/.test(source), "Memory UI must not update prior memory records");
   assert(!/\.from\(["']ayhem_memories["']\)\s*\.delete\(/.test(source), "Memory UI must not delete prior memory records");
 });
