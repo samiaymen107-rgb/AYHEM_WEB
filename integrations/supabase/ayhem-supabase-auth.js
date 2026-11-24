@@ -6,6 +6,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.0";
 
 let client;
+let sessionReadPromise = null;
 
 export function getAyhemSupabaseClient(config = globalThis.window?.AYHEM_SUPABASE) {
   if (!config || typeof config.url !== "string" || typeof config.anonKey !== "string") {
@@ -36,10 +37,17 @@ export async function signInAyhem(email, password) {
   return data;
 }
 
-export async function getAyhemSession() {
-  const { data, error } = await getAyhemSupabaseClient().auth.getSession();
-  if (error) throw error;
-  return data.session;
+// Deduplicate simultaneous session reads across the auth UI, AI gateway and startup orchestrator.
+export function getAyhemSession() {
+  if (!sessionReadPromise) {
+    sessionReadPromise = getAyhemSupabaseClient().auth.getSession()
+      .then(({ data, error }) => {
+        if (error) throw error;
+        return data.session;
+      })
+      .finally(() => { sessionReadPromise = null; });
+  }
+  return sessionReadPromise;
 }
 
 export async function signOutAyhem() {
