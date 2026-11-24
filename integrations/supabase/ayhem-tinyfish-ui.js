@@ -34,7 +34,7 @@ form?.addEventListener("submit", async event => {
     if (!sessionData.session) throw new Error("يجب تسجيل الدخول أولاً.");
 
     const { data, error } = await client.functions.invoke("ayhem-tinyfish-run", {
-      body: { url, goal, max_duration_seconds: 30 },
+      body: { url, goal, consent: consent.checked === true, max_duration_seconds: 30 },
     });
     if (error) throw error;
     show(data?.ok ? "اكتملت استجابة TinyFish." : "لم تنجح المهمة.", data);
