@@ -3,6 +3,7 @@ import { createAyhemRemoteMemoryStore } from "./ayhem-remote-memory.js?v=2026112
 
 const button = document.getElementById("memoryLoadBtn");
 const testButton = document.getElementById("memoryRoundTripBtn");
+const isolationButton = document.getElementById("memoryIsolationBtn");
 const status = document.getElementById("memoryStatus");
 const output = document.getElementById("memoryOutput");
 
@@ -100,14 +101,48 @@ async function testCloudMemoryRoundTrip() {
   }
 }
 
+
+async function verifyCloudMemoryIsolation() {
+  if (!isolationButton || !output) return;
+  isolationButton.disabled = true;
+  if (button) button.disabled = true;
+  if (testButton) testButton.disabled = true;
+  output.textContent = "جارٍ التحقق من هوية الحساب لدى Supabase وفحص عزل السجلات بوضع القراءة فقط...";
+  try {
+    const result = await createAyhemRemoteMemoryStore().verifyIsolation();
+    output.textContent = JSON.stringify({
+      test: "CLOUD_MEMORY_AUTHENTICATED_RLS_ISOLATION",
+      result: result.isolation_passed ? "PASS" : "FAIL",
+      authenticated_user_verified: result.authenticated,
+      own_records_visible: result.own_visible_count,
+      foreign_records_visible: result.foreign_visible_count,
+      checked_at: result.checked_at,
+      note: "فحص قراءة فقط باستخدام عدّ النتائج دون جلب محتوى الذاكرة أو معرّفات سجلات الآخرين. لم تتم أي كتابة أو عملية تعديل أو حذف."
+    }, null, 2);
+    showStatus(result.isolation_passed
+      ? "نجح الفحص: تم التحقق من الحساب ولم تظهر له أي سجلات مملوكة لحساب آخر."
+      : "تحذير أمني: أظهر الفحص سجلات لا تخص الحساب الحالي. لا تتابع استخدام الذاكرة قبل مراجعة سياسة RLS.");
+  } catch (error) {
+    const detail = error?.message || "خطأ غير معروف";
+    output.textContent = "تعذر إكمال فحص العزل: " + detail;
+    showStatus("فشل فحص الجلسة وعزل الذاكرة: " + detail);
+  } finally {
+    isolationButton.disabled = false;
+    if (button) button.disabled = false;
+    if (testButton) testButton.disabled = false;
+  }
+}
+
 button?.addEventListener("click", loadCloudMemory);
 testButton?.addEventListener("click", testCloudMemoryRoundTrip);
+isolationButton?.addEventListener("click", verifyCloudMemoryIsolation);
 
 try {
   const client = getAyhemSupabaseClient();
   client.auth.onAuthStateChange((_event, session) => {
     if (button) button.disabled = !session?.user;
     if (testButton) testButton.disabled = !session?.user;
+    if (isolationButton) isolationButton.disabled = !session?.user;
     if (!session?.user) {
       showStatus("سجّل الدخول لعرض الذاكرة السحابية أو اختبار الحفظ والاسترجاع.");
       if (output) output.textContent = "";
@@ -118,6 +153,7 @@ try {
   getAyhemSession().then(session => {
     if (button) button.disabled = !session?.user;
     if (testButton) testButton.disabled = !session?.user;
+    if (isolationButton) isolationButton.disabled = !session?.user;
     if (session?.user) showStatus("تم التحقق من الجلسة. يمكنك عرض الذاكرة أو تشغيل اختبار حفظ واسترجاع مستقل.");
   }).catch(error => showStatus("تعذر التحقق من الجلسة: " + (error?.message || "خطأ")));
 } catch (error) {

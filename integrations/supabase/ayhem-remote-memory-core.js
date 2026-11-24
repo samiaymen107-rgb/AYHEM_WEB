@@ -56,5 +56,43 @@ export function createAyhemRemoteMemoryStore({ client, getSession } = {}) {
       if (error) throw error;
       return data || [];
     },
+
+    /**
+     * Read-only RLS diagnostic. The Auth server verifies the current user;
+     * count-only queries then check whether this JWT can see any rows owned
+     * by a different user. No memory contents or foreign row identifiers are fetched.
+     */
+    async verifyIsolation() {
+      if (typeof client.auth?.getUser !== "function") {
+        throw new Error("verified_auth_user_lookup_unavailable");
+      }
+      const { data, error: authError } = await client.auth.getUser();
+      if (authError) throw authError;
+      const user = data?.user;
+      if (!user?.id) throw new Error("authentication_required");
+
+      const ownQuery = client
+        .from("ayhem_memories")
+        .select("id", { count: "exact", head: true })
+        .eq("owner_id", user.id);
+      const foreignQuery = client
+        .from("ayhem_memories")
+        .select("id", { count: "exact", head: true })
+        .neq("owner_id", user.id);
+
+      const [ownResult, foreignResult] = await Promise.all([ownQuery, foreignQuery]);
+      if (ownResult.error) throw ownResult.error;
+      if (foreignResult.error) throw foreignResult.error;
+
+      const ownVisibleCount = ownResult.count ?? 0;
+      const foreignVisibleCount = foreignResult.count ?? 0;
+      return {
+        authenticated: true,
+        own_visible_count: ownVisibleCount,
+        foreign_visible_count: foreignVisibleCount,
+        isolation_passed: foreignVisibleCount === 0,
+        checked_at: new Date().toISOString(),
+      };
+    },
   });
 }

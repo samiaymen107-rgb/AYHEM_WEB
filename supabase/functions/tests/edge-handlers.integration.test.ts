@@ -247,3 +247,59 @@ Deno.test("Cloud memory adapter: refuses writes without an authenticated user", 
   assert(rejected, "memory adapter must reject unauthenticated writes");
   equal(insertCalls, 0, "unauthenticated memory insert count");
 });
+
+
+Deno.test("Cloud memory adapter: read-only RLS isolation diagnostic uses verified Auth identity and count-only queries", async () => {
+  const queries: Array<{ table: string; columns: string; options: unknown; filter: string; ownerId: string }> = [];
+  let foreignCount = 0;
+  let authLookups = 0;
+  const client = {
+    auth: {
+      getUser: async () => {
+        authLookups++;
+        return { data: { user: { id: "verified-user-id" } }, error: null };
+      },
+    },
+    from(table: string) {
+      return {
+        select(columns: string, options: unknown) {
+          return {
+            eq: async (column: string, ownerId: string) => {
+              queries.push({ table, columns, options, filter: column, ownerId });
+              return { count: 4, error: null };
+            },
+            neq: async (column: string, ownerId: string) => {
+              queries.push({ table, columns, options, filter: column, ownerId });
+              return { count: foreignCount, error: null };
+            },
+          };
+        },
+      };
+    },
+  };
+  const store = createAyhemRemoteMemoryStore({
+    client,
+    getSession: async () => ({ user: { id: "cached-session-user" } }),
+  });
+
+  const clean = await store.verifyIsolation();
+  equal(authLookups, 1, "verified Auth lookup count");
+  equal(clean.authenticated, true, "verified authenticated state");
+  equal(clean.own_visible_count, 4, "own visible count");
+  equal(clean.foreign_visible_count, 0, "foreign visible count");
+  equal(clean.isolation_passed, true, "clean RLS isolation result");
+  equal(queries.length, 2, "count-only query count");
+  for (const query of queries) {
+    equal(query.table, "ayhem_memories", "diagnostic table");
+    equal(query.columns, "id", "diagnostic selects only row ID for count");
+    equal((query.options as { count: string }).count, "exact", "diagnostic exact count");
+    equal((query.options as { head: boolean }).head, true, "diagnostic head-only request");
+    equal(query.filter, "owner_id", "diagnostic ownership filter");
+    equal(query.ownerId, "verified-user-id", "diagnostic uses Auth-verified user ID");
+  }
+
+  foreignCount = 2;
+  const exposed = await store.verifyIsolation();
+  equal(exposed.foreign_visible_count, 2, "foreign rows are detected");
+  equal(exposed.isolation_passed, false, "foreign rows fail isolation check");
+});

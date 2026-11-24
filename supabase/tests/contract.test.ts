@@ -52,6 +52,10 @@ Deno.test("Cloud memory adapter: requires a session and canonical record ID", as
   includes(adapter, "getAyhemSession", "Production adapter must use the authenticated Supabase session");
   includes(source, '.order("created_at", { ascending: false })', "Memory listing must remain newest-first");
   includes(source, "Math.min(500, Math.max(1", "Memory listing limit must remain bounded");
+  includes(source, "async verifyIsolation()", "Memory adapter must expose the read-only isolation diagnostic");
+  includes(source, "client.auth.getUser()", "Isolation diagnostic must verify identity with the Auth server");
+  includes(source, '.select("id", { count: "exact", head: true })', "Isolation diagnostic must use count-only head queries");
+  includes(source, '.neq("owner_id", user.id)', "Isolation diagnostic must test visibility of foreign-owned rows");
   assert(!/^\s{4}(?:update|delete)\s*\(/m.test(source), "Memory adapter must not expose update/delete methods");
 });
 
@@ -61,6 +65,8 @@ Deno.test("Cloud memory UI: round-trip verification must not mutate prior record
   includes(source, "store.list({ limit: 100 })", "Round-trip test must read back saved records");
   includes(source, "restored.metadata?.canonical_id === canonicalId", "Round-trip test must verify canonical ID");
   includes(source, "evidence_level: restored.evidence_level", "Round-trip output must preserve evidence classification");
+  includes(source, "memoryIsolationBtn", "Cloud memory UI must expose the authenticated isolation diagnostic");
+  includes(source, "createAyhemRemoteMemoryStore().verifyIsolation()", "Cloud memory UI must invoke the read-only isolation diagnostic");
   assert(!/\.from\(["']ayhem_memories["']\)\s*\.update\(/.test(source), "Memory UI must not update prior memory records");
   assert(!/\.from\(["']ayhem_memories["']\)\s*\.delete\(/.test(source), "Memory UI must not delete prior memory records");
 });
