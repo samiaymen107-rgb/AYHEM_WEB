@@ -3,7 +3,7 @@
  * Browser-safe: publishable/anon key only. Never place service_role keys here.
  * Configure window.AYHEM_SUPABASE = { url, anonKey } before importing.
  */
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.119.2";
 
 let client;
 let sessionReadPromise = null;
