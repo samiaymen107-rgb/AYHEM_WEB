@@ -1,11 +1,13 @@
-import "../supabase/public-config.js";
-import { getAyhemSupabaseClient } from "../supabase/ayhem-supabase-auth.js";
-
 /**
  * Browser AI panel backed by the authenticated Supabase Edge Function.
  * Provider credentials remain server-side in Supabase secrets.
+ *
+ * Keep Supabase browser modules lazy-loaded so the UI can be tested in Node
+ * without attempting to import the browser-only esm.sh URL.
  */
-function createSupabaseAIClient() {
+async function createSupabaseAIClient() {
+  await import("../supabase/public-config.js");
+  const { getAyhemSupabaseClient } = await import("../supabase/ayhem-supabase-auth.js");
   const supabase = getAyhemSupabaseClient();
   return Object.freeze({
     async health() {
@@ -49,7 +51,7 @@ export async function mountAyhemAIUI({
 
   let client;
   try {
-    client = clientFactory();
+    client = await clientFactory();
     const health = await client.health();
     if (health.ready !== true) {
       status.textContent = health.message || "غير متصل — سجّل الدخول أولاً.";
