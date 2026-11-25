@@ -349,6 +349,8 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   };
 
   const resizeComposer = () => {
+    // Lightweight test doubles and non-browser mounts may not expose CSSStyleDeclaration.
+    if (!input.style) return;
     input.style.height = "auto";
     const max = Math.round((documentRef.defaultView?.innerHeight || 800) * 0.26);
     input.style.height = Math.min(input.scrollHeight, max) + "px";
