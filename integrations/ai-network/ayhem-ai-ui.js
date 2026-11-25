@@ -70,7 +70,7 @@ async function createSupabaseAIClient() {
         }
         const reply = typeof data?.reply === "string" ? data.reply.trim() : "";
         if (!reply) throw new Error(data?.error || "لم يصل رد نصي من AYHEM.");
-        return { output: reply, provider: data.provider || "unknown", memoryRecordsUsed, memoryReadError };
+        return { output: reply, provider: data.provider || "unknown", model: typeof data.model === "string" ? data.model : "", memoryRecordsUsed, memoryReadError };
       } catch (error) {
         if (controller.signal.aborted) throw new Error("انتهت مهلة الواجهة بعد 30 ثانية. أعد المحاولة.");
         throw error;
@@ -216,7 +216,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
         : result.memoryRecordsUsed
           ? " استُخدمت " + result.memoryRecordsUsed + " سجلات ذاكرة ذات صلة."
           : " لم يُعثر على سجلات ذاكرة ذات صلة.";
-      status.textContent = "نجح الاتصال الحي — تم استلام رد فعلي من " + providerLabel + "." + memoryLabel + (verification.findings.length ? " فحص التحقق: " + verification.findings.length + " تنبيهات." : " فحص الأنماط: لا تنبيهات.");
+      status.textContent = "نجح الاتصال الحي — تم استلام رد فعلي من " + providerLabel + (result.model ? " (النموذج: " + result.model + ")" : "") + "." + memoryLabel + (verification.findings.length ? " فحص التحقق: " + verification.findings.length + " تنبيهات." : " فحص الأنماط: لا تنبيهات.");
       feedbackPanel.hidden = false;
       feedbackStatus.textContent = localLearningContext ? "استُخدمت تصحيحات محلية سابقة ذات صلة." : "لا توجد تصحيحات محلية سابقة ذات صلة.";
       input.value = "";
