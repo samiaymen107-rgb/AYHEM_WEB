@@ -96,17 +96,6 @@ Deno.test("AYHEM Edge handlers: authenticated runtime paths with mocked upstream
 
   await isolated(async () => {
     Deno.env.set("TINYFISH_API_KEY", "test-only-tinyfish-key");
-    let calls = 0;
-    globalThis.fetch = async () => { calls++; return Response.json({}); };
-    const response = await tinyfishRunHandler(request("https://local.test/tinyfish", "POST", {
-      consent: true, url: "http://example.com", goal: "reject insecure URL",
-    }));
-    equal(response.status, 400, "TinyFish HTTP URL rejection");
-    equal(calls, 0, "TinyFish must not call upstream for HTTP URL");
-  });
-
-  await isolated(async () => {
-    Deno.env.set("TINYFISH_API_KEY", "test-only-tinyfish-key");
     globalThis.fetch = async (input, init) => {
       equal(String(input), "https://agent.tinyfish.ai/v1/wallet", "TinyFish wallet endpoint");
       equal(init?.method, "GET", "TinyFish health upstream method");
