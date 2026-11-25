@@ -43,6 +43,7 @@ function getAyhemCoreReply(input: string): string | null {
     .normalize("NFKC")
     .replace(/[\\u064B-\\u065F\\u0670\\u0640]/gu, "")
     .replace(/[أإآ]/gu, "ا")
+    .replace(/مرجبا/gu, "مرحبا")
     .replace(/[؟?!！،,؛;:.\\sـ]/gu, "");
   if (!normalized || normalized.length > 180) return null;
 
