@@ -166,6 +166,14 @@ test("saves an explicit memory request through the authenticated cloud store wit
   assert.match(documentRef.elements.aiConnectionStatus.textContent, /تأكيد من قاعدة البيانات/);
 });
 
+test("does not replace a greeting-only AI reply with the composer placeholder", () => {
+  assert.equal(
+    cleanAyhemReply("مرحباً! كيف يمكنني مساعدتك اليوم؟"),
+    "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟",
+  );
+  assert.equal(cleanAyhemReply("مرحباً بك!"), "مرحباً بك!");
+});
+
 test("parses only clearly marked automatic corrections", () => {
   assert.equal(parseAyhemAutomaticCorrection("تصحيح: اسمي أيهم"), "اسمي أيهم");
   assert.equal(parseAyhemAutomaticCorrection("أقصد: أريد جواباً مختصراً"), "أريد جواباً مختصراً");
