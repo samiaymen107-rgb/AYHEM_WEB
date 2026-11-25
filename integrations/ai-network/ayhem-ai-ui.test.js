@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave, parseAyhemAutomaticCorrection, cleanAyhemReply } from "./ayhem-ai-ui.js";
+import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave, parseAyhemAutomaticCorrection, cleanAyhemReply, getAyhemGreetingReply } from "./ayhem-ai-ui.js";
 
 function fakeDocument() {
   const elements = Object.fromEntries(
@@ -201,4 +201,25 @@ test("automatically learns a clearly marked correction locally", async () => {
     if (originalStorage === undefined) delete globalThis.localStorage;
     else globalThis.localStorage = originalStorage;
   }
+});
+test("answers standalone greetings politely before authentication or network checks", async () => {
+  assert.equal(getAyhemGreetingReply("مرحبا"), "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟");
+  assert.equal(getAyhemGreetingReply("السلام عليكم"), "وعليكم السلام ورحمة الله وبركاته، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟");
+  assert.equal(getAyhemGreetingReply("صباح الخير"), "صباح النور والسرور، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟");
+  assert.equal(getAyhemGreetingReply("أهلاً!"), "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟");
+  assert.equal(getAyhemGreetingReply("مرحبا، أريد تحليل ملف"), null);
+
+  const documentRef = fakeDocument();
+  let networkCalls = 0;
+  await mountAyhemAIUI({
+    documentRef,
+    clientFactory: () => {
+      networkCalls++;
+      return { health: async () => ({ ready: false }) };
+    },
+  });
+  documentRef.elements.aiPrompt.value = "مرحبا";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  assert.match(documentRef.elements.aiOutput.textContent, /أهلاً وسهلاً/);
+  assert.equal(networkCalls, 1);
 });
