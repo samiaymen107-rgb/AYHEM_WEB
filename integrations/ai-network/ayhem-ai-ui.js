@@ -185,6 +185,16 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   const learning = createAyhemLocalLearningStore();
   let activePrompt = "";
 
+  const scrollConversationToLatest = () => {
+    if (!conversation) return;
+    const view = documentRef.defaultView;
+    const scroll = () => {
+      conversation.scrollTop = Math.max(0, conversation.scrollHeight - conversation.clientHeight);
+    };
+    if (typeof view?.requestAnimationFrame === "function") view.requestAnimationFrame(scroll);
+    else scroll();
+  };
+
   const createElement = typeof documentRef.createElement === "function"
     ? tag => documentRef.createElement(tag)
     : () => ({ style: {}, addEventListener() {}, append() {}, setAttribute() {}, value: "", textContent: "", hidden: false });
@@ -298,7 +308,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       conversation.append(assistantBubble);
       output = assistantBubble;
       conversation.append(feedbackPanel, reasoningPanel);
-      conversation.scrollTop = conversation.scrollHeight;
+      scrollConversationToLatest();
     }
     status.textContent = "جارٍ إرسال الطلب إلى بوابة AYHEM الآمنة...";
     output.textContent = "جارٍ استرجاع الذاكرة ذات الصلة ثم الاتصال بمزوّد الذكاء.";
@@ -309,6 +319,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
         if (typeof client.saveMemory !== "function") throw new Error("cloud_memory_save_unavailable");
         const saved = await client.saveMemory(explicitMemory);
         renderAyhemAssistantMessage(output, "تم حفظ المعلومة في الذاكرة السحابية بنجاح.\n\n" + saved.content, documentRef);
+        scrollConversationToLatest();
         status.textContent = "تأكيد من قاعدة البيانات: أُنشئ سجل ذاكرة سحابي جديد لهذا الحساب.";
         feedbackPanel.hidden = true;
         reasoningPanel.hidden = true;
@@ -327,6 +338,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       renderAyhemAssistantMessage(output, verification.findings.length
         ? result.output + "\n\n[مراجعة AYHEM المحلية]\n" + verification.findings.map(item => "• " + item.message).join("\n") + "\n" + verification.disclaimer
         : result.output + "\n\n[فحص AYHEM المحلي]\nلم تُكتشف أنماط تحذير مهيأة. " + verification.disclaimer, documentRef);
+      scrollConversationToLatest();
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
       const memoryLabel = result.memoryReadError
         ? " تعذر قراءة الذاكرة؛ أُكملت المحادثة دون سياق ذاكرة."
@@ -345,6 +357,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     } finally {
       sending = false;
       send.disabled = false;
+      scrollConversationToLatest();
     }
   };
 
