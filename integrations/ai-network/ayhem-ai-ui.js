@@ -227,6 +227,17 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     output.textContent = "جارٍ استرجاع الذاكرة ذات الصلة ثم الاتصال بمزوّد الذكاء.";
     try {
       activePrompt = prompt;
+      const explicitMemory = parseAyhemExplicitMemorySave(prompt);
+      if (explicitMemory) {
+        if (typeof client.saveMemory !== "function") throw new Error("cloud_memory_save_unavailable");
+        const saved = await client.saveMemory(explicitMemory);
+        output.textContent = "تم حفظ المعلومة في الذاكرة السحابية بنجاح.\n\n" + saved.content;
+        status.textContent = "تأكيد من قاعدة البيانات: أُنشئ سجل ذاكرة سحابي جديد لهذا الحساب.";
+        feedbackPanel.hidden = true;
+        reasoningPanel.hidden = true;
+        input.value = "";
+        return;
+      }
       const reasoningPlan = createAyhemReasoningPlan(prompt);
       const reasoningContext = buildAyhemReasoningContext(reasoningPlan);
       const localLearningContext = learning.getRelevantContext(prompt);
