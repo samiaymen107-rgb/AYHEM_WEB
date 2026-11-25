@@ -21,8 +21,8 @@ export function parseAyhemExplicitMemorySave(prompt) {
   if (typeof prompt !== "string") return null;
   const value = prompt.trim();
   const patterns = [
-    /^(?:احفظ|سجّل)\\s+(?:هذه المعلومة|المعلومة)\\s+في\\s+الذاكرة\\s+السحابية\\s*[:：]\\s*([\\s\\S]+)$/u,
-    /^(?:احفظ|سجّل)\\s+في\\s+الذاكرة\\s+السحابية\\s*[:：]\\s*([\\s\\S]+)$/u,
+    /^(?:احفظ|سجّل)\s+(?:هذه المعلومة|المعلومة)\s+في\s+الذاكرة\s+السحابية\s*[:：]\s*([\s\S]+)$/u,
+    /^(?:احفظ|سجّل)\s+في\s+الذاكرة\s+السحابية\s*[:：]\s*([\s\S]+)$/u,
   ];
   for (const pattern of patterns) {
     const match = value.match(pattern);
