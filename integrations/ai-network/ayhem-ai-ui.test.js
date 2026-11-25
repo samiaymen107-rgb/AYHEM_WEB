@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave } from "./ayhem-ai-ui.js";
+import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave, parseAyhemAutomaticCorrection } from "./ayhem-ai-ui.js";
 
 function fakeDocument() {
   const elements = Object.fromEntries(
@@ -166,4 +166,29 @@ test("saves an explicit memory request through the authenticated cloud store wit
   assert.equal(asked, false);
   assert.match(documentRef.elements.aiOutput.textContent, /تم حفظ المعلومة في الذاكرة السحابية بنجاح/);
   assert.match(documentRef.elements.aiConnectionStatus.textContent, /تأكيد من قاعدة البيانات/);
+});
+
+test("parses only clearly marked automatic corrections", () => {
+  assert.equal(parseAyhemAutomaticCorrection("تصحيح: اسمي أيهم"), "اسمي أيهم");
+  assert.equal(parseAyhemAutomaticCorrection("أقصد: أريد جواباً مختصراً"), "أريد جواباً مختصراً");
+  assert.equal(parseAyhemAutomaticCorrection("مرحبا، كيف يمكنني مساعدتك اليوم؟"), null);
+});
+
+test("automatically learns a clearly marked correction locally", async () => {
+  const values = new Map();
+  const storage = { getItem: key => values.get(key) || null, setItem: (key, value) => values.set(key, value) };
+  const documentRef = fakeDocument();
+  let asks = 0;
+  await mountAyhemAIUI({
+    documentRef,
+    clientFactory: () => ({
+      health: async () => ({ ready: true }),
+      ask: async () => ({ output: "تم." }),
+    }),
+  });
+  documentRef.elements.aiPrompt.value = "ما اسمي؟";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  documentRef.elements.aiPrompt.value = "تصحيح: اسمي أيهم";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  assert.match(documentRef.elements.aiOutput.textContent, /تم\./);
 });
