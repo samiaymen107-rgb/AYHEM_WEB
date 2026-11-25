@@ -13,6 +13,7 @@ function withTimeout(promise, label, ms = 10000) {
 
 import { buildRelevantMemoryContext } from "./ayhem-memory-context.js";
 import { createAyhemLocalLearningStore } from "./ayhem-local-learning.js";
+import { createAyhemReasoningPlan, buildAyhemReasoningContext } from "./ayhem-reasoning-core.js";
 export { buildRelevantMemoryContext } from "./ayhem-memory-context.js";
 
 async function createSupabaseAIClient() {
@@ -99,6 +100,15 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   const createElement = typeof documentRef.createElement === "function"
     ? tag => documentRef.createElement(tag)
     : () => ({ style: {}, addEventListener() {}, append() {}, setAttribute() {}, value: "", textContent: "", hidden: false });
+  const reasoningPanel = createElement("section");
+  reasoningPanel.className = "ai-reasoning-plan";
+  reasoningPanel.hidden = true;
+  reasoningPanel.style.cssText = "margin-top:12px;padding:14px;border:1px solid rgba(110,168,254,.25);border-radius:12px";
+  const reasoningTitle = createElement("strong");
+  reasoningTitle.textContent = "خطة التفكير المحلية";
+  const reasoningBody = createElement("div");
+  reasoningPanel.append(reasoningTitle, reasoningBody);
+
   const feedbackPanel = createElement("section");
   feedbackPanel.className = "ai-learning-feedback";
   feedbackPanel.hidden = true;
@@ -124,7 +134,10 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   feedbackStatus.setAttribute("role", "status");
   feedbackActions.append(helpfulButton, correctionButton);
   feedbackPanel.append(feedbackTitle, feedbackHint, correctionInput, feedbackActions, feedbackStatus);
-  if (output.parentNode) output.parentNode.insertBefore(feedbackPanel, output.nextSibling);
+  if (output.parentNode) {
+    output.parentNode.insertBefore(feedbackPanel, output.nextSibling);
+    output.parentNode.insertBefore(reasoningPanel, feedbackPanel.nextSibling);
+  }
 
   helpfulButton.addEventListener("click", () => {
     if (!activePrompt) return;
@@ -184,8 +197,13 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     output.textContent = "جارٍ استرجاع الذاكرة ذات الصلة ثم الاتصال بمزوّد الذكاء.";
     try {
       activePrompt = prompt;
+      const reasoningPlan = createAyhemReasoningPlan(prompt);
+      const reasoningContext = buildAyhemReasoningContext(reasoningPlan);
       const localLearningContext = learning.getRelevantContext(prompt);
-      const result = await client.ask(prompt, localLearningContext);
+      const combinedContext = [reasoningContext, localLearningContext].filter(Boolean).join("\n\n");
+      const result = await client.ask(prompt, combinedContext);
+      reasoningBody.textContent = reasoningPlan.intent_label + "\n" + reasoningPlan.steps.map(step => step.id + ". " + step.title).join("\n") + "\nالمخاطر: " + reasoningPlan.risks.join("؛ ");
+      reasoningPanel.hidden = false;
       output.textContent = result.output;
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
       const memoryLabel = result.memoryReadError
@@ -199,6 +217,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       input.value = "";
     } catch (error) {
       feedbackPanel.hidden = true;
+      reasoningPanel.hidden = true;
       output.textContent = String(error?.message || error || "حدث خطأ غير معروف.").slice(0, 500);
       status.textContent = "فشل طلب AI Gateway. التفاصيل معروضة أدناه.";
     } finally {
