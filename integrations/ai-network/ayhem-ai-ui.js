@@ -342,6 +342,16 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     status.textContent = "جارٍ إرسال الطلب إلى بوابة AYHEM الآمنة...";
     output.textContent = "جارٍ استرجاع الذاكرة ذات الصلة ثم الاتصال بمزوّد الذكاء.";
     try {
+      const automaticCorrection = parseAyhemAutomaticCorrection(prompt);
+      let automaticCorrectionSaved = false;
+      if (automaticCorrection && lastAssistantPrompt) {
+        const learned = learning.recordFeedback({
+          prompt: lastAssistantPrompt,
+          kind: "correction",
+          correction: automaticCorrection,
+        });
+        automaticCorrectionSaved = learned.saved === true;
+      }
       activePrompt = prompt;
       const explicitMemory = parseAyhemExplicitMemorySave(prompt);
       if (explicitMemory) {
@@ -374,7 +384,10 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
           : " لم يُعثر على سجلات ذاكرة ذات صلة.";
       status.textContent = "تم استلام الرد.";
       feedbackPanel.hidden = false;
-      feedbackStatus.textContent = localLearningContext ? "استُخدمت تصحيحات محلية سابقة ذات صلة." : "لا توجد تصحيحات محلية سابقة ذات صلة.";
+      feedbackStatus.textContent = automaticCorrectionSaved
+        ? "تعلّم أيهم التصحيح تلقائياً وحفظه محلياً."
+        : localLearningContext ? "استُخدمت تصحيحات محلية سابقة ذات صلة." : "التعلّم المحلي جاهز لالتقاط التصحيحات الواضحة تلقائياً.";
+      if (!automaticCorrectionSaved) lastAssistantPrompt = prompt;
       input.value = "";
     } catch (error) {
       feedbackPanel.hidden = true;
