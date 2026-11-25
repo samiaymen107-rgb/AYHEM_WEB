@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave, parseAyhemAutomaticCorrection, cleanAyhemReply, getAyhemGreetingReply } from "./ayhem-ai-ui.js";
+import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave, parseAyhemAutomaticCorrection, cleanAyhemReply, getAyhemGreetingReply, isAyhemContextualSaveCommand } from "./ayhem-ai-ui.js";
 
 function fakeDocument() {
   const elements = Object.fromEntries(
@@ -222,4 +222,32 @@ test("answers standalone greetings politely before authentication or network che
   await documentRef.elements.aiSendBtn.handlers.click();
   assert.match(documentRef.elements.aiOutput.textContent, /أهلاً وسهلاً/);
   assert.equal(networkCalls, 1);
+});
+
+
+test("recognizes short contextual save commands without guessing content", () => {
+  assert.equal(isAyhemContextualSaveCommand("سجلها"), true);
+  assert.equal(isAyhemContextualSaveCommand("احفظها"), true);
+  assert.equal(isAyhemContextualSaveCommand("save it"), true);
+  assert.equal(isAyhemContextualSaveCommand("سجل"), false);
+  assert.equal(isAyhemContextualSaveCommand("سجل هذا المشروع في الذاكرة"), false);
+});
+
+test("saves the immediately preceding assistant reply when the user says سجلها", async () => {
+  const documentRef = fakeDocument();
+  let savedContent = "";
+  await mountAyhemAIUI({
+    documentRef,
+    clientFactory: () => ({
+      health: async () => ({ ready: true }),
+      saveMemory: async content => { savedContent = content; return { id: "memory-context-1", content }; },
+      ask: async () => ({ output: "الرد السابق الذي طلب المستخدم حفظه." }),
+    }),
+  });
+  documentRef.elements.aiPrompt.value = "ما المعلومة؟";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  documentRef.elements.aiPrompt.value = "سجلها";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  assert.equal(savedContent, "الرد السابق الذي طلب المستخدم حفظه.");
+  assert.match(documentRef.elements.aiOutput.textContent, /تم حفظ المعلومة في الذاكرة السحابية بنجاح/);
 });
