@@ -114,7 +114,8 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   const status = documentRef?.getElementById("aiConnectionStatus");
   const input = documentRef?.getElementById("aiPrompt");
   const send = documentRef?.getElementById("aiSendBtn");
-  const output = documentRef?.getElementById("aiOutput");
+  let output = documentRef?.getElementById("aiOutput");
+  const conversation = documentRef?.getElementById("aiConversation");
   if (!status || !input || !send || !output) return Object.freeze({ state: "not-mounted" });
   if (send.dataset?.ayhemAiMounted === "true") return Object.freeze({ state: "already-mounted" });
   if (send.dataset) send.dataset.ayhemAiMounted = "true";
@@ -223,6 +224,22 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     }
     sending = true;
     send.disabled = true;
+    if (conversation && typeof documentRef.createElement === "function") {
+      const welcome = conversation.querySelector?.(".welcome-card");
+      if (welcome) welcome.remove();
+      const userBubble = documentRef.createElement("div");
+      userBubble.className = "user-message";
+      userBubble.textContent = prompt;
+      conversation.append(userBubble);
+      const assistantBubble = documentRef.createElement("div");
+      assistantBubble.className = "assistant-message";
+      assistantBubble.setAttribute("role", "status");
+      assistantBubble.textContent = "يفكر أيهم...";
+      conversation.append(assistantBubble);
+      output = assistantBubble;
+      conversation.append(feedbackPanel, reasoningPanel);
+      conversation.scrollTop = conversation.scrollHeight;
+    }
     status.textContent = "جارٍ إرسال الطلب إلى بوابة AYHEM الآمنة...";
     output.textContent = "جارٍ استرجاع الذاكرة ذات الصلة ثم الاتصال بمزوّد الذكاء.";
     try {
@@ -272,6 +289,12 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   };
 
   send.addEventListener("click", handleSend);
+  input.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      if (!sending) handleSend();
+    }
+  });
   if (typeof window !== "undefined") window.__AYHEM_AI_UI_MOUNTED = true;
   status.textContent = "تم تحميل واجهة AI. جارٍ تهيئة جلسة Supabase...";
   output.textContent = "زر الإرسال يعمل؛ سيعرض سبب التعذر بدلاً من تجاهل الضغط.";
