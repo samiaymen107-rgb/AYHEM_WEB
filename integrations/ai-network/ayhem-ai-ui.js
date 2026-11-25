@@ -200,9 +200,9 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       const reasoningPlan = createAyhemReasoningPlan(prompt);
       const reasoningContext = buildAyhemReasoningContext(reasoningPlan);
       const localLearningContext = learning.getRelevantContext(prompt);
-      const combinedContext = [reasoningContext, localLearningContext].filter(Boolean).join("\\n\\n");
+      const combinedContext = [reasoningContext, localLearningContext].filter(Boolean).join("\n\n");
       const result = await client.ask(prompt, combinedContext);
-      reasoningBody.textContent = reasoningPlan.intent_label + "\\n" + reasoningPlan.steps.map(step => step.id + ". " + step.title).join("\\n") + "\\nالمخاطر: " + reasoningPlan.risks.join("؛ ");
+      reasoningBody.textContent = reasoningPlan.intent_label + "\n" + reasoningPlan.steps.map(step => step.id + ". " + step.title).join("\n") + "\nالمخاطر: " + reasoningPlan.risks.join("؛ ");
       reasoningPanel.hidden = false;
       output.textContent = result.output;
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
