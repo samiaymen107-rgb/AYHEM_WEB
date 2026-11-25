@@ -71,6 +71,24 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .chat-composer textarea:focus{border-color:#d9b66f88;box-shadow:0 0 0 3px #d9b66f14,0 8px 28px #0003}.chat-send{position:absolute;right:19px;bottom:37px;width:36px;height:36px;border:0;border-radius:13px;background:linear-gradient(145deg,#f0d58f,#c49a50);color:#142238;font-size:1.35rem;font-weight:900}.chat-send:disabled{opacity:.45}.chat-disclaimer{text-align:center;color:#8395aa;font-size:.63rem;margin:7px 0 0}
 .chat-screen .ai-learning-feedback,.chat-screen .ai-reasoning-plan{flex:0 0 auto;margin:0 10px 8px!important;max-height:25dvh;overflow:auto;background:#102139!important;border-radius:14px!important;font-size:.82rem}.chat-screen .ai-learning-feedback textarea{max-height:90px}.chat-screen .ai-learning-feedback button{min-height:36px}
 @media(max-height:650px){.chat-top{height:44px;flex-basis:44px}.chat-history{padding-top:12px;gap:12px}.welcome-card{padding:8px}.welcome-orb{width:48px;height:48px}.chat-composer{padding-top:7px}.chat-composer textarea{min-height:46px}.chat-send{bottom:34px}}
+
+/* Readable, safe assistant rich-text rendering */
+.assistant-message{white-space:normal}
+.ai-md-paragraph{margin:0 0 10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ai-md-paragraph:last-child{margin-bottom:0}
+.assistant-message h2,.assistant-message h3,.assistant-message h4{margin:15px 0 7px;line-height:1.5;color:#f4d99e}
+.ai-md-list{margin:4px 0 12px;padding-inline-start:24px;line-height:1.85}
+.ai-md-list li{padding-inline-start:3px;margin:3px 0}
+.ai-md-code{direction:ltr;text-align:left;white-space:pre;overflow:auto;max-width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:#050d18;color:#dceaff;font: .82rem/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}
+.ai-md-paragraph code,.assistant-message h2 code,.assistant-message h3 code{direction:ltr;unicode-bidi:isolate;padding:2px 5px;border-radius:5px;background:#ffffff12;color:#f2d28e;font-family:ui-monospace,monospace;font-size:.88em}
+.ai-message-actions{display:flex;justify-content:flex-start;margin-top:12px}
+.ai-copy-button{border:1px solid var(--line);border-radius:10px;padding:6px 11px;background:#ffffff08;color:var(--muted);font-size:.72rem}
+.chat-composer textarea{overflow-y:auto;scrollbar-width:thin}
+.chat-send{transition:transform .15s ease,opacity .15s ease}
+.chat-send:active{transform:scale(.94)}
+.chat-send:disabled{cursor:wait}
+@media(min-width:700px){.chat-history{padding-inline:22px}.user-message{max-width:82%}}
+
 </style>
 </head>
 <body>
@@ -148,5 +166,5 @@ document.getElementById("startBtn").addEventListener("click",async()=>{const b=d
 <script type="module" src="AYHEM_MASTER_ORCHESTRATOR.js?v=20261125-single-screen"></script>
 <script type="module" src="./integrations/supabase/ayhem-auth-ui.js?v=20261124-groq1"></script>
 <script type="module" src="./integrations/supabase/ayhem-memory-ui.js?v=20261125-rls1"></script>
-<script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=20261125-chat-reply-fix1"></script>
+<script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=20261125-chat-polish1"></script>
 </body></html>
