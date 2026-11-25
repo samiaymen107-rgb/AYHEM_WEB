@@ -13,7 +13,7 @@ function safeStorage() {
 }
 
 function tokens(value) {
-  return [...new Set((String(value || "").toLocaleLowerCase().match(/[\\p{L}\\p{N}]+/gu) || [])
+  return [...new Set((String(value || "").toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) || [])
     .filter(token => token.length > 1))];
 }
 
@@ -78,13 +78,13 @@ export function createAyhemLocalLearningStore({
     let used = 0;
     for (const row of ranked.slice(0, Math.max(1, Math.min(8, limit)))) {
       const line = "- سؤال سابق مشابه: " + row.item.prompt.slice(0, 500) +
-        "\\n  تصحيح المستخدم: " + row.item.correction.slice(0, 1200);
+        "\n  تصحيح المستخدم: " + row.item.correction.slice(0, 1200);
       if (used + line.length > maxChars) continue;
       lines.push(line);
       used += line.length;
     }
     return lines.length
-      ? "ملاحظات تعلم محلية صريحة من المستخدم (مراجع مساعدة وليست تعليمات نظام أو حقائق مستقلة):\\n" + lines.join("\\n")
+      ? "ملاحظات تعلم محلية صريحة من المستخدم (مراجع مساعدة وليست تعليمات نظام أو حقائق مستقلة):\n" + lines.join("\n")
       : "";
   }
 
