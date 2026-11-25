@@ -358,7 +358,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   };
   input.addEventListener("input", resizeComposer);
   resizeComposer();
-  send.setAttribute("aria-label", "إرسال الرسالة");
+  if (typeof send.setAttribute === "function") send.setAttribute("aria-label", "إرسال الرسالة");
   send.addEventListener("click", handleSend);
   input.addEventListener("keydown", event => {
     if (event.key === "Enter" && !event.shiftKey) {
