@@ -81,5 +81,4 @@ Deno.test("TinyFish UI: resource guardian protects the non-renewable wallet", as
   includes(source, "reserveTask(url, goal)", "TinyFish UI must record task fingerprints before dispatch");
   includes(source, "if (taskInFlight)", "TinyFish UI must prevent concurrent duplicate submissions");
   includes(source, "لن تتم إعادة المحاولة تلقائياً", "TinyFish UI must not automatically retry paid tasks");
-  includes(source, "input", ""); // Keep this test source-only; no network or provider calls.
 });
