@@ -1,232 +1,90 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AYHEM WEB — العقل الرقمي الحي</title>
-  <meta name="description" content="AYHEM — واجهة ذكية موحدة ومتوافقة مع الهاتف" />
-  <meta name="theme-color" content="#07111f" />
-  <meta name="ayhem-worker-url" content="" />
-  <style>
-    :root {
-      --bg: #0b1020;
-      --panel: #121a33;
-      --text: #e8ecff;
-      --muted: #9aa7d6;
-      --accent: #6ea8fe;
-      --border: rgba(255,255,255,.12);
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-    }
-
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
-      background: radial-gradient(circle at top, #182447 0%, var(--bg) 55%);
-      color: var(--text);
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
-
-    .app {
-      width: min(920px, 100%);
-      background: rgba(18,26,51,.92);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .hero {
-      padding: 32px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .brand {
-      font-size: 1.8rem;
-      font-weight: 800;
-      margin: 0 0 10px;
-    }
-
-    .subtitle {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.8;
-    }
-
-    .content {
-      display: grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 20px;
-      padding: 24px;
-    }
-
-    .panel {
-      background: rgba(255,255,255,.03);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 20px;
-    }
-
-    .panel h2 {
-      margin-top: 0;
-      font-size: 1.1rem;
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 18px;
-    }
-
-    button, a.button {
-      appearance: none;
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 18px;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform .15s ease, opacity .15s ease, background .15s ease;
-    }
-
-    button:hover, a.button:hover { transform: translateY(-1px); }
-
-    .primary { background: var(--accent); color: #081022; }
-    .secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
-
-    #view {
-      min-height: 280px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-      text-align: center;
-      line-height: 1.8;
-      padding: 20px;
-    }
-
-    .footer {
-      padding: 18px 24px 24px;
-      color: var(--muted);
-      font-size: .92rem;
-    }
-
-    .auth-panel { margin: 0 24px 24px; }
-    .auth-panel input { width: 100%; margin-top: 8px; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: #0b1020; color: var(--text); font: inherit; }
-    .auth-panel label { display: block; margin-top: 12px; }
-    .auth-panel [hidden] { display: none !important; }
-    .ai-panel { margin: 0 24px 24px; }
-    .ai-panel textarea {
-      width: 100%; min-height: 100px; resize: vertical;
-      padding: 12px; border-radius: 12px; border: 1px solid var(--border);
-      background: #0b1020; color: var(--text); font: inherit;
-    }
-    .ai-status { color: var(--muted); margin: 8px 0 14px; }
-    .ai-output {
-      min-height: 56px; margin-top: 14px; padding: 14px;
-      border: 1px solid var(--border); border-radius: 12px;
-      white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8;
-    }
-
-    @media (max-width: 768px) {
-      .content { grid-template-columns: 1fr; }
-      .hero, .content, .footer { padding: 20px; }
-    }
-
-    /* AYHEM mobile-first interface refresh */
-    :root{--bg:#07111f;--panel:#101f33;--text:#f3f7ff;--muted:#a8b7cc;--accent:#d8b66f;--border:rgba(180,203,230,.16);--shadow:0 18px 48px rgba(0,0,0,.28)}
-    body{display:block;min-height:100svh;padding:clamp(12px,3vw,28px);background:radial-gradient(ellipse at 50% -15%,#23436a 0%,#0b1728 42%,#060d18 100%);padding-bottom:max(24px,env(safe-area-inset-bottom))}
-    .app{width:min(900px,100%);margin:0 auto;border-radius:26px;background:rgba(12,25,42,.94);border-color:rgba(216,182,111,.22);backdrop-filter:blur(14px)}
-    .hero{padding:clamp(22px,5vw,42px);background:linear-gradient(135deg,rgba(30,58,88,.72),rgba(13,27,45,.18));}
-    .brand{font-size:clamp(1.45rem,5vw,2.25rem);line-height:1.35;letter-spacing:-.03em}
-    .subtitle{max-width:62ch;font-size:.96rem}
-    .content{grid-template-columns:1fr 1fr;gap:14px;padding:16px 20px}
-    .panel{background:linear-gradient(155deg,rgba(24,42,65,.86),rgba(13,26,43,.92));border-color:var(--border);border-radius:20px;padding:clamp(16px,3.5vw,22px)}
-    .panel h2{font-size:1.04rem;line-height:1.5}
-    .actions{gap:10px;margin-top:16px}
-    button,a.button{min-height:48px;padding:12px 16px;border-radius:14px;font:inherit;font-weight:750;touch-action:manipulation}
-    button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid rgba(216,182,111,.72);outline-offset:3px}
-    button:disabled{opacity:.55;cursor:not-allowed;transform:none}
-    .primary{background:linear-gradient(135deg,#e4c982,#c59a4c);color:#142033}
-    .secondary{background:rgba(255,255,255,.035);border:1px solid var(--border);color:var(--text)}
-    #view{min-height:160px;justify-content:flex-start;text-align:right;white-space:pre-wrap;background:rgba(3,10,19,.22);border:1px solid var(--border);border-radius:15px}
-    .auth-panel,.ai-panel{margin:0 20px 16px}
-    .auth-panel input,.ai-panel textarea{width:100%;min-height:48px;border-radius:14px;border:1px solid var(--border);background:#081525;padding:13px;color:var(--text);font:inherit}
-    .auth-panel label,.ai-panel label{display:block;margin-top:14px;font-weight:650}
-    .ai-panel textarea{min-height:132px;resize:vertical}
-    .ai-output{background:rgba(4,12,22,.55);border-color:var(--border);border-radius:15px;min-height:58px}
-    .ai-status{line-height:1.8}
-    ul{padding-inline-start:22px;line-height:2.1;color:var(--muted)}
-    .footer{padding:18px 22px 24px;text-align:center}
-    .mobile-nav{display:none}
-    @media(max-width:700px){
-      body{padding:10px 10px max(16px,env(safe-area-inset-bottom))}
-      .app{border-radius:20px}
-      .hero{padding:22px 18px}
-      .content{grid-template-columns:1fr;padding:12px;gap:12px}
-      .auth-panel,.ai-panel{margin:0 12px 12px}
-      .panel{padding:17px}
-      .actions{display:grid;grid-template-columns:1fr}
-      .actions button,.actions a.button{width:100%;min-height:50px}
-      #view{min-height:130px}
-      .brand{max-width:16ch}
-      .mobile-nav{position:sticky;bottom:8px;z-index:5;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 12px 14px;padding:7px;border:1px solid var(--border);border-radius:17px;background:rgba(5,14,25,.94);backdrop-filter:blur(16px)}
-      .mobile-nav a{display:grid;place-items:center;min-height:44px;padding:6px 4px;border-radius:11px;color:var(--text);font-size:.82rem;font-weight:700;text-decoration:none}
-      .mobile-nav a:active{background:rgba(216,182,111,.16)}
-      .footer{font-size:.82rem}
-    }
-    @media(min-width:701px){.auth-panel,.ai-panel{margin-left:24px;margin-right:24px}}
-    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
-
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07111f"><meta name="description" content="AYHEM — تطبيق العقل الرقمي على الهاتف">
+<title>AYHEM | أيهم</title>
+<style>
+:root{color-scheme:dark;--bg:#07111f;--surface:#102139;--surface2:#152b45;--text:#f5f7fb;--muted:#a9b8ca;--gold:#d9b66f;--line:rgba(210,224,240,.14);--safe-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden}
+body{font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:radial-gradient(ellipse at 50% 0,#1b3c60 0,#0a1728 48%,#050c16 100%);color:var(--text);overscroll-behavior:none}
+button,input,textarea{font:inherit}
+button{touch-action:manipulation;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.app{width:100%;height:100vh;height:100dvh;max-width:560px;margin:0 auto;display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding: max(10px,env(safe-area-inset-top)) 12px calc(8px + var(--safe-bottom));gap:10px}
+.topbar{min-height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 6px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:.04em;font-size:1.15rem}
+.logo{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#f0d58f,#a77c38);color:#132238;font-size:1.1rem;box-shadow:0 6px 22px #0005}
+.live{font-size:.72rem;color:#9ed8b7;border:1px solid #9ed8b744;border-radius:999px;padding:5px 9px}
+.workspace{min-height:0;position:relative}
+.screen{height:100%;min-height:0;display:none;overflow:hidden;flex-direction:column;gap:12px;animation:appear .18s ease}
+.screen.active{display:flex}
+@keyframes appear{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:none}}
+.home-hero{flex:1;min-height:0;border:1px solid rgba(217,182,111,.22);border-radius:25px;background:linear-gradient(155deg,rgba(27,54,82,.94),rgba(10,24,40,.96));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px;gap:14px}
+.orb{width:104px;height:104px;border-radius:34px;display:grid;place-items:center;font-size:2.5rem;font-weight:900;color:#17243a;background:radial-gradient(circle at 35% 25%,#fff0c5,#d8b66f 48%,#88632e);box-shadow:0 0 0 10px #d8b66f12,0 15px 45px #0006}
+.home-hero h1{margin:2px 0 0;font-size:clamp(1.65rem,7vw,2.15rem)}
+.home-hero p{margin:0;color:var(--muted);line-height:1.7;font-size:.9rem;max-width:30ch}
+.home-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:8px}
+.tile{min-height:66px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.045);color:var(--text);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:750;padding:10px}
+.tile.primary{grid-column:1/-1;background:linear-gradient(135deg,#e7cb86,#c49a50);color:#172338;border:0;min-height:56px}
+.tile small{display:block;font-size:.68rem;font-weight:500;opacity:.75}
+.screen-card{height:100%;min-height:0;display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(155deg,rgba(20,41,64,.97),rgba(9,22,37,.98));padding:16px;overflow:hidden}
+.screen-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.screen-heading h2{font-size:1rem;margin:0}
+.back{border:1px solid var(--line);background:#ffffff08;color:var(--text);border-radius:12px;padding:8px 12px;min-height:38px}
+.panel{background:transparent;border:0;border-radius:0;padding:0;min-height:0;display:flex;flex-direction:column;gap:9px;flex:1;overflow:hidden}
+.panel h2{display:none}
+.ai-status{font-size:.8rem;color:var(--muted);line-height:1.55;margin:0}
+.panel label{font-size:.85rem;font-weight:650}
+.panel input,.panel textarea{width:100%;min-height:46px;border-radius:13px;border:1px solid var(--line);background:#071525;color:var(--text);padding:11px 12px}
+.panel textarea{min-height:76px;max-height:22vh;resize:none}
+.panel .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}
+.panel button{min-height:44px;border-radius:13px;padding:9px 10px;border:1px solid var(--line);background:#ffffff08;color:var(--text);font-size:.82rem;font-weight:700}
+.panel button.primary{background:linear-gradient(135deg,#e7cb86,#c49a50);color:#172338;border:0}
+.panel button:disabled{opacity:.5}
+.panel form{display:flex;flex-direction:column;gap:7px;min-height:0}
+.panel form .actions{margin-top:4px}
+.ai-output{flex:1;min-height:48px;overflow:auto;overscroll-behavior:contain;margin:0;padding:12px;border:1px solid var(--line);border-radius:13px;background:#050e1b88;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font-size:.84rem}
+#memoryOutput{flex:1;min-height:40px;overflow:auto}
+#authSignOut{width:100%}
+.bottom-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:6px;border:1px solid var(--line);border-radius:18px;background:rgba(5,14,25,.96);backdrop-filter:blur(16px)}
+.bottom-nav button{min-height:48px;border:0;border-radius:13px;background:transparent;color:var(--muted);font-size:.74rem;font-weight:700}
+.bottom-nav button[aria-current="page"]{background:#d9b66f1c;color:var(--gold)}
+[hidden]{display:none!important}
+@media(max-height:650px){.app{gap:6px;padding-top:max(5px,env(safe-area-inset-top));padding-bottom:calc(5px + var(--safe-bottom))}.topbar{min-height:44px}.logo{width:32px;height:32px}.home-hero{padding:12px;gap:8px}.orb{width:76px;height:76px;border-radius:25px;font-size:2rem}.tile{min-height:54px}.tile.primary{min-height:48px}.screen-card{padding:12px;gap:7px}.panel textarea{min-height:58px}}
+@media(min-width:700px){body{display:grid;place-items:center}.app{height:min(900px,100dvh);border-inline:1px solid var(--line);background:#091727;box-shadow:0 20px 80px #0008}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
 </head>
 <body>
-  <main class="app">
-    <section class="hero">
-      <h1 class="brand">مشروع أيهم — أول عقل رقمي حي</h1>
-      <p class="subtitle">
-        نقطة دخول موحدة لإدارة النظام، عرض اللوحات، وربط الوحدات الأساسية بطريقة منظمة.  
-        <br>Unified entry point for system management, dashboard view, and module linking.
-      </p>
-
+<main class="app">
+<header class="topbar"><div class="brand"><span class="logo">A</span><span>AYHEM <span style="color:var(--gold)">| أيهم</span></span></div><span class="live">واجهة الهاتف</span></header>
+<div class="workspace">
+<section class="screen active" id="screen-home" aria-label="الرئيسية">
+<div class="home-hero">
+<div class="orb">A</div><h1>أيهم</h1><p>عقلك الرقمي الموحّد<br>تحليل · ذاكرة · معرفة</p>
+<div class="home-actions">
+<button class="tile primary" id="startBtn">▶ بدء النظام</button>
+<button class="tile" data-go="ai">الذكاء الاصطناعي<small>تحدث مع أيهم</small></button>
+<button class="tile" data-go="memory">الذاكرة السحابية<small>عرض وحفظ السجلات</small></button>
+<button class="tile" data-go="account">الحساب<small>تسجيل الدخول</small></button>
+<button class="tile" id="dashboardBtn">لوحة الإدارة<small>Dashboard</small></button>
+</div>
+<p id="view" class="ai-status" role="status" aria-live="polite">النظام جاهز للبدء. اختر إحدى الوحدات.</p>
+</div>
+</section>
+<section class="screen" id="screen-ai"><div class="screen-card"><div class="screen-heading"><h2>محادثة أيهم</h2><button class="back" data-go="home">الرئيسية</button></div><section class="panel ai-panel" aria-labelledby="aiTitle">
+      <h2 id="aiTitle">الاتصال بالذكاء الاصطناعي / AI Gateway</h2>
+      <p id="aiConnectionStatus" class="ai-status" role="status" aria-live="polite">جارٍ التحقق من إعداد الاتصال...</p>
+      <label for="aiPrompt">رسالتك إلى أيهم</label>
+      <textarea id="aiPrompt" placeholder="اكتب سؤالك هنا..." maxlength="8000"></textarea>
       <div class="actions">
-        <button class="primary" id="startBtn">بدء النظام / Start System</button>
-        <a class="button secondary" href="index.html#aiTitle">تشغيل العقل</a>
-        <button class="secondary" id="dashboardBtn">فتح لوحة التحكم / Dashboard</button>
-        <a class="button secondary" href="AYHEM_PROGRESS_DASHBOARD.html">متابعة نسبة الإنجاز / Progress</a>
+        <button class="primary" id="aiSendBtn" type="button">إرسال إلى أيهم</button>
       </div>
-    </section>
-
-    <nav class="mobile-nav" aria-label="تنقل سريع"><a href="#memoryTitle">الذاكرة</a><a href="#authTitle">الحساب</a><a href="#aiTitle">أيهم AI</a></nav>
-
-    <section class="content">
-      <div class="panel">
-        <h2>الواجهة الرئيسية / Main View</h2>
-        <div id="view">
-          اضغط على "بدء النظام" لعرض محتوى البداية، أو "فتح لوحة التحكم" للانتقال إلى لوحة الإدارة.
-          <br>Press "Start System" to load main content, or "Dashboard" to open admin panel.
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2>وحدات البداية / Initial Modules</h2>
-        <ul>
-          <li>CORE: النواة الأساسية / Core engine</li>
-          <li>MEMORY: الذاكرة / Memory system</li>
-          <li>AI: الذكاء والتحليل / AI & Analytics</li>
-          <li>UI: الواجهة والتحكم / Interface & Controls</li>
-        </ul>
-      </div>
-    </section>
-
-    <section class="panel auth-panel" aria-labelledby="memoryTitle">
+      <div id="aiOutput" class="ai-output" role="status" aria-live="polite">لن يظهر الاتصال كجاهز إلا بعد نجاح فحص البوابة ومزوّد الذكاء الاصطناعي.</div>
+    </section></div></section>
+<section class="screen" id="screen-memory"><div class="screen-card"><div class="screen-heading"><h2>الذاكرة السحابية</h2><button class="back" data-go="home">الرئيسية</button></div><section class="panel auth-panel" aria-labelledby="memoryTitle">
       <h2 id="memoryTitle">الذاكرة السحابية / Cloud Memory</h2>
       <p id="memoryStatus" class="ai-status" role="status" aria-live="polite">سجّل الدخول لعرض الذاكرة أو إضافة سجل اختبار مستقل والتحقق من حفظه واسترجاعه. لا يُحذف أو يُعدّل أي سجل سابق.</p>
       <div class="actions">
@@ -235,9 +93,8 @@
         <button class="secondary" id="memoryIsolationBtn" type="button" disabled>فحص الجلسة وعزل الذاكرة (قراءة فقط)</button>
       </div>
       <pre id="memoryOutput" class="ai-output" aria-live="polite"></pre>
-    </section>
-
-    <section class="panel auth-panel" aria-labelledby="authTitle">
+    </section></div></section>
+<section class="screen" id="screen-account"><div class="screen-card"><div class="screen-heading"><h2>حساب AYHEM</h2><button class="back" data-go="home">الرئيسية</button></div><section class="panel auth-panel" aria-labelledby="authTitle">
       <h2 id="authTitle">تسجيل الدخول إلى AYHEM / Supabase Auth</h2>
       <p id="authStatus" class="ai-status" role="status" aria-live="polite">جارٍ تهيئة تسجيل الدخول...</p>
       <form id="authForm">
@@ -256,65 +113,21 @@
         <div class="actions"><button class="primary" id="authRecoverySubmit" type="submit">حفظ كلمة المرور الجديدة</button></div>
       </form>
       <button class="secondary" id="authSignOut" type="button" hidden>تسجيل الخروج</button>
-    </section>
-
-    <section class="panel ai-panel" aria-labelledby="aiTitle">
-      <h2 id="aiTitle">الاتصال بالذكاء الاصطناعي / AI Gateway</h2>
-      <p id="aiConnectionStatus" class="ai-status" role="status" aria-live="polite">جارٍ التحقق من إعداد الاتصال...</p>
-      <label for="aiPrompt">رسالتك إلى أيهم</label>
-      <textarea id="aiPrompt" placeholder="اكتب سؤالك هنا..." maxlength="8000"></textarea>
-      <div class="actions">
-        <button class="primary" id="aiSendBtn" type="button">إرسال إلى أيهم</button>
-      </div>
-      <div id="aiOutput" class="ai-output" role="status" aria-live="polite">لن يظهر الاتصال كجاهز إلا بعد نجاح فحص البوابة ومزوّد الذكاء الاصطناعي.</div>
-    </section>
-
-    <div class="footer">
-      AYHEM WEB — نسخة موحّدة ذكية للمشروع / Unified Smart Version
-    </div>
-  </main>
-
-  <!-- سكربت ذكي متطور لتشغيل المشروع -->
-  <script type="module" src="AYHEM_MASTER_ORCHESTRATOR.js?v=20261124-groq1"></script>
-
-  <script>
-    const view = document.getElementById('view');
-
-    document.getElementById('startBtn').addEventListener('click', async () => {
-      const button = document.getElementById('startBtn');
-      button.disabled = true;
-      view.textContent = 'جارٍ تشغيل وفحص وحدات AYHEM الفعلية...';
-      try {
-        const report = await window.AYHEM_ORCHESTRATOR.start();
-        const lines = report.modules.map(item => (item.status === 'ready' ? '✓ ' : '⚠ ') + item.name + ': ' + item.detail);
-        view.textContent = 'حالة التشغيل: ' + report.state + ' (' + report.ready + '/' + report.total + ')\n' + lines.join('\n');
-      } catch (error) {
-        view.textContent = 'تعذر بدء النظام: ' + (error?.message || error);
-      } finally {
-        button.disabled = false;
-      }
-    });
-
-    document.getElementById('dashboardBtn').addEventListener('click', () => {
-      window.location.href = 'AYHEM_DASHBOARD.html';
-    });
-  </script>
-  <script type="module" src="./integrations/supabase/ayhem-auth-ui.js?v=20261124-groq1"></script>
-  <script type="module" src="./integrations/supabase/ayhem-memory-ui.js?v=20261125-rls1"></script>
-
-  <script>
-    // Immediate tap feedback: distinguishes a loaded AI handler from a dead button.
-    document.addEventListener("click", event => {
-      const button = event.target?.closest?.("#aiSendBtn");
-      if (!button) return;
-      const status = document.getElementById("aiConnectionStatus");
-      const output = document.getElementById("aiOutput");
-      if (!window.__AYHEM_AI_UI_MOUNTED) {
-        if (status) status.textContent = "تم التقاط الضغط، لكن وحدة AI لم تُحمّل بعد. أعد تحميل الصفحة بعد اكتمال التحديث.";
-        if (output) output.textContent = "تعذر تشغيل معالج الإرسال: وحدة AI Gateway غير مركّبة.";
-      }
-    }, true);
-  </script>
-  <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=20261124-groq1"></script>
-</body>
-</html>
+    </section></div></section>
+</div>
+<nav class="bottom-nav" aria-label="التنقل الرئيسي">
+<button data-go="home" aria-current="page">الرئيسية</button><button data-go="ai">أيهم AI</button><button data-go="memory">الذاكرة</button><button data-go="account">الحساب</button>
+</nav>
+</main>
+<script>
+const screens=[...document.querySelectorAll(".screen")];
+function navigate(name){screens.forEach(s=>s.classList.toggle("active",s.id==="screen-"+name));document.querySelectorAll("[data-go]").forEach(b=>{if(b.tagName==="BUTTON"&&b.closest(".bottom-nav")){if(b.dataset.go===name)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")}});}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)navigate(b.dataset.go)});
+document.getElementById("dashboardBtn").addEventListener("click",()=>location.href="AYHEM_DASHBOARD.html");
+document.getElementById("startBtn").addEventListener("click",async()=>{const b=document.getElementById("startBtn"),v=document.getElementById("view");b.disabled=true;v.textContent="جارٍ فحص وحدات AYHEM...";try{const r=await window.AYHEM_ORCHESTRATOR.start();v.textContent="حالة النظام: "+r.state+" ("+r.ready+"/"+r.total+")";}catch(e){v.textContent="تعذر الفحص: "+(e?.message||e)}finally{b.disabled=false}});
+</script>
+<script type="module" src="AYHEM_MASTER_ORCHESTRATOR.js?v=20261125-single-screen"></script>
+<script type="module" src="./integrations/supabase/ayhem-auth-ui.js?v=20261124-groq1"></script>
+<script type="module" src="./integrations/supabase/ayhem-memory-ui.js?v=20261125-rls1"></script>
+<script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=20261124-groq1"></script>
+</body></html>
