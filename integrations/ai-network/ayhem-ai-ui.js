@@ -348,6 +348,15 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     }
   };
 
+  const resizeComposer = () => {
+    input.style.height = "auto";
+    const max = Math.round((documentRef.defaultView?.innerHeight || 800) * 0.26);
+    input.style.height = Math.min(input.scrollHeight, max) + "px";
+    input.style.overflowY = input.scrollHeight > max ? "auto" : "hidden";
+  };
+  input.addEventListener("input", resizeComposer);
+  resizeComposer();
+  send.setAttribute("aria-label", "إرسال الرسالة");
   send.addEventListener("click", handleSend);
   input.addEventListener("keydown", event => {
     if (event.key === "Enter" && !event.shiftKey) {
