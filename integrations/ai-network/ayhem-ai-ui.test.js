@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildRelevantMemoryContext, mountAyhemAIUI } from "./ayhem-ai-ui.js";
+import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave } from "./ayhem-ai-ui.js";
 
 function fakeDocument() {
   const elements = Object.fromEntries(
@@ -130,4 +130,40 @@ test("shows provider and model only from gateway response metadata", async () =>
   await documentRef.elements.aiSendBtn.handlers.click();
   assert.match(documentRef.elements.aiConnectionStatus.textContent, /Groq/);
   assert.match(documentRef.elements.aiConnectionStatus.textContent, /openai\/gpt-oss-20b/);
+});
+
+
+test("recognizes only explicit cloud-memory save commands", () => {
+  assert.equal(
+    parseAyhemExplicitMemorySave("احفظ هذه المعلومة في الذاكرة السحابية: اسم مشروعي هو AYHEM"),
+    "اسم مشروعي هو AYHEM",
+  );
+  assert.equal(
+    parseAyhemExplicitMemorySave("احفظ في الذاكرة السحابية: أفضل العمل خطوة بخطوة"),
+    "أفضل العمل خطوة بخطوة",
+  );
+  assert.equal(parseAyhemExplicitMemorySave("هل تستطيع حفظ هذه المعلومة؟"), null);
+});
+
+test("saves an explicit memory request through the authenticated cloud store without asking Groq", async () => {
+  const documentRef = fakeDocument();
+  let savedContent = "";
+  let asked = false;
+  await mountAyhemAIUI({
+    documentRef,
+    clientFactory: () => ({
+      health: async () => ({ ready: true }),
+      saveMemory: async content => {
+        savedContent = content;
+        return { id: "memory-1", content };
+      },
+      ask: async () => { asked = true; return { output: "unexpected" }; },
+    }),
+  });
+  documentRef.elements.aiPrompt.value = "احفظ هذه المعلومة في الذاكرة السحابية: اسم مشروعي هو AYHEM";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  assert.equal(savedContent, "اسم مشروعي هو AYHEM");
+  assert.equal(asked, false);
+  assert.match(documentRef.elements.aiOutput.textContent, /تم حفظ المعلومة في الذاكرة السحابية بنجاح/);
+  assert.match(documentRef.elements.aiConnectionStatus.textContent, /تأكيد من قاعدة البيانات/);
 });
