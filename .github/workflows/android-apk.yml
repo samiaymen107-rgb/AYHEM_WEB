@@ -47,6 +47,21 @@ jobs:
       - name: Generate Android project
         run: npx cap add android
 
+      - name: Apply AYHEM launcher icon
+        run: |
+          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            case "$density" in
+              mdpi) size=48 ;;
+              hdpi) size=72 ;;
+              xhdpi) size=96 ;;
+              xxhdpi) size=144 ;;
+              xxxhdpi) size=192 ;;
+            esac
+            mkdir -p "android/app/src/main/res/mipmap-$density"
+            convert assets/ayhem-logo.jpg -resize "${size}x${size}!" "android/app/src/main/res/mipmap-$density/ic_launcher.png"
+            cp "android/app/src/main/res/mipmap-$density/ic_launcher.png" "android/app/src/main/res/mipmap-$density/ic_launcher_round.png"
+          done
+
       - name: Synchronize Android assets
         run: npx cap sync android
 
