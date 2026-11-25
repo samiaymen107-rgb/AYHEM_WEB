@@ -17,15 +17,42 @@ import { createAyhemReasoningPlan, buildAyhemReasoningContext } from "./ayhem-re
 import { buildAyhemVerificationContext, verifyAyhemAnswer } from "./ayhem-verification-core.js";
 export { buildRelevantMemoryContext } from "./ayhem-memory-context.js";
 
-export function cleanAyhemReply(value) {
-  const text = typeof value === "string" ? value : "";
-  return text.replace(/^\s*(?:مرحبًا|مرحباً|مرحبا)[!！،,.\s]*(?:كيف يمكنني مساعدتك اليوم؟|كيف أستطيع مساعدتك اليوم؟)[!！،,.\s]*/u, "").trim();
+export function getAyhemGreetingReply(prompt) {
+  if (typeof prompt !== "string") return null;
+  const normalized = prompt.trim().toLocaleLowerCase("ar")
+    .replace(/مرجبا/gu, "مرحبا")
+    .replace(/[!！؟?،,؛;.\sـ]+/gu, "")
+    .replace(/(?:مرحبا){2,}/gu, "مرحبا");
+  if (!normalized || normalized.length > 48) return null;
+  if (/^(?:السلامعليكم|السلامعليكمورحمةاللهوبركاته|سلامعليكم|وعليكمالسلام|مرحبا|مرحباً|مرحبًا|اهلا|أهلا|أهلاً|اهلين|أهلين|صباحالخير|مساءالخير|هاي|hello|hi)$/iu.test(normalized)) {
+    if (/^(?:السلامعليكم|سلامعليكم|السلامعليكمورحمةاللهوبركاته)$/u.test(normalized)) {
+      return "وعليكم السلام ورحمة الله وبركاته، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟";
+    }
+    if (/^(?:صباحالخير)$/u.test(normalized)) return "صباح النور والسرور، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟";
+    if (/^(?:مساءالخير)$/u.test(normalized)) return "مساء النور، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟";
+    if (/^(?:hello|hi)$/iu.test(normalized)) return "Hello! Welcome. How can I help you?";
+    return "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟";
+  }
+  return null;
 }
 
-export function parseAyhemAutomaticCorrection(prompt) {
+export function cleanAyhemReply(value) {
+  const text = typeof value === "string" ? value.trim() : "";
+  if (!text) return "";
+  const cleaned = text.replace(/^\s*(?:مرحبًا|مرحباً|مرحبا)[!！،,.\s]*(?:كيف يمكنني مساعدتك اليوم؟|كيف أستطيع مساعدتك اليوم؟)[!！،,.\s]*/u, "").trim();
+  if (!cleaned && /^(?:مرحبًا|مرحباً|مرحبا)[!！،,.\s]*(?:كيف يمكنني مساعدتك اليوم؟|كيف أستطيع مساعدتك اليوم؟)?[!！،,.\s]*$/u.test(text)) {
+    return "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟";
+  }
+  return cleaned || text;
+}export function parseAyhemAutomaticCorrection(prompt) {
   if (typeof prompt !== "string") return null;
   const match = prompt.trim().match(/^(?:تصحيح|التصحيح|أقصد|بل الصحيح|لا،? الصحيح)\s*[:：،-]?\s*([\s\S]{3,})$/u);
   return match?.[1]?.trim() || null;
+}
+
+export function isAyhemContextualSaveCommand(prompt) {
+  if (typeof prompt !== "string") return false;
+  return /^(?:سجلها|سجّلها|احفظها|احفظ ذلك|سجل ذلك|سجّل ذلك|احفظه|سجله|سجّله|save it|remember it)[.!؟?،,\s]*$/iu.test(prompt.trim());
 }
 
 export function parseAyhemExplicitMemorySave(prompt) {
@@ -196,6 +223,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   const learning = createAyhemLocalLearningStore();
   let activePrompt = "";
   let lastAssistantPrompt = "";
+  let lastAssistantReply = "";
 
   const scrollConversationToLatest = () => {
     if (!conversation) return;
@@ -306,6 +334,33 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     const prompt = typeof input.value === "string" ? input.value.trim() : "";
     if (!prompt) { output.textContent = "اكتب سؤالاً أولاً."; status.textContent = "بانتظار رسالتك."; return; }
     if (sending) return;
+
+    // Reply to a standalone greeting immediately, without requiring login or an AI network call.
+    const greetingReply = getAyhemGreetingReply(prompt);
+    if (greetingReply) {
+      if (conversation && typeof documentRef.createElement === "function") {
+        const welcome = conversation.querySelector?.(".welcome-card");
+        if (welcome) welcome.remove();
+        const userBubble = documentRef.createElement("div");
+        userBubble.className = "user-message";
+        userBubble.textContent = prompt;
+        conversation.append(userBubble);
+        const assistantBubble = documentRef.createElement("div");
+        assistantBubble.className = "assistant-message";
+        assistantBubble.setAttribute("role", "status");
+        conversation.append(assistantBubble);
+        renderAyhemAssistantMessage(assistantBubble, greetingReply, documentRef);
+        output = assistantBubble;
+        scrollConversationToLatest();
+      } else {
+        output.textContent = greetingReply;
+      }
+      lastAssistantReply = greetingReply;
+      status.textContent = "تم ردّ التحية.";
+      input.value = "";
+      resizeComposer();
+      return;
+    }
     if (initializationError) {
       output.textContent = "تعذر تهيئة خدمة المصادقة: " + initializationError;
       status.textContent = "فشل إعداد اتصال AYHEM/Supabase.";
@@ -355,9 +410,11 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       }
       activePrompt = prompt;
       const explicitMemory = parseAyhemExplicitMemorySave(prompt);
-      if (explicitMemory) {
+      const contextualSave = isAyhemContextualSaveCommand(prompt) ? lastAssistantReply : null;
+      if (explicitMemory || contextualSave) {
+        const memoryContent = explicitMemory || contextualSave;
         if (typeof client.saveMemory !== "function") throw new Error("cloud_memory_save_unavailable");
-        const saved = await client.saveMemory(explicitMemory);
+        const saved = await client.saveMemory(memoryContent);
         renderAyhemAssistantMessage(output, "تم حفظ المعلومة في الذاكرة السحابية بنجاح.\n\n" + saved.content, documentRef);
         scrollConversationToLatest();
         status.textContent = "تأكيد من قاعدة البيانات: أُنشئ سجل ذاكرة سحابي جديد لهذا الحساب.";
@@ -376,6 +433,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       reasoningPanel.hidden = false;
       const verification = verifyAyhemAnswer(prompt, result.output);
       const cleanOutput = cleanAyhemReply(result.output) || "اكتب طلبك مباشرة.";
+      lastAssistantReply = cleanOutput;
       renderAyhemAssistantMessage(output, cleanOutput, documentRef);
       scrollConversationToLatest();
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
@@ -394,8 +452,14 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     } catch (error) {
       feedbackPanel.hidden = true;
       reasoningPanel.hidden = true;
-      output.textContent = String(error?.message || error || "حدث خطأ غير معروف.").slice(0, 500);
-      status.textContent = "فشل طلب AI Gateway. التفاصيل معروضة أدناه.";
+      const internalError = String(error?.message || error || "");
+      const isTransientAIError = /Groq|لا يحتوي على نص|لم يصل رد نصي|AI Gateway|fetch|network|timeout|502|503|504/i.test(internalError);
+      output.textContent = isTransientAIError
+        ? "تعذّر الحصول على رد هذه المرة. أعد إرسال سؤالك بعد لحظات."
+        : /authentication_required|انتهت جلسة الدخول/i.test(internalError)
+          ? "انتهت جلسة الدخول. سجّل الدخول مجدداً ثم أعد المحاولة."
+          : "تعذّر إكمال الطلب. تحقق من الاتصال ثم أعد المحاولة.";
+      status.textContent = "لم يكتمل الرد. يمكنك المحاولة مجدداً.";
     } finally {
       sending = false;
       send.disabled = false;

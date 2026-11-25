@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave, parseAyhemAutomaticCorrection, cleanAyhemReply } from "./ayhem-ai-ui.js";
+import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave, parseAyhemAutomaticCorrection, cleanAyhemReply, getAyhemGreetingReply, isAyhemContextualSaveCommand } from "./ayhem-ai-ui.js";
 
 function fakeDocument() {
   const elements = Object.fromEntries(
@@ -166,6 +166,14 @@ test("saves an explicit memory request through the authenticated cloud store wit
   assert.match(documentRef.elements.aiConnectionStatus.textContent, /تأكيد من قاعدة البيانات/);
 });
 
+test("does not replace a greeting-only AI reply with the composer placeholder", () => {
+  assert.equal(
+    cleanAyhemReply("مرحباً! كيف يمكنني مساعدتك اليوم؟"),
+    "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟",
+  );
+  assert.equal(cleanAyhemReply("مرحباً بك!"), "مرحباً بك!");
+});
+
 test("parses only clearly marked automatic corrections", () => {
   assert.equal(parseAyhemAutomaticCorrection("تصحيح: اسمي أيهم"), "اسمي أيهم");
   assert.equal(parseAyhemAutomaticCorrection("أقصد: أريد جواباً مختصراً"), "أريد جواباً مختصراً");
@@ -201,4 +209,71 @@ test("automatically learns a clearly marked correction locally", async () => {
     if (originalStorage === undefined) delete globalThis.localStorage;
     else globalThis.localStorage = originalStorage;
   }
+});
+test("answers standalone greetings politely before authentication or network checks", async () => {
+  assert.equal(getAyhemGreetingReply("مرحبا"), "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟");
+  assert.equal(getAyhemGreetingReply("مرحبا مرجبا"), "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟");
+  assert.equal(getAyhemGreetingReply("مرحبا مرحبا"), "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟");
+  assert.equal(getAyhemGreetingReply("السلام عليكم"), "وعليكم السلام ورحمة الله وبركاته، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟");
+  assert.equal(getAyhemGreetingReply("صباح الخير"), "صباح النور والسرور، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟");
+  assert.equal(getAyhemGreetingReply("أهلاً!"), "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟");
+  assert.equal(getAyhemGreetingReply("مرحبا، أريد تحليل ملف"), null);
+
+  const documentRef = fakeDocument();
+  let networkCalls = 0;
+  await mountAyhemAIUI({
+    documentRef,
+    clientFactory: () => {
+      networkCalls++;
+      return { health: async () => ({ ready: false }) };
+    },
+  });
+  documentRef.elements.aiPrompt.value = "مرحبا";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  assert.match(documentRef.elements.aiOutput.textContent, /أهلاً وسهلاً/);
+  assert.equal(networkCalls, 1);
+});
+
+
+test("recognizes short contextual save commands without guessing content", () => {
+  assert.equal(isAyhemContextualSaveCommand("سجلها"), true);
+  assert.equal(isAyhemContextualSaveCommand("احفظها"), true);
+  assert.equal(isAyhemContextualSaveCommand("save it"), true);
+  assert.equal(isAyhemContextualSaveCommand("سجل"), false);
+  assert.equal(isAyhemContextualSaveCommand("سجل هذا المشروع في الذاكرة"), false);
+});
+
+test("saves the immediately preceding assistant reply when the user says سجلها", async () => {
+  const documentRef = fakeDocument();
+  let savedContent = "";
+  await mountAyhemAIUI({
+    documentRef,
+    clientFactory: () => ({
+      health: async () => ({ ready: true }),
+      saveMemory: async content => { savedContent = content; return { id: "memory-context-1", content }; },
+      ask: async () => ({ output: "الرد السابق الذي طلب المستخدم حفظه." }),
+    }),
+  });
+  documentRef.elements.aiPrompt.value = "ما المعلومة؟";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  documentRef.elements.aiPrompt.value = "سجلها";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  assert.equal(savedContent, "الرد السابق الذي طلب المستخدم حفظه.");
+  assert.match(documentRef.elements.aiOutput.textContent, /تم حفظ المعلومة في الذاكرة السحابية بنجاح/);
+});
+
+test("hides raw Groq empty-response diagnostics from the chat UI", async () => {
+  const documentRef = fakeDocument();
+  await mountAyhemAIUI({
+    documentRef,
+    clientFactory: () => ({
+      health: async () => ({ ready: true }),
+      ask: async () => { throw new Error("وصل رد من Groq لكنه لا يحتوي على نص قابل للعرض."); },
+    }),
+  });
+  documentRef.elements.aiPrompt.value = "من أسّسك؟";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  assert.equal(documentRef.elements.aiOutput.textContent, "تعذّر الحصول على رد هذه المرة. أعد إرسال سؤالك بعد لحظات.");
+  assert.doesNotMatch(documentRef.elements.aiOutput.textContent, /Groq|خطأ تقني|AI Gateway/);
+  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "لم يكتمل الرد. يمكنك المحاولة مجدداً.");
 });
