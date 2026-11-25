@@ -191,8 +191,9 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     const scroll = () => {
       conversation.scrollTop = Math.max(0, conversation.scrollHeight - conversation.clientHeight);
     };
-    if (typeof view?.requestAnimationFrame === "function") view.requestAnimationFrame(scroll);
-    else scroll();
+    if (typeof view?.requestAnimationFrame === "function") {
+      view.requestAnimationFrame(() => view.requestAnimationFrame(scroll));
+    } else scroll();
   };
 
   const createElement = typeof documentRef.createElement === "function"
@@ -365,11 +366,27 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     // Lightweight test doubles and non-browser mounts may not expose CSSStyleDeclaration.
     if (!input.style) return;
     input.style.height = "auto";
-    const max = Math.round((documentRef.defaultView?.innerHeight || 800) * 0.26);
-    input.style.height = Math.min(input.scrollHeight, max) + "px";
+    const view = documentRef.defaultView;
+    const viewportHeight = view?.visualViewport?.height || view?.innerHeight || 800;
+    const max = Math.max(96, Math.round(viewportHeight * 0.24));
+    input.style.height = Math.min(Math.max(input.scrollHeight, 52), max) + "px";
     input.style.overflowY = input.scrollHeight > max ? "auto" : "hidden";
+    scrollConversationToLatest();
   };
   input.addEventListener("input", resizeComposer);
+  input.addEventListener("focus", () => {
+    const view = documentRef.defaultView;
+    if (typeof view?.requestAnimationFrame === "function") {
+      view.requestAnimationFrame(() => {
+        resizeComposer();
+        scrollConversationToLatest();
+      });
+    }
+  });
+  documentRef.defaultView?.visualViewport?.addEventListener("resize", () => {
+    resizeComposer();
+    scrollConversationToLatest();
+  }, { passive: true });
   resizeComposer();
   if (typeof send.setAttribute === "function") send.setAttribute("aria-label", "إرسال الرسالة");
   send.addEventListener("click", handleSend);
