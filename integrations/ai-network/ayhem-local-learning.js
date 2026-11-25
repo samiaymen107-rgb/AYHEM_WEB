@@ -8,6 +8,7 @@ const STORAGE_KEY = "AYHEM_LOCAL_LEARNING_V1";
 const MAX_RECORDS = 200;
 const MAX_TEXT = 4000;
 
+/** @returns {{ getItem(key: string): string | null, setItem(key: string, value: string): void } | null} */
 function safeStorage() {
   try { return globalThis.localStorage || null; } catch { return null; }
 }
@@ -21,6 +22,9 @@ function cleanText(value, max = MAX_TEXT) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
+/**
+ * @param {{ storage?: { getItem(key: string): string | null, setItem(key: string, value: string): void } | null, now?: () => string, makeId?: () => string }} [options]
+ */
 export function createAyhemLocalLearningStore({
   storage = safeStorage(),
   now = () => new Date().toISOString(),
@@ -46,6 +50,7 @@ export function createAyhemLocalLearningStore({
     } catch { return { saved: false, reason: "local_storage_quota_or_access_error" }; }
   }
 
+  /** @param {{ prompt?: string, kind?: string, correction?: string }} [input] */
   function recordFeedback({ prompt, kind, correction = "" } = {}) {
     const safePrompt = cleanText(prompt);
     const safeCorrection = cleanText(correction);
