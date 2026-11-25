@@ -19,7 +19,7 @@ export { buildRelevantMemoryContext } from "./ayhem-memory-context.js";
 
 export function cleanAyhemReply(value) {
   const text = typeof value === "string" ? value : "";
-  return text.replace(/^\\s*(?:مرحبًا|مرحباً|مرحبا)[!！،,.\\s]*(?:كيف يمكنني مساعدتك اليوم؟|كيف أستطيع مساعدتك اليوم؟)[!！،,.\\s]*/u, "").trim();
+  return text.replace(/^\s*(?:مرحبًا|مرحباً|مرحبا)[!！،,.\s]*(?:كيف يمكنني مساعدتك اليوم؟|كيف أستطيع مساعدتك اليوم؟)[!！،,.\s]*/u, "").trim();
 }
 
 export function parseAyhemAutomaticCorrection(prompt) {
