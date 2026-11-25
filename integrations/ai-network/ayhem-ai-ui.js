@@ -51,7 +51,7 @@ async function createSupabaseAIClient() {
         }
 
         const { data, error } = await supabase.functions.invoke("ayhem-openai-chat", {
-          body: { message: localLearningContext ? prompt + "\\n\\n" + localLearningContext : prompt, memory_context: memoryContext },
+          body: { message: localLearningContext ? prompt + "\n\n" + localLearningContext : prompt, memory_context: memoryContext },
           signal: controller.signal,
         });
         if (error) {
@@ -180,7 +180,8 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     status.textContent = "جارٍ إرسال الطلب إلى بوابة AYHEM الآمنة...";
     output.textContent = "جارٍ استرجاع الذاكرة ذات الصلة ثم الاتصال بمزوّد الذكاء.";
     try {
-      activePrompt = prompt;\n      const localLearningContext = learning.getRelevantContext(prompt);\n      const result = await client.ask(prompt, localLearningContext);
+      activePrompt = prompt;
+      const localLearningContext = learning.getRelevantContext(prompt);\n      const result = await client.ask(prompt, localLearningContext);
       output.textContent = result.output;
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
       const memoryLabel = result.memoryReadError
@@ -189,9 +190,11 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
           ? " استُخدمت " + result.memoryRecordsUsed + " سجلات ذاكرة ذات صلة."
           : " لم يُعثر على سجلات ذاكرة ذات صلة.";
       status.textContent = "نجح الاتصال الحي — تم استلام رد فعلي من " + providerLabel + "." + memoryLabel;
-      feedbackPanel.hidden = false;\n      feedbackStatus.textContent = localLearningContext ? "استُخدمت تصحيحات محلية سابقة ذات صلة." : "لا توجد تصحيحات محلية سابقة ذات صلة.";\n      input.value = "";
+      feedbackPanel.hidden = false;
+      feedbackStatus.textContent = localLearningContext ? "استُخدمت تصحيحات محلية سابقة ذات صلة." : "لا توجد تصحيحات محلية سابقة ذات صلة.";\n      input.value = "";
     } catch (error) {
-      feedbackPanel.hidden = true;\n      output.textContent = String(error?.message || error || "حدث خطأ غير معروف.").slice(0, 500);
+      feedbackPanel.hidden = true;
+      output.textContent = String(error?.message || error || "حدث خطأ غير معروف.").slice(0, 500);
       status.textContent = "فشل طلب AI Gateway. التفاصيل معروضة أدناه.";
     } finally {
       sending = false;
