@@ -194,7 +194,8 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   let initialized = false;
   let initializationError = null;
   const learning = createAyhemLocalLearningStore();
-  let activePrompt = "";\n  let lastAssistantPrompt = "";
+  let activePrompt = "";
+  let lastAssistantPrompt = "";
 
   const scrollConversationToLatest = () => {
     if (!conversation) return;
@@ -374,7 +375,8 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       reasoningBody.textContent = reasoningPlan.intent_label + "\n" + reasoningPlan.steps.map(step => step.id + ". " + step.title).join("\n") + "\nالمخاطر: " + reasoningPlan.risks.join("؛ ");
       reasoningPanel.hidden = false;
       const verification = verifyAyhemAnswer(prompt, result.output);
-      const cleanOutput = cleanAyhemReply(result.output) || "اكتب طلبك مباشرة.";\n      renderAyhemAssistantMessage(output, cleanOutput, documentRef);
+      const cleanOutput = cleanAyhemReply(result.output) || "اكتب طلبك مباشرة.";
+      renderAyhemAssistantMessage(output, cleanOutput, documentRef);
       scrollConversationToLatest();
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
       const memoryLabel = result.memoryReadError
