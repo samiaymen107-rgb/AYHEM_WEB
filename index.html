@@ -87,6 +87,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .chat-send{transition:transform .15s ease,opacity .15s ease}
 .chat-send:active{transform:scale(.94)}
 .chat-send:disabled{cursor:wait}
+/* Redmi 13 / Android: keep every message in the scrollable conversation, never shrink long replies. */
+.chat-history{min-width:0;min-height:0;flex:1 1 0%;overflow-x:hidden;overflow-y:auto;scroll-padding-block:16px 24px;-webkit-overflow-scrolling:touch;}
+.chat-history>.user-message,.chat-history>.assistant-message,.chat-history>.ai-learning-feedback,.chat-history>.ai-reasoning-plan{flex:0 0 auto;min-width:0;width:100%;}
+.chat-history>.user-message{width:auto;max-width:88%;}
+.chat-history>.assistant-message{width:100%;max-width:100%;overflow-wrap:anywhere;word-break:normal;}
+.assistant-message p,.assistant-message li,.assistant-message h2,.assistant-message h3,.assistant-message h4{max-width:100%;overflow-wrap:anywhere;word-break:normal;}
+.assistant-message pre,.assistant-message .ai-md-code{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;}
+.chat-screen,.chat-composer{min-width:0;}
+@media(max-width:699px){.chat-history{padding:14px 10px 22px;gap:14px}.chat-composer{padding-bottom:max(5px,env(safe-area-inset-bottom))}.chat-history>.user-message{max-width:92%}}
 @media(min-width:700px){.chat-history{padding-inline:22px}.user-message{max-width:82%}}
 
 </style>
@@ -166,5 +175,5 @@ document.getElementById("startBtn").addEventListener("click",async()=>{const b=d
 <script type="module" src="AYHEM_MASTER_ORCHESTRATOR.js?v=20261125-single-screen"></script>
 <script type="module" src="./integrations/supabase/ayhem-auth-ui.js?v=20261124-groq1"></script>
 <script type="module" src="./integrations/supabase/ayhem-memory-ui.js?v=20261125-rls1"></script>
-<script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=20261125-chat-polish1"></script>
+<script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=20261125-redmi13-scroll1"></script>
 </body></html>
