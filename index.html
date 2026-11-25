@@ -17,8 +17,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:.04em;font-size:1.15rem}
 .logo{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#f0d58f,#a77c38);color:#132238;font-size:1.1rem;box-shadow:0 6px 22px #0005}
 .live{font-size:.72rem;color:#9ed8b7;border:1px solid #9ed8b744;border-radius:999px;padding:5px 9px}
-.workspace{min-height:0;position:relative}
-.screen{height:100%;min-height:0;display:none;overflow:hidden;flex-direction:column;gap:12px;animation:appear .18s ease}
+.workspace{height:100%;min-height:0;position:relative;overflow:hidden}
+.screen{position:absolute;inset:0;width:100%;height:100%;min-height:0;display:none;overflow:hidden;flex-direction:column;gap:12px;animation:appear .18s ease}
 .screen.active{display:flex}
 @keyframes appear{from{opacity:.65;transform:translateY(4px)}to{opacity:1;transform:none}}
 .home-hero{flex:1;min-height:0;border:1px solid rgba(217,182,111,.22);border-radius:25px;background:linear-gradient(155deg,rgba(27,54,82,.94),rgba(10,24,40,.96));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:22px;gap:14px}
