@@ -97,7 +97,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   let activePrompt = "";
 
   const createElement = typeof documentRef.createElement === "function"
-    ? tag => createElement(tag)
+    ? tag => documentRef.createElement(tag)
     : () => ({ style: {}, addEventListener() {}, append() {}, setAttribute() {}, value: "", textContent: "", hidden: false });
   const feedbackPanel = createElement("section");
   feedbackPanel.className = "ai-learning-feedback";
