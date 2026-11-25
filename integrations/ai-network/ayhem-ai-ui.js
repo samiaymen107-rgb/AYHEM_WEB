@@ -181,7 +181,8 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     output.textContent = "جارٍ استرجاع الذاكرة ذات الصلة ثم الاتصال بمزوّد الذكاء.";
     try {
       activePrompt = prompt;
-      const localLearningContext = learning.getRelevantContext(prompt);\n      const result = await client.ask(prompt, localLearningContext);
+      const localLearningContext = learning.getRelevantContext(prompt);
+      const result = await client.ask(prompt, localLearningContext);
       output.textContent = result.output;
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
       const memoryLabel = result.memoryReadError
@@ -191,7 +192,8 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
           : " لم يُعثر على سجلات ذاكرة ذات صلة.";
       status.textContent = "نجح الاتصال الحي — تم استلام رد فعلي من " + providerLabel + "." + memoryLabel;
       feedbackPanel.hidden = false;
-      feedbackStatus.textContent = localLearningContext ? "استُخدمت تصحيحات محلية سابقة ذات صلة." : "لا توجد تصحيحات محلية سابقة ذات صلة.";\n      input.value = "";
+      feedbackStatus.textContent = localLearningContext ? "استُخدمت تصحيحات محلية سابقة ذات صلة." : "لا توجد تصحيحات محلية سابقة ذات صلة.";
+      input.value = "";
     } catch (error) {
       feedbackPanel.hidden = true;
       output.textContent = String(error?.message || error || "حدث خطأ غير معروف.").slice(0, 500);
