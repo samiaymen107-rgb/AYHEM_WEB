@@ -20,7 +20,9 @@ export { buildRelevantMemoryContext } from "./ayhem-memory-context.js";
 export function getAyhemGreetingReply(prompt) {
   if (typeof prompt !== "string") return null;
   const normalized = prompt.trim().toLocaleLowerCase("ar")
-    .replace(/[!！؟?،,؛;.\sـ]+/gu, "");
+    .replace(/مرجبا/gu, "مرحبا")
+    .replace(/[!！؟?،,؛;.\sـ]+/gu, "")
+    .replace(/(?:مرحبا){2,}/gu, "مرحبا");
   if (!normalized || normalized.length > 48) return null;
   if (/^(?:السلامعليكم|السلامعليكمورحمةاللهوبركاته|سلامعليكم|وعليكمالسلام|مرحبا|مرحباً|مرحبًا|اهلا|أهلا|أهلاً|اهلين|أهلين|صباحالخير|مساءالخير|هاي|hello|hi)$/iu.test(normalized)) {
     if (/^(?:السلامعليكم|سلامعليكم|السلامعليكمورحمةاللهوبركاته)$/u.test(normalized)) {
@@ -447,8 +449,14 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     } catch (error) {
       feedbackPanel.hidden = true;
       reasoningPanel.hidden = true;
-      output.textContent = String(error?.message || error || "حدث خطأ غير معروف.").slice(0, 500);
-      status.textContent = "فشل طلب AI Gateway. التفاصيل معروضة أدناه.";
+      const internalError = String(error?.message || error || "");
+      const isTransientAIError = /Groq|لا يحتوي على نص|لم يصل رد نصي|AI Gateway|fetch|network|timeout|502|503|504/i.test(internalError);
+      output.textContent = isTransientAIError
+        ? "تعذّر الحصول على رد هذه المرة. أعد إرسال سؤالك بعد لحظات."
+        : /authentication_required|انتهت جلسة الدخول/i.test(internalError)
+          ? "انتهت جلسة الدخول. سجّل الدخول مجدداً ثم أعد المحاولة."
+          : "تعذّر إكمال الطلب. تحقق من الاتصال ثم أعد المحاولة.";
+      status.textContent = "لم يكتمل الرد. يمكنك المحاولة مجدداً.";
     } finally {
       sending = false;
       send.disabled = false;
