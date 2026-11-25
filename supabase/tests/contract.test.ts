@@ -70,3 +70,16 @@ Deno.test("Cloud memory UI: round-trip verification must not mutate prior record
   assert(!/\.from\(["']ayhem_memories["']\)\s*\.update\(/.test(source), "Memory UI must not update prior memory records");
   assert(!/\.from\(["']ayhem_memories["']\)\s*\.delete\(/.test(source), "Memory UI must not delete prior memory records");
 });
+
+
+Deno.test("TinyFish UI: resource guardian protects the non-renewable wallet", async () => {
+  const source = await read("integrations/supabase/ayhem-tinyfish-ui.js");
+  includes(source, "MINIMUM_RESERVE_USD = 2", "TinyFish UI must preserve a minimum wallet reserve");
+  includes(source, "DUPLICATE_WINDOW_MS = 30 * 60 * 1000", "TinyFish UI must apply a duplicate cooldown");
+  includes(source, 'invoke("ayhem-tinyfish-health", { method: "GET" })', "Every paid task must be preceded by a read-only wallet check");
+  includes(source, "wallet.balance < MINIMUM_RESERVE_USD", "TinyFish UI must block tasks below the reserve");
+  includes(source, "reserveTask(url, goal)", "TinyFish UI must record task fingerprints before dispatch");
+  includes(source, "if (taskInFlight)", "TinyFish UI must prevent concurrent duplicate submissions");
+  includes(source, "لن تتم إعادة المحاولة تلقائياً", "TinyFish UI must not automatically retry paid tasks");
+  includes(source, "input", ""); // Keep this test source-only; no network or provider calls.
+});
