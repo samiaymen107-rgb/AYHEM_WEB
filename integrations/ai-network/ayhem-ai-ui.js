@@ -14,6 +14,7 @@ function withTimeout(promise, label, ms = 10000) {
 import { buildRelevantMemoryContext } from "./ayhem-memory-context.js";
 import { createAyhemLocalLearningStore } from "./ayhem-local-learning.js";
 import { createAyhemReasoningPlan, buildAyhemReasoningContext } from "./ayhem-reasoning-core.js";
+import { buildAyhemVerificationContext, verifyAyhemAnswer } from "./ayhem-verification-core.js";
 export { buildRelevantMemoryContext } from "./ayhem-memory-context.js";
 
 async function createSupabaseAIClient() {
@@ -200,18 +201,22 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       const reasoningPlan = createAyhemReasoningPlan(prompt);
       const reasoningContext = buildAyhemReasoningContext(reasoningPlan);
       const localLearningContext = learning.getRelevantContext(prompt);
-      const combinedContext = [reasoningContext, localLearningContext].filter(Boolean).join("\n\n");
+      const verificationContext = buildAyhemVerificationContext(prompt);
+      const combinedContext = [reasoningContext, verificationContext, localLearningContext].filter(Boolean).join("\n\n");
       const result = await client.ask(prompt, combinedContext);
       reasoningBody.textContent = reasoningPlan.intent_label + "\n" + reasoningPlan.steps.map(step => step.id + ". " + step.title).join("\n") + "\nالمخاطر: " + reasoningPlan.risks.join("؛ ");
       reasoningPanel.hidden = false;
-      output.textContent = result.output;
+      const verification = verifyAyhemAnswer(prompt, result.output);
+      output.textContent = verification.findings.length
+        ? result.output + "\n\n[مراجعة AYHEM المحلية]\n" + verification.findings.map(item => "• " + item.message).join("\n") + "\n" + verification.disclaimer
+        : result.output + "\n\n[فحص AYHEM المحلي]\nلم تُكتشف أنماط تحذير مهيأة. " + verification.disclaimer;
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
       const memoryLabel = result.memoryReadError
         ? " تعذر قراءة الذاكرة؛ أُكملت المحادثة دون سياق ذاكرة."
         : result.memoryRecordsUsed
           ? " استُخدمت " + result.memoryRecordsUsed + " سجلات ذاكرة ذات صلة."
           : " لم يُعثر على سجلات ذاكرة ذات صلة.";
-      status.textContent = "نجح الاتصال الحي — تم استلام رد فعلي من " + providerLabel + "." + memoryLabel;
+      status.textContent = "نجح الاتصال الحي — تم استلام رد فعلي من " + providerLabel + "." + memoryLabel + (verification.findings.length ? " فحص التحقق: " + verification.findings.length + " تنبيهات." : " فحص الأنماط: لا تنبيهات.");
       feedbackPanel.hidden = false;
       feedbackStatus.textContent = localLearningContext ? "استُخدمت تصحيحات محلية سابقة ذات صلة." : "لا توجد تصحيحات محلية سابقة ذات صلة.";
       input.value = "";
