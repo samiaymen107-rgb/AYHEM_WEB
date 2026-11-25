@@ -5,6 +5,7 @@ import { handler as tinyfishRunHandler } from "../ayhem-tinyfish-run/index.ts";
 import { handler as tinyfishHealthHandler } from "../ayhem-tinyfish-health/index.ts";
 import { createAyhemRemoteMemoryStore } from "../../../integrations/supabase/ayhem-remote-memory-core.js";
 import { buildRelevantMemoryContext } from "../../../integrations/ai-network/ayhem-memory-context.js";
+import { createAyhemReasoningPlan, buildAyhemReasoningContext } from "../../../integrations/ai-network/ayhem-reasoning-core.js";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -354,4 +355,19 @@ Deno.test("AYHEM local learning: explicit corrections persist separately and are
   assert(context.includes("مراعاة الجفاف"), "matching correction must be retrieved");
   equal(values.get("AYHEM_MEMORY"), "LEGACY_MEMORY_MUST_REMAIN_UNCHANGED", "legacy memory must remain untouched");
   equal(learning.stats().corrections, 1, "correction count");
+});
+
+
+Deno.test("AYHEM reasoning core: offline planning, evidence boundaries, and bounded context", () => {
+  const plan = createAyhemReasoningPlan("حلل خطة تمويل المشروع وقارن الخيارات وحدد المخاطر");
+  equal(plan.mode, "local_deterministic_scaffold", "reasoning mode");
+  equal(plan.intent, "compare", "comparison intent precedence");
+  assert(plan.steps.length >= 4, "reasoning plan must contain actionable steps");
+  assert(plan.evidence_policy.some((item) => item.includes("استنتاج")), "evidence policy must distinguish inference");
+  assert(plan.risks.length > 0, "reasoning plan must expose risks");
+  const context = buildAyhemReasoningContext(plan);
+  assert(context.includes("لا تدّع تنفيذ"), "provider context must prohibit false execution claims");
+  assert(context.length <= 2600, "reasoning context must be bounded");
+  const unknown = createAyhemReasoningPlan("؟");
+  equal(unknown.requires_clarification, true, "short ambiguous prompt needs clarification");
 });
