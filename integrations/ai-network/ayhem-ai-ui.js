@@ -17,6 +17,20 @@ import { createAyhemReasoningPlan, buildAyhemReasoningContext } from "./ayhem-re
 import { buildAyhemVerificationContext, verifyAyhemAnswer } from "./ayhem-verification-core.js";
 export { buildRelevantMemoryContext } from "./ayhem-memory-context.js";
 
+export function parseAyhemExplicitMemorySave(prompt) {
+  if (typeof prompt !== "string") return null;
+  const value = prompt.trim();
+  const patterns = [
+    /^(?:احفظ|سجّل)\\s+(?:هذه المعلومة|المعلومة)\\s+في\\s+الذاكرة\\s+السحابية\\s*[:：]\\s*([\\s\\S]+)$/u,
+    /^(?:احفظ|سجّل)\\s+في\\s+الذاكرة\\s+السحابية\\s*[:：]\\s*([\\s\\S]+)$/u,
+  ];
+  for (const pattern of patterns) {
+    const match = value.match(pattern);
+    if (match?.[1]?.trim()) return match[1].trim();
+  }
+  return null;
+}
+
 async function createSupabaseAIClient() {
   await import("../supabase/public-config.js");
   const { getAyhemSupabaseClient, getAyhemSession } = await import("../supabase/ayhem-supabase-auth.js?v=20261124-2");
@@ -31,6 +45,21 @@ async function createSupabaseAIClient() {
     onAuthStateChange(callback) {
       const { data } = supabase.auth.onAuthStateChange((event, session) => callback(event, session));
       return () => data.subscription.unsubscribe();
+    },
+    async saveMemory(content) {
+      const session = await getAyhemSession();
+      if (!session?.access_token || !session?.user?.id) throw new Error("authentication_required");
+      const saved = await memoryStore.append({
+        id: "ayhem-user-memory-" + globalThis.crypto.randomUUID(),
+        title: content.length > 100 ? content.slice(0, 97) + "..." : content,
+        content,
+        createdAt: new Date().toISOString(),
+        status: "user_provided",
+        source: "ayhem-explicit-chat-save",
+        tags: ["user-memory", "explicit-save"],
+        confidence: 1,
+      });
+      return saved;
     },
     async ask(prompt, localLearningContext = "") {
       const session = await getAyhemSession();
