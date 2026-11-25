@@ -63,7 +63,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .chat-top>div{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}.chat-top strong{font-size:1rem}.chat-top small{font-size:.68rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chat-menu{width:38px;height:38px;border:1px solid var(--line);border-radius:12px;background:#ffffff08;color:var(--text)}.chat-mark{width:32px;height:32px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,#f0d58f,#a77c38);color:#142238;font-weight:900}
 .chat-history{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:24px 12px 18px;display:flex;flex-direction:column;gap:18px;scrollbar-width:thin;scrollbar-color:#49617b transparent}
-.welcome-card{text-align:center;margin:auto auto 16px;max-width:330px;color:var(--muted);padding:18px 10px}.welcome-card h1{font-size:1.35rem;color:var(--text);margin:14px 0 7px}.welcome-card p{font-size:.85rem;line-height:1.7;margin:0}.welcome-orb{margin:auto;width:62px;height:62px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(145deg,#f0d58f,#a77c38);color:#142238;font-size:1.7rem;font-weight:900;box-shadow:0 0 35px #d9b66f25}
+.welcome-card{text-align:center;margin:auto auto 16px;max-width:330px;color:var(--muted);padding:18px 10px}.welcome-card h1{font-size:1.35rem;color:var(--text);margin:14px 0 7px}.welcome-card p{font-size:.85rem;line-height:1.7;margin:0}.welcome-orb{margin:auto;width:max-content;max-width:100%;min-height:48px;padding:10px 20px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,#f0d58f,#a77c38);color:#142238;font-size:1rem;font-weight:850;white-space:nowrap;box-shadow:0 0 35px #d9b66f25}
 .user-message{align-self:flex-start;max-width:88%;padding:12px 15px;border:1px solid rgba(117,166,220,.18);border-radius:18px 18px 5px 18px;background:linear-gradient(135deg,#173754,#10283f);color:#f5f7fb;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;font-size:.92rem}
 .assistant-message{align-self:stretch;max-width:100%;padding:4px 2px 12px;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.9;font-size:.94rem;direction:auto;text-align:start}.assistant-message:empty{display:none}
 .chat-composer{flex:0 0 auto;position:relative;padding:10px 10px 3px;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(7,17,31,.94),#07111f)}
@@ -167,7 +167,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 <section class="screen chat-screen active" id="screen-ai" aria-label="محادثة أيهم">
   <div class="chat-top"><button class="chat-menu" data-go="home" aria-label="القائمة">☰</button><div><strong>أيهم</strong><small id="aiConnectionStatus" role="status" aria-live="polite">جارٍ تهيئة الاتصال...</small></div><span class="chat-mark">A</span></div>
   <div id="aiConversation" class="chat-history" aria-live="polite">
-    <div class="welcome-card"><div class="welcome-orb">A</div><h1>كيف أستطيع مساعدتك؟</h1><p>اسأل أيهم، وسأساعدك في التحليل والتخطيط والبحث.</p></div>
+    <div class="welcome-card"><div class="welcome-orb">أيهم مساعدك الرقمي</div><h1>كيف أستطيع مساعدتك؟</h1><p>اسأل أيهم، وسأساعدك في التحليل والتخطيط والبحث.</p></div>
     <div id="aiOutput" class="assistant-message" role="status">لن يظهر الاتصال كجاهز إلا بعد نجاح فحص البوابة ومزوّد الذكاء الاصطناعي.</div>
   </div>
   <section class="chat-composer" aria-label="إرسال رسالة">
@@ -235,5 +235,5 @@ document.getElementById("startBtn").addEventListener("click",async()=>{const b=d
 <script type="module" src="AYHEM_MASTER_ORCHESTRATOR.js?v=20261125-single-screen"></script>
 <script type="module" src="./integrations/supabase/ayhem-auth-ui.js?v=20261124-groq1"></script>
 <script type="module" src="./integrations/supabase/ayhem-memory-ui.js?v=20261125-rls1"></script>
-<script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=20261125-fullscreen-focus1"></script>
+<script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=20261125-brand-title1"></script>
 </body></html>
