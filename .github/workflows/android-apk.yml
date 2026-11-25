@@ -47,6 +47,11 @@ jobs:
       - name: Generate Android project
         run: npx cap add android
 
+      - name: Install image conversion utility
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+
       - name: Apply AYHEM launcher icon
         run: |
           for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
