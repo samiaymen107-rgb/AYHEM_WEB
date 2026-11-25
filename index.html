@@ -4,7 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AYHEM WEB — العقل الرقمي الحي</title>
-  <meta name="description" content="موقع مشروع أيهم — أول عقل رقمي حي" />
+  <meta name="description" content="AYHEM — واجهة ذكية موحدة ومتوافقة مع الهاتف" />
+  <meta name="theme-color" content="#07111f" />
   <meta name="ayhem-worker-url" content="" />
   <style>
     :root {
@@ -138,6 +139,52 @@
       .content { grid-template-columns: 1fr; }
       .hero, .content, .footer { padding: 20px; }
     }
+
+    /* AYHEM mobile-first interface refresh */
+    :root{--bg:#07111f;--panel:#101f33;--text:#f3f7ff;--muted:#a8b7cc;--accent:#d8b66f;--border:rgba(180,203,230,.16);--shadow:0 18px 48px rgba(0,0,0,.28)}
+    body{display:block;min-height:100svh;padding:clamp(12px,3vw,28px);background:radial-gradient(ellipse at 50% -15%,#23436a 0%,#0b1728 42%,#060d18 100%);padding-bottom:max(24px,env(safe-area-inset-bottom))}
+    .app{width:min(900px,100%);margin:0 auto;border-radius:26px;background:rgba(12,25,42,.94);border-color:rgba(216,182,111,.22);backdrop-filter:blur(14px)}
+    .hero{padding:clamp(22px,5vw,42px);background:linear-gradient(135deg,rgba(30,58,88,.72),rgba(13,27,45,.18));}
+    .brand{font-size:clamp(1.45rem,5vw,2.25rem);line-height:1.35;letter-spacing:-.03em}
+    .subtitle{max-width:62ch;font-size:.96rem}
+    .content{grid-template-columns:1fr 1fr;gap:14px;padding:16px 20px}
+    .panel{background:linear-gradient(155deg,rgba(24,42,65,.86),rgba(13,26,43,.92));border-color:var(--border);border-radius:20px;padding:clamp(16px,3.5vw,22px)}
+    .panel h2{font-size:1.04rem;line-height:1.5}
+    .actions{gap:10px;margin-top:16px}
+    button,a.button{min-height:48px;padding:12px 16px;border-radius:14px;font:inherit;font-weight:750;touch-action:manipulation}
+    button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid rgba(216,182,111,.72);outline-offset:3px}
+    button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .primary{background:linear-gradient(135deg,#e4c982,#c59a4c);color:#142033}
+    .secondary{background:rgba(255,255,255,.035);border:1px solid var(--border);color:var(--text)}
+    #view{min-height:160px;justify-content:flex-start;text-align:right;white-space:pre-wrap;background:rgba(3,10,19,.22);border:1px solid var(--border);border-radius:15px}
+    .auth-panel,.ai-panel{margin:0 20px 16px}
+    .auth-panel input,.ai-panel textarea{width:100%;min-height:48px;border-radius:14px;border:1px solid var(--border);background:#081525;padding:13px;color:var(--text);font:inherit}
+    .auth-panel label,.ai-panel label{display:block;margin-top:14px;font-weight:650}
+    .ai-panel textarea{min-height:132px;resize:vertical}
+    .ai-output{background:rgba(4,12,22,.55);border-color:var(--border);border-radius:15px;min-height:58px}
+    .ai-status{line-height:1.8}
+    ul{padding-inline-start:22px;line-height:2.1;color:var(--muted)}
+    .footer{padding:18px 22px 24px;text-align:center}
+    .mobile-nav{display:none}
+    @media(max-width:700px){
+      body{padding:10px 10px max(16px,env(safe-area-inset-bottom))}
+      .app{border-radius:20px}
+      .hero{padding:22px 18px}
+      .content{grid-template-columns:1fr;padding:12px;gap:12px}
+      .auth-panel,.ai-panel{margin:0 12px 12px}
+      .panel{padding:17px}
+      .actions{display:grid;grid-template-columns:1fr}
+      .actions button,.actions a.button{width:100%;min-height:50px}
+      #view{min-height:130px}
+      .brand{max-width:16ch}
+      .mobile-nav{position:sticky;bottom:8px;z-index:5;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 12px 14px;padding:7px;border:1px solid var(--border);border-radius:17px;background:rgba(5,14,25,.94);backdrop-filter:blur(16px)}
+      .mobile-nav a{display:grid;place-items:center;min-height:44px;padding:6px 4px;border-radius:11px;color:var(--text);font-size:.82rem;font-weight:700;text-decoration:none}
+      .mobile-nav a:active{background:rgba(216,182,111,.16)}
+      .footer{font-size:.82rem}
+    }
+    @media(min-width:701px){.auth-panel,.ai-panel{margin-left:24px;margin-right:24px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+
   </style>
 </head>
 <body>
@@ -156,6 +203,8 @@
         <a class="button secondary" href="AYHEM_PROGRESS_DASHBOARD.html">متابعة نسبة الإنجاز / Progress</a>
       </div>
     </section>
+
+    <nav class="mobile-nav" aria-label="تنقل سريع"><a href="#memoryTitle">الذاكرة</a><a href="#authTitle">الحساب</a><a href="#aiTitle">أيهم AI</a></nav>
 
     <section class="content">
       <div class="panel">
@@ -209,21 +258,6 @@
       <button class="secondary" id="authSignOut" type="button" hidden>تسجيل الخروج</button>
     </section>
 
-    <section class="panel auth-panel" aria-labelledby="tinyfishTitle">
-      <h2 id="tinyfishTitle">مهام TinyFish</h2>
-      <p id="tinyfishStatus" class="ai-status" role="status" aria-live="polite">يتطلب تسجيل الدخول. التشغيل قد يستهلك رصيد TinyFish.</p>
-      <div class="actions"><button class="secondary" id="tinyfishHealthBtn" type="button">فحص حالة المحفظة (قراءة فقط)</button></div>
-      <form id="tinyfishForm">
-        <label for="tinyfishUrl">رابط الصفحة (HTTPS)</label>
-        <input id="tinyfishUrl" type="url" inputmode="url" placeholder="https://example.com" required />
-        <label for="tinyfishGoal">المهمة المطلوبة</label>
-        <input id="tinyfishGoal" type="text" maxlength="4000" placeholder="صف ما تريد من أيهم تنفيذه..." required />
-        <label><input id="tinyfishConsent" type="checkbox" required /> أوافق على تشغيل المهمة وقد تستهلك رصيد TinyFish.</label>
-        <div class="actions"><button class="primary" id="tinyfishSubmit" type="submit">تشغيل المهمة</button></div>
-      </form>
-      <pre id="tinyfishOutput" class="ai-output" aria-live="polite"></pre>
-    </section>
-
     <section class="panel ai-panel" aria-labelledby="aiTitle">
       <h2 id="aiTitle">الاتصال بالذكاء الاصطناعي / AI Gateway</h2>
       <p id="aiConnectionStatus" class="ai-status" role="status" aria-live="polite">جارٍ التحقق من إعداد الاتصال...</p>
@@ -267,7 +301,7 @@
   </script>
   <script type="module" src="./integrations/supabase/ayhem-auth-ui.js?v=20261124-groq1"></script>
   <script type="module" src="./integrations/supabase/ayhem-memory-ui.js?v=20261125-rls1"></script>
-  <script type="module" src="./integrations/supabase/ayhem-tinyfish-ui.js?v=20261124-groq1"></script>
+
   <script>
     // Immediate tap feedback: distinguishes a loaded AI handler from a dead button.
     document.addEventListener("click", event => {
