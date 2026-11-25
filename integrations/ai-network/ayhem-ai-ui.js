@@ -17,6 +17,12 @@ import { createAyhemReasoningPlan, buildAyhemReasoningContext } from "./ayhem-re
 import { buildAyhemVerificationContext, verifyAyhemAnswer } from "./ayhem-verification-core.js";
 export { buildRelevantMemoryContext } from "./ayhem-memory-context.js";
 
+export function parseAyhemAutomaticCorrection(prompt) {
+  if (typeof prompt !== "string") return null;
+  const match = prompt.trim().match(/^(?:تصحيح|التصحيح|أقصد|بل الصحيح|لا،? الصحيح)\s*[:：،-]?\s*([\s\S]{3,})$/u);
+  return match?.[1]?.trim() || null;
+}
+
 export function parseAyhemExplicitMemorySave(prompt) {
   if (typeof prompt !== "string") return null;
   const value = prompt.trim();
@@ -183,7 +189,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   let initialized = false;
   let initializationError = null;
   const learning = createAyhemLocalLearningStore();
-  let activePrompt = "";
+  let activePrompt = "";\n  let lastAssistantPrompt = "";
 
   const scrollConversationToLatest = () => {
     if (!conversation) return;
@@ -413,7 +419,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   });
   if (typeof window !== "undefined") window.__AYHEM_AI_UI_MOUNTED = true;
   status.textContent = "تم تحميل واجهة AI. جارٍ تهيئة جلسة Supabase...";
-  output.textContent = "زر الإرسال يعمل؛ سيعرض سبب التعذر بدلاً من تجاهل الضغط.";
+  output.textContent = "";
 
   try {
     client = await withTimeout(clientFactory(), "supabase_client_init", 12000);
