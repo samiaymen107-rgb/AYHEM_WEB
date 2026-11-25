@@ -116,3 +116,18 @@ test("does not attach duplicate click listeners to the same button", async () =>
   assert.equal(second.state, "already-mounted");
   assert.equal(documentRef.elements.aiSendBtn.handlers.click, first);
 });
+
+test("shows provider and model only from gateway response metadata", async () => {
+  const documentRef = fakeDocument();
+  await mountAyhemAIUI({
+    documentRef,
+    clientFactory: () => ({
+      health: async () => ({ ready: true }),
+      ask: async () => ({ output: "أنا AYHEM AI.", provider: "groq", model: "openai/gpt-oss-20b" }),
+    }),
+  });
+  documentRef.elements.aiPrompt.value = "ما المزوّد والنموذج؟";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  assert.match(documentRef.elements.aiConnectionStatus.textContent, /Groq/);
+  assert.match(documentRef.elements.aiConnectionStatus.textContent, /openai\/gpt-oss-20b/);
+});
