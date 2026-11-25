@@ -37,10 +37,15 @@ export function getAyhemGreetingReply(prompt) {
 }
 
 export function cleanAyhemReply(value) {
-  const text = typeof value === "string" ? value : "";
-  return text.replace(/^\s*(?:مرحبًا|مرحباً|مرحبا)[!！،,.\s]*(?:كيف يمكنني مساعدتك اليوم؟|كيف أستطيع مساعدتك اليوم؟)[!！،,.\s]*/u, "").trim();
+  const text = typeof value === "string" ? value.trim() : "";
+  if (!text) return "";
+  const cleaned = text.replace(/^\\s*(?:مرحبًا|مرحباً|مرحبا)[!！،,.\\s]*(?:كيف يمكنني مساعدتك اليوم؟|كيف أستطيع مساعدتك اليوم؟)[!！،,.\\s]*/u, "").trim();
+  // Never turn a valid greeting-only AI reply into the composer placeholder.
+  if (!cleaned && /^(?:مرحبًا|مرحباً|مرحبا)[!！،,.\\s]*(?:كيف يمكنني مساعدتك اليوم؟|كيف أستطيع مساعدتك اليوم؟)?[!！،,.\\s]*$/u.test(text)) {
+    return "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟";
+  }
+  return cleaned || text;
 }
-
 export function parseAyhemAutomaticCorrection(prompt) {
   if (typeof prompt !== "string") return null;
   const match = prompt.trim().match(/^(?:تصحيح|التصحيح|أقصد|بل الصحيح|لا،? الصحيح)\s*[:：،-]?\s*([\s\S]{3,})$/u);
