@@ -196,6 +196,22 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     } else scroll();
   };
 
+  // Keep the newest reply in view whenever its content or layout changes.
+  // This also covers delayed font/layout changes and the Android keyboard viewport.
+  const viewForObservers = documentRef.defaultView;
+  const ConversationMutationObserver = viewForObservers?.MutationObserver;
+  if (conversation && typeof ConversationMutationObserver === "function") {
+    const conversationObserver = new ConversationMutationObserver(() => scrollConversationToLatest());
+    conversationObserver.observe(conversation, { childList: true, subtree: true, characterData: true });
+  }
+  const ConversationResizeObserver = viewForObservers?.ResizeObserver;
+  let conversationResizeObserver = null;
+  if (conversation && typeof ConversationResizeObserver === "function") {
+    conversationResizeObserver = new ConversationResizeObserver(() => scrollConversationToLatest());
+    conversationResizeObserver.observe(conversation);
+    if (output) conversationResizeObserver.observe(output);
+  }
+
   const createElement = typeof documentRef.createElement === "function"
     ? tag => documentRef.createElement(tag)
     : () => ({ style: {}, addEventListener() {}, append() {}, setAttribute() {}, value: "", textContent: "", hidden: false });
@@ -308,6 +324,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       assistantBubble.textContent = "يفكر أيهم...";
       conversation.append(assistantBubble);
       output = assistantBubble;
+      conversationResizeObserver?.observe(assistantBubble);
       conversation.append(feedbackPanel, reasoningPanel);
       scrollConversationToLatest();
     }
