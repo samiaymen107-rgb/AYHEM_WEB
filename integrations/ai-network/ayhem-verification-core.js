@@ -35,7 +35,7 @@ export function verifyAyhemAnswer(prompt, answer) {
     add("geography_conflict", "high", "توجد إشارة إلى المغرب في إجابة عن سيدي بوزيد؛ راجع الدولة والحدود الجغرافية.");
   }
 
-  const asksAuthorities = includesAny(p, ["جهات رسمية", "مؤسسات رسمية", "الجهات الادارية", "الجهات الإدارية", "وزارات", "السلطات المختصة"]);
+  const asksAuthorities = includesAny(p, ["جهات رسمية", "الجهات الرسمية", "مؤسسات رسمية", "الجهات الادارية", "الجهات الإدارية", "وزارات", "السلطات المختصة"]);
   const suspectInstitutionNames = [
     "وزارة التنمية الريفية",
     "وزارة الزراعة",
