@@ -359,7 +359,13 @@ Deno.test("AYHEM local learning: explicit corrections persist separately and are
 
 
 Deno.test("AYHEM reasoning core: offline planning, evidence boundaries, and bounded context", () => {
-  const plan = createAyhemReasoningPlan("حلل خطة تمويل المشروع وقارن الخيارات وحدد المخاطر");
+  const plan = createAyhemReasoningPlan("حلل خطة تمويل المشروع وقارن الخيارات وحدد المخاطر") as {
+    mode: string;
+    intent: string;
+    steps: unknown[];
+    evidence_policy: string[];
+    risks: unknown[];
+  };
   equal(plan.mode, "local_deterministic_scaffold", "reasoning mode");
   equal(plan.intent, "compare", "comparison intent precedence");
   assert(plan.steps.length >= 4, "reasoning plan must contain actionable steps");
@@ -368,6 +374,6 @@ Deno.test("AYHEM reasoning core: offline planning, evidence boundaries, and boun
   const context = buildAyhemReasoningContext(plan);
   assert(context.includes("لا تدّع تنفيذ"), "provider context must prohibit false execution claims");
   assert(context.length <= 2600, "reasoning context must be bounded");
-  const unknown = createAyhemReasoningPlan("؟");
+  const unknown = createAyhemReasoningPlan("؟") as { requires_clarification: boolean };
   equal(unknown.requires_clarification, true, "short ambiguous prompt needs clarification");
 });
