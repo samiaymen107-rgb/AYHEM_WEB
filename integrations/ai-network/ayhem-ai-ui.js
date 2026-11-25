@@ -17,6 +17,23 @@ import { createAyhemReasoningPlan, buildAyhemReasoningContext } from "./ayhem-re
 import { buildAyhemVerificationContext, verifyAyhemAnswer } from "./ayhem-verification-core.js";
 export { buildRelevantMemoryContext } from "./ayhem-memory-context.js";
 
+export function getAyhemGreetingReply(prompt) {
+  if (typeof prompt !== "string") return null;
+  const normalized = prompt.trim().toLocaleLowerCase("ar")
+    .replace(/[!！؟?،,؛;.\sـ]+/gu, "");
+  if (!normalized || normalized.length > 48) return null;
+  if (/^(?:السلامعليكم|السلامعليكمورحمةاللهوبركاته|سلامعليكم|وعليكمالسلام|مرحبا|مرحباً|مرحبًا|اهلا|أهلا|أهلاً|اهلين|أهلين|صباحالخير|مساءالخير|هاي|hello|hi)$/iu.test(normalized)) {
+    if (/^(?:السلامعليكم|سلامعليكم|السلامعليكمورحمةاللهوبركاته)$/u.test(normalized)) {
+      return "وعليكم السلام ورحمة الله وبركاته، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟";
+    }
+    if (/^(?:صباحالخير)$/u.test(normalized)) return "صباح النور والسرور، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟";
+    if (/^(?:مساءالخير)$/u.test(normalized)) return "مساء النور، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟";
+    if (/^(?:hello|hi)$/iu.test(normalized)) return "Hello! Welcome. How can I help you?";
+    return "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟";
+  }
+  return null;
+}
+
 export function cleanAyhemReply(value) {
   const text = typeof value === "string" ? value : "";
   return text.replace(/^\s*(?:مرحبًا|مرحباً|مرحبا)[!！،,.\s]*(?:كيف يمكنني مساعدتك اليوم؟|كيف أستطيع مساعدتك اليوم؟)[!！،,.\s]*/u, "").trim();
@@ -306,6 +323,32 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     const prompt = typeof input.value === "string" ? input.value.trim() : "";
     if (!prompt) { output.textContent = "اكتب سؤالاً أولاً."; status.textContent = "بانتظار رسالتك."; return; }
     if (sending) return;
+
+    // Reply to a standalone greeting immediately, without requiring login or an AI network call.
+    const greetingReply = getAyhemGreetingReply(prompt);
+    if (greetingReply) {
+      if (conversation && typeof documentRef.createElement === "function") {
+        const welcome = conversation.querySelector?.(".welcome-card");
+        if (welcome) welcome.remove();
+        const userBubble = documentRef.createElement("div");
+        userBubble.className = "user-message";
+        userBubble.textContent = prompt;
+        conversation.append(userBubble);
+        const assistantBubble = documentRef.createElement("div");
+        assistantBubble.className = "assistant-message";
+        assistantBubble.setAttribute("role", "status");
+        conversation.append(assistantBubble);
+        renderAyhemAssistantMessage(assistantBubble, greetingReply, documentRef);
+        output = assistantBubble;
+        scrollConversationToLatest();
+      } else {
+        output.textContent = greetingReply;
+      }
+      status.textContent = "تم ردّ التحية.";
+      input.value = "";
+      resizeComposer();
+      return;
+    }
     if (initializationError) {
       output.textContent = "تعذر تهيئة خدمة المصادقة: " + initializationError;
       status.textContent = "فشل إعداد اتصال AYHEM/Supabase.";
