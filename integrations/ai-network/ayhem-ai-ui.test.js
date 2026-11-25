@@ -67,7 +67,9 @@ test("enables chat after session check and renders returned text safely", async 
   documentRef.elements.aiPrompt.value = "  حلل البيانات  ";
   await documentRef.elements.aiSendBtn.handlers.click();
   assert.equal(received, "حلل البيانات");
-  assert.equal(documentRef.elements.aiOutput.textContent, "<script>not HTML</script>");
+  assert.ok(documentRef.elements.aiOutput.textContent.startsWith("<script>not HTML</script>"));
+  assert.match(documentRef.elements.aiOutput.textContent, /فحص AYHEM المحلي/);
+  assert.match(documentRef.elements.aiOutput.textContent, /عدم ظهور تحذير لا يثبت صحة الإجابة/);
   assert.equal(documentRef.elements.aiPrompt.value, "");
   assert.match(documentRef.elements.aiConnectionStatus.textContent, /نجح الاتصال الحي/);
   assert.match(documentRef.elements.aiConnectionStatus.textContent, /2 سجلات ذاكرة/);
