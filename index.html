@@ -12,7 +12,7 @@ body{font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;back
 button,input,textarea{font:inherit}
 button{touch-action:manipulation;cursor:pointer}
 button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-.app{width:100%;height:100vh;height:100dvh;max-width:560px;margin:0 auto;display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding: max(10px,env(safe-area-inset-top)) 12px calc(8px + var(--safe-bottom));gap:10px}
+.app{width:100%;height:var(--ayhem-viewport-height,100vh);height:var(--ayhem-viewport-height,100dvh);max-width:560px;margin:0 auto;display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding: max(10px,env(safe-area-inset-top)) 12px calc(8px + var(--safe-bottom));gap:10px}
 .topbar{min-height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 6px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:.04em;font-size:1.15rem}
 .logo{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#f0d58f,#a77c38);color:#132238;font-size:1.1rem;box-shadow:0 6px 22px #0005}
@@ -95,16 +95,43 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .assistant-message p,.assistant-message li,.assistant-message h2,.assistant-message h3,.assistant-message h4{max-width:100%;overflow-wrap:anywhere;word-break:normal;}
 .assistant-message pre,.assistant-message .ai-md-code{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;}
 .chat-screen,.chat-composer{min-width:0;}
+
+/* Full-screen mobile chat mode and Android visual-viewport keyboard handling */
+.app.chat-mode{grid-template-rows:minmax(0,1fr);gap:0}
+.app.chat-mode>.topbar,.app.chat-mode>.bottom-nav{display:none}
+.app.chat-mode>.workspace{height:100%;min-height:0}
+.app.chat-mode #screen-ai{border:0;border-radius:0}
+.app.chat-mode .chat-top{padding-inline:max(12px,env(safe-area-inset-left)) max(12px,env(safe-area-inset-right))}
+.app.chat-mode .chat-history{padding-bottom:24px}
+.app.chat-mode .chat-composer{padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right));padding-bottom:max(8px,env(safe-area-inset-bottom))}
+.chat-composer textarea{scroll-margin-block:10px}
+@media(max-width:699px){
+  .app.chat-mode{position:fixed;inset-inline:0;top:var(--ayhem-viewport-top,0px);width:100%;max-width:none;height:var(--ayhem-viewport-height,100dvh);margin:0;padding:0;overflow:hidden}
+  .app.chat-mode>.workspace{height:100%;width:100%;overflow:hidden}
+  .app.chat-mode #screen-ai{inset:0;height:100%;width:100%;padding-top:env(safe-area-inset-top);padding-bottom:0}
+  .app.chat-mode .chat-top{height:52px;flex-basis:52px;min-height:52px}
+  .app.chat-mode .chat-history{flex:1 1 0%;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+  .app.chat-mode .chat-composer{flex:0 0 auto;padding-top:9px}
+  .app.chat-mode .chat-composer textarea{min-height:52px;max-height:24dvh;max-height:24vh;font-size:16px;line-height:1.5}
+  .app.chat-mode .chat-send{bottom:calc(38px + env(safe-area-inset-bottom,0px))}
+  .app.chat-mode .chat-disclaimer{margin:5px 0 0;padding-bottom:2px}
+}
+@media(max-height:520px) and (max-width:699px){
+  .app.chat-mode .chat-top{height:42px;flex-basis:42px;min-height:42px}
+  .app.chat-mode .chat-composer textarea{min-height:42px;max-height:18vh;padding-top:9px;padding-bottom:9px}
+  .app.chat-mode .chat-send{bottom:calc(30px + env(safe-area-inset-bottom,0px))}
+}
+
 @media(max-width:699px){.chat-history{padding:14px 10px 22px;gap:14px}.chat-composer{padding-bottom:max(5px,env(safe-area-inset-bottom))}.chat-history>.user-message{max-width:92%}}
 @media(min-width:700px){.chat-history{padding-inline:22px}.user-message{max-width:82%}}
 
 </style>
 </head>
 <body>
-<main class="app">
+<main class="app chat-mode">
 <header class="topbar"><div class="brand"><span class="logo">A</span><span>AYHEM <span style="color:var(--gold)">| أيهم</span></span></div><span class="live">واجهة الهاتف</span></header>
 <div class="workspace">
-<section class="screen active" id="screen-home" aria-label="الرئيسية">
+<section class="screen" id="screen-home" aria-label="الرئيسية">
 <div class="home-hero">
 <div class="orb">A</div><h1>أيهم</h1><p>عقلك الرقمي الموحّد<br>تحليل · ذاكرة · معرفة</p>
 <div class="home-actions">
@@ -167,7 +194,21 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 </main>
 <script>
 const screens=[...document.querySelectorAll(".screen")];
-function navigate(name){screens.forEach(s=>s.classList.toggle("active",s.id==="screen-"+name));document.querySelectorAll("[data-go]").forEach(b=>{if(b.tagName==="BUTTON"&&b.closest(".bottom-nav")){if(b.dataset.go===name)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")}});}
+(function syncAyhemVisualViewport(){
+  const root=document.documentElement;
+  const viewport=window.visualViewport;
+  const update=()=>{
+    const height=viewport?.height||window.innerHeight;
+    const top=viewport?.offsetTop||0;
+    root.style.setProperty("--ayhem-viewport-height",Math.max(240,Math.round(height))+"px");
+    root.style.setProperty("--ayhem-viewport-top",Math.max(0,Math.round(top))+"px");
+  };
+  update();
+  viewport?.addEventListener("resize",update,{passive:true});
+  viewport?.addEventListener("scroll",update,{passive:true});
+  window.addEventListener("resize",update,{passive:true});
+})();
+function navigate(name){document.querySelector(".app")?.classList.toggle("chat-mode",name==="ai");screens.forEach(s=>s.classList.toggle("active",s.id==="screen-"+name));document.querySelectorAll("[data-go]").forEach(b=>{if(b.tagName==="BUTTON"&&b.closest(".bottom-nav")){if(b.dataset.go===name)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")}});}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)navigate(b.dataset.go)});
 document.getElementById("dashboardBtn").addEventListener("click",()=>location.href="AYHEM_DASHBOARD.html");
 document.getElementById("startBtn").addEventListener("click",async()=>{const b=document.getElementById("startBtn"),v=document.getElementById("view");b.disabled=true;v.textContent="جارٍ فحص وحدات AYHEM...";try{const r=await window.AYHEM_ORCHESTRATOR.start();v.textContent="حالة النظام: "+r.state+" ("+r.ready+"/"+r.total+")";}catch(e){v.textContent="تعذر الفحص: "+(e?.message||e)}finally{b.disabled=false}});
