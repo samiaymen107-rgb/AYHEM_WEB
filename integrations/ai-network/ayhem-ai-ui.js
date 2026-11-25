@@ -353,9 +353,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       reasoningBody.textContent = reasoningPlan.intent_label + "\n" + reasoningPlan.steps.map(step => step.id + ". " + step.title).join("\n") + "\nالمخاطر: " + reasoningPlan.risks.join("؛ ");
       reasoningPanel.hidden = false;
       const verification = verifyAyhemAnswer(prompt, result.output);
-      renderAyhemAssistantMessage(output, verification.findings.length
-        ? result.output + "\n\n[مراجعة AYHEM المحلية]\n" + verification.findings.map(item => "• " + item.message).join("\n") + "\n" + verification.disclaimer
-        : result.output + "\n\n[فحص AYHEM المحلي]\nلم تُكتشف أنماط تحذير مهيأة. " + verification.disclaimer, documentRef);
+      renderAyhemAssistantMessage(output, result.output, documentRef);
       scrollConversationToLatest();
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
       const memoryLabel = result.memoryReadError
@@ -363,7 +361,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
         : result.memoryRecordsUsed
           ? " استُخدمت " + result.memoryRecordsUsed + " سجلات ذاكرة ذات صلة."
           : " لم يُعثر على سجلات ذاكرة ذات صلة.";
-      status.textContent = "نجح الاتصال الحي — تم استلام رد فعلي من " + providerLabel + (result.model ? " (النموذج: " + result.model + ")" : "") + "." + memoryLabel + (verification.findings.length ? " فحص التحقق: " + verification.findings.length + " تنبيهات." : " فحص الأنماط: لا تنبيهات.");
+      status.textContent = "تم استلام الرد.";
       feedbackPanel.hidden = false;
       feedbackStatus.textContent = localLearningContext ? "استُخدمت تصحيحات محلية سابقة ذات صلة." : "لا توجد تصحيحات محلية سابقة ذات صلة.";
       input.value = "";
