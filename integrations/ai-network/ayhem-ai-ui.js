@@ -96,28 +96,31 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   const learning = createAyhemLocalLearningStore();
   let activePrompt = "";
 
-  const feedbackPanel = documentRef.createElement("section");
+  const createElement = typeof documentRef.createElement === "function"
+    ? tag => createElement(tag)
+    : () => ({ style: {}, addEventListener() {}, append() {}, setAttribute() {}, value: "", textContent: "", hidden: false });
+  const feedbackPanel = createElement("section");
   feedbackPanel.className = "ai-learning-feedback";
   feedbackPanel.hidden = true;
   feedbackPanel.style.cssText = "margin-top:12px;padding:14px;border:1px solid rgba(110,168,254,.35);border-radius:12px";
-  const feedbackTitle = documentRef.createElement("strong");
+  const feedbackTitle = createElement("strong");
   feedbackTitle.textContent = "تعلّم أيهم من تقييمك (محلي ومجاني)";
-  const feedbackHint = documentRef.createElement("p");
+  const feedbackHint = createElement("p");
   feedbackHint.textContent = "لا يحفظ أيهم المحادثات تلقائياً. احفظ التصحيح أو التقييم الذي تختاره فقط على هذا الجهاز.";
-  const correctionInput = documentRef.createElement("textarea");
+  const correctionInput = createElement("textarea");
   correctionInput.rows = 3;
   correctionInput.maxLength = 4000;
   correctionInput.placeholder = "اكتب التصحيح أو المعلومة التي تريد من أيهم الاستفادة منها...";
   correctionInput.style.cssText = "width:100%;margin:8px 0;padding:10px;border-radius:10px;background:#0b1020;color:inherit;border:1px solid rgba(255,255,255,.18);font:inherit";
-  const feedbackActions = documentRef.createElement("div");
+  const feedbackActions = createElement("div");
   feedbackActions.style.cssText = "display:flex;gap:8px;flex-wrap:wrap";
-  const helpfulButton = documentRef.createElement("button");
+  const helpfulButton = createElement("button");
   helpfulButton.type = "button";
   helpfulButton.textContent = "إجابة مفيدة";
-  const correctionButton = documentRef.createElement("button");
+  const correctionButton = createElement("button");
   correctionButton.type = "button";
   correctionButton.textContent = "حفظ التصحيح والتعلّم";
-  const feedbackStatus = documentRef.createElement("p");
+  const feedbackStatus = createElement("p");
   feedbackStatus.setAttribute("role", "status");
   feedbackActions.append(helpfulButton, correctionButton);
   feedbackPanel.append(feedbackTitle, feedbackHint, correctionInput, feedbackActions, feedbackStatus);
