@@ -68,11 +68,9 @@ test("enables chat after session check and renders returned text safely", async 
   await documentRef.elements.aiSendBtn.handlers.click();
   assert.equal(received, "حلل البيانات");
   assert.ok(documentRef.elements.aiOutput.textContent.startsWith("<script>not HTML</script>"));
-  assert.match(documentRef.elements.aiOutput.textContent, /فحص AYHEM المحلي/);
-  assert.match(documentRef.elements.aiOutput.textContent, /عدم ظهور تحذير لا يثبت صحة الإجابة/);
+  assert.doesNotMatch(documentRef.elements.aiOutput.textContent, /فحص AYHEM المحلي|عدم ظهور تحذير لا يثبت صحة الإجابة/);
   assert.equal(documentRef.elements.aiPrompt.value, "");
-  assert.match(documentRef.elements.aiConnectionStatus.textContent, /نجح الاتصال الحي/);
-  assert.match(documentRef.elements.aiConnectionStatus.textContent, /2 سجلات ذاكرة/);
+  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "تم استلام الرد.");
 });
 
 test("reports memory degradation without blocking the AI response", async () => {
@@ -86,7 +84,7 @@ test("reports memory degradation without blocking the AI response", async () => 
   });
   documentRef.elements.aiPrompt.value = "اختبار";
   await documentRef.elements.aiSendBtn.handlers.click();
-  assert.match(documentRef.elements.aiConnectionStatus.textContent, /دون سياق ذاكرة/);
+  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "تم استلام الرد.");
 });
 
 test("retains a working click handler when Supabase initialization fails", async () => {
@@ -117,7 +115,7 @@ test("does not attach duplicate click listeners to the same button", async () =>
   assert.equal(documentRef.elements.aiSendBtn.handlers.click, first);
 });
 
-test("shows provider and model only from gateway response metadata", async () => {
+test("keeps provider and model metadata out of the user-facing answer", async () => {
   const documentRef = fakeDocument();
   await mountAyhemAIUI({
     documentRef,
@@ -128,8 +126,8 @@ test("shows provider and model only from gateway response metadata", async () =>
   });
   documentRef.elements.aiPrompt.value = "ما المزوّد والنموذج؟";
   await documentRef.elements.aiSendBtn.handlers.click();
-  assert.match(documentRef.elements.aiConnectionStatus.textContent, /Groq/);
-  assert.match(documentRef.elements.aiConnectionStatus.textContent, /openai\/gpt-oss-20b/);
+  assert.equal(documentRef.elements.aiOutput.textContent, "أنا AYHEM AI.");
+  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "تم استلام الرد.");
 });
 
 
