@@ -204,6 +204,8 @@ test("automatically learns a clearly marked correction locally", async () => {
 });
 test("answers standalone greetings politely before authentication or network checks", async () => {
   assert.equal(getAyhemGreetingReply("مرحبا"), "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟");
+  assert.equal(getAyhemGreetingReply("مرحبا مرجبا"), "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟");
+  assert.equal(getAyhemGreetingReply("مرحبا مرحبا"), "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟");
   assert.equal(getAyhemGreetingReply("السلام عليكم"), "وعليكم السلام ورحمة الله وبركاته، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟");
   assert.equal(getAyhemGreetingReply("صباح الخير"), "صباح النور والسرور، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟");
   assert.equal(getAyhemGreetingReply("أهلاً!"), "مرحباً بك! أهلاً وسهلاً، كيف يمكنني مساعدتك؟");
@@ -250,4 +252,20 @@ test("saves the immediately preceding assistant reply when the user says سجل�
   await documentRef.elements.aiSendBtn.handlers.click();
   assert.equal(savedContent, "الرد السابق الذي طلب المستخدم حفظه.");
   assert.match(documentRef.elements.aiOutput.textContent, /تم حفظ المعلومة في الذاكرة السحابية بنجاح/);
+});
+
+test("hides raw Groq empty-response diagnostics from the chat UI", async () => {
+  const documentRef = fakeDocument();
+  await mountAyhemAIUI({
+    documentRef,
+    clientFactory: () => ({
+      health: async () => ({ ready: true }),
+      ask: async () => { throw new Error("وصل رد من Groq لكنه لا يحتوي على نص قابل للعرض."); },
+    }),
+  });
+  documentRef.elements.aiPrompt.value = "من أسّسك؟";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  assert.equal(documentRef.elements.aiOutput.textContent, "تعذّر الحصول على رد هذه المرة. أعد إرسال سؤالك بعد لحظات.");
+  assert.doesNotMatch(documentRef.elements.aiOutput.textContent, /Groq|خطأ تقني|AI Gateway/);
+  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "لم يكتمل الرد. يمكنك المحاولة مجدداً.");
 });
