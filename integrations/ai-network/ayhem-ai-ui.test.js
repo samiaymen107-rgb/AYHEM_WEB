@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave, parseAyhemAutomaticCorrection } from "./ayhem-ai-ui.js";
+import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave, parseAyhemAutomaticCorrection, cleanAyhemReply } from "./ayhem-ai-ui.js";
 
 function fakeDocument() {
   const elements = Object.fromEntries(
@@ -191,4 +191,9 @@ test("automatically learns a clearly marked correction locally", async () => {
   documentRef.elements.aiPrompt.value = "تصحيح: اسمي أيهم";
   await documentRef.elements.aiSendBtn.handlers.click();
   assert.match(documentRef.elements.aiOutput.textContent, /تم\./);
+});
+
+test("removes generic welcome text while preserving the actual answer", () => {
+  assert.equal(cleanAyhemReply("مرحبًا! كيف يمكنني مساعدتك اليوم؟ أحتاج إلى تحليل هذه البيانات."), "أحتاج إلى تحليل هذه البيانات.");
+  assert.equal(cleanAyhemReply("النتيجة هي 42."), "النتيجة هي 42.");
 });
