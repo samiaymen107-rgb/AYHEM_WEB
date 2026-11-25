@@ -110,6 +110,63 @@ async function createSupabaseAIClient() {
   });
 }
 
+
+function renderAyhemAssistantMessage(target, content, documentRef) {
+  if (!target || !documentRef?.createElement) { if (target) target.textContent = content; return; }
+  target.replaceChildren();
+  const lines = String(content || "").replace(/\r\n?/g, "\n").split("\n");
+  let list = null, code = null, paragraph = [];
+  const flushParagraph = () => {
+    if (!paragraph.length) return;
+    const p = documentRef.createElement("p"); p.className = "ai-md-paragraph";
+    appendInline(p, paragraph.join(" ")); target.append(p); paragraph = [];
+  };
+  const appendInline = (parent, value) => {
+    const pattern = /(\*\*[^*]+\*\*|\x60[^\x60]+\x60)/g;
+    let cursor = 0;
+    for (const match of value.matchAll(pattern)) {
+      if (match.index > cursor) parent.append(documentRef.createTextNode(value.slice(cursor, match.index)));
+      const token = match[0], strong = token.startsWith("**");
+      const node = documentRef.createElement(strong ? "strong" : "code");
+      node.textContent = strong ? token.slice(2, -2) : token.slice(1, -1);
+      parent.append(node); cursor = match.index + token.length;
+    }
+    if (cursor < value.length) parent.append(documentRef.createTextNode(value.slice(cursor)));
+  };
+  for (const line of lines) {
+    if (line.startsWith("\x60\x60\x60")) {
+      flushParagraph(); list = null;
+      if (code) { target.append(code); code = null; }
+      else { code = documentRef.createElement("pre"); code.className = "ai-md-code"; }
+      continue;
+    }
+    if (code) { code.append(documentRef.createTextNode(line + "\n")); continue; }
+    if (!line.trim()) { flushParagraph(); list = null; continue; }
+    const heading = line.match(/^(#{1,3})\s+(.+)$/);
+    if (heading) {
+      flushParagraph(); list = null;
+      const h = documentRef.createElement("h" + Math.min(heading[1].length + 1, 4));
+      appendInline(h, heading[2]); target.append(h); continue;
+    }
+    const item = line.match(/^\s*(?:[-*•]|\d+[.)])\s+(.+)$/);
+    if (item) {
+      flushParagraph();
+      if (!list) { list = documentRef.createElement("ul"); list.className = "ai-md-list"; target.append(list); }
+      const li = documentRef.createElement("li"); appendInline(li, item[1]); list.append(li); continue;
+    }
+    list = null; paragraph.push(line.trim());
+  }
+  flushParagraph(); if (code) target.append(code);
+  const actions = documentRef.createElement("div"); actions.className = "ai-message-actions";
+  const copy = documentRef.createElement("button"); copy.type = "button";
+  copy.className = "ai-copy-button"; copy.textContent = "نسخ الرد";
+  copy.addEventListener("click", async () => {
+    try { await globalThis.navigator?.clipboard?.writeText?.(String(content || "")); copy.textContent = "تم النسخ"; }
+    catch { copy.textContent = "تعذر النسخ"; }
+  });
+  actions.append(copy); target.append(actions);
+}
+
 export async function mountAyhemAIUI({ documentRef = globalThis.document, clientFactory = createSupabaseAIClient } = {}) {
   const status = documentRef?.getElementById("aiConnectionStatus");
   const input = documentRef?.getElementById("aiPrompt");
@@ -251,7 +308,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       if (explicitMemory) {
         if (typeof client.saveMemory !== "function") throw new Error("cloud_memory_save_unavailable");
         const saved = await client.saveMemory(explicitMemory);
-        output.textContent = "تم حفظ المعلومة في الذاكرة السحابية بنجاح.\n\n" + saved.content;
+        renderAyhemAssistantMessage(output, "تم حفظ المعلومة في الذاكرة السحابية بنجاح.\n\n" + saved.content, documentRef);
         status.textContent = "تأكيد من قاعدة البيانات: أُنشئ سجل ذاكرة سحابي جديد لهذا الحساب.";
         feedbackPanel.hidden = true;
         reasoningPanel.hidden = true;
@@ -267,9 +324,9 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       reasoningBody.textContent = reasoningPlan.intent_label + "\n" + reasoningPlan.steps.map(step => step.id + ". " + step.title).join("\n") + "\nالمخاطر: " + reasoningPlan.risks.join("؛ ");
       reasoningPanel.hidden = false;
       const verification = verifyAyhemAnswer(prompt, result.output);
-      output.textContent = verification.findings.length
+      renderAyhemAssistantMessage(output, verification.findings.length
         ? result.output + "\n\n[مراجعة AYHEM المحلية]\n" + verification.findings.map(item => "• " + item.message).join("\n") + "\n" + verification.disclaimer
-        : result.output + "\n\n[فحص AYHEM المحلي]\nلم تُكتشف أنماط تحذير مهيأة. " + verification.disclaimer;
+        : result.output + "\n\n[فحص AYHEM المحلي]\nلم تُكتشف أنماط تحذير مهيأة. " + verification.disclaimer, documentRef);
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
       const memoryLabel = result.memoryReadError
         ? " تعذر قراءة الذاكرة؛ أُكملت المحادثة دون سياق ذاكرة."
