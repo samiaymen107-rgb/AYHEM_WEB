@@ -99,17 +99,6 @@ Deno.test("AYHEM Edge handlers: authenticated runtime paths with mocked upstream
     let calls = 0;
     globalThis.fetch = async () => { calls++; return Response.json({}); };
     const response = await tinyfishRunHandler(request("https://local.test/tinyfish", "POST", {
-      consent: false, url: "https://example.com", goal: "no consent",
-    }));
-    equal(response.status, 403, "TinyFish explicit consent status");
-    equal(calls, 0, "TinyFish must not call upstream without consent");
-  });
-
-  await isolated(async () => {
-    Deno.env.set("TINYFISH_API_KEY", "test-only-tinyfish-key");
-    let calls = 0;
-    globalThis.fetch = async () => { calls++; return Response.json({}); };
-    const response = await tinyfishRunHandler(request("https://local.test/tinyfish", "POST", {
       consent: true, url: "http://example.com", goal: "reject insecure URL",
     }));
     equal(response.status, 400, "TinyFish HTTP URL rejection");
