@@ -22,18 +22,17 @@ Deno.test("AI gateway: bounds memory context and does not auto-fallback to paid 
   includes(source, 'body.memory_context.slice(0, 10000)', "AI memory context must remain bounded");
   includes(source, "if (response.status === 429)", "Groq rate-limit handling must remain explicit");
   includes(source, "لم يتم التحويل تلقائياً إلى OpenAI", "Groq quota failure must not trigger paid fallback");
-  includes(source, 'preferred === "openai"', "OpenAI may only be selected through explicit provider preference or configured fallback when Groq is absent");
+  assert(!source.includes("openaiReply("), "AI gateway must not contain an active OpenAI provider implementation");
+  includes(source, "const provider = groqKey ? \"groq\" : null", "Only Groq may be selected in zero-cost mode");
+  includes(source, "لم يتم استدعاء أي مزوّد مدفوع", "Missing Groq must fail closed without paid fallback");
 });
 
-Deno.test("TinyFish runner: requires explicit consent and HTTPS-only URLs", async () => {
+Deno.test("TinyFish runner: hard-disabled server-side in zero-cost mode", async () => {
   const source = await read("supabase/functions/ayhem-tinyfish-run/index.ts");
-  includes(source, 'req.method !== "POST"', "TinyFish runner must reject non-POST requests");
-  includes(source, 'authorization.startsWith("Bearer ")', "TinyFish runner must require bearer authentication");
-  includes(source, "input.consent !== true", "TinyFish runner must require explicit consent");
-  includes(source, 'parsed.protocol !== "https:"', "TinyFish runner must reject non-HTTPS URLs");
-  includes(source, "parsed.username || parsed.password", "TinyFish runner must reject credential-bearing URLs");
-  includes(source, "goal.length > 4000", "TinyFish goal length must remain bounded");
-  includes(source, "Math.min(60, Math.max(10", "TinyFish runtime duration must remain clamped");
+  includes(source, "zero_cost_policy", "TinyFish runner must identify the zero-cost policy");
+  includes(source, "tinyfish_disabled_no_topups", "TinyFish runner must reject paid automation");
+  assert(!source.includes("agent.tinyfish.ai/v1/automation/run"), "TinyFish runner must not call the paid automation endpoint");
+  assert(!source.includes("TINYFISH_API_KEY"), "Disabled runner must not read or use the TinyFish API key");
 });
 
 Deno.test("TinyFish health: is read-only and authenticated", async () => {
@@ -72,13 +71,11 @@ Deno.test("Cloud memory UI: round-trip verification must not mutate prior record
 });
 
 
-Deno.test("TinyFish UI: resource guardian protects the non-renewable wallet", async () => {
+Deno.test("TinyFish UI: zero-cost mode blocks all paid activity locally", async () => {
   const source = await read("integrations/supabase/ayhem-tinyfish-ui.js");
-  includes(source, "MINIMUM_RESERVE_USD = 2", "TinyFish UI must preserve a minimum wallet reserve");
-  includes(source, "DUPLICATE_WINDOW_MS = 30 * 60 * 1000", "TinyFish UI must apply a duplicate cooldown");
-  includes(source, 'invoke("ayhem-tinyfish-health", { method: "GET" })', "Every paid task must be preceded by a read-only wallet check");
-  includes(source, "wallet.balance < MINIMUM_RESERVE_USD", "TinyFish UI must block tasks below the reserve");
-  includes(source, "reserveTask(url, goal)", "TinyFish UI must record task fingerprints before dispatch");
-  includes(source, "if (taskInFlight)", "TinyFish UI must prevent concurrent duplicate submissions");
-  includes(source, "لن تتم إعادة المحاولة تلقائياً", "TinyFish UI must not automatically retry paid tasks");
+  includes(source, "وضع الاكتفاء الذاتي المجاني مفعّل", "TinyFish UI must disclose zero-cost mode");
+  includes(source, "submit.disabled = true", "TinyFish task submit must be disabled");
+  includes(source, "healthButton.hidden = true", "Wallet polling/check UI must be hidden");
+  assert(!source.includes("functions.invoke"), "TinyFish UI must not call any Edge Function");
+  assert(!source.includes("agent.tinyfish.ai"), "TinyFish UI must not contact TinyFish directly");
 });

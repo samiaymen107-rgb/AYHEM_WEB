@@ -84,44 +84,14 @@ Deno.test("AYHEM Edge handlers: authenticated runtime paths with mocked upstream
   await isolated(async () => {
     Deno.env.set("TINYFISH_API_KEY", "test-only-tinyfish-key");
     let calls = 0;
-    globalThis.fetch = async (input, init) => {
-      calls++;
-      equal(String(input), "https://agent.tinyfish.ai/v1/automation/run", "TinyFish run endpoint");
-      const payload = JSON.parse(String(init?.body));
-      equal(payload.agent_config.max_duration_seconds, 60, "TinyFish duration upper clamp");
-      equal(payload.url, "https://example.com/", "TinyFish normalized URL");
-      equal(new Headers(init?.headers).get("X-API-Key"), "test-only-tinyfish-key", "TinyFish server key header");
-      return Response.json({ run_id: "mock-run-1" });
-    };
+    globalThis.fetch = async () => { calls++; throw new Error("disabled TinyFish runner must never call upstream"); };
     const response = await tinyfishRunHandler(request("https://local.test/tinyfish", "POST", {
-      consent: true, url: "https://example.com", goal: "read public page", max_duration_seconds: 999,
+      consent: true, url: "https://example.com", goal: "must remain disabled",
     }));
-    equal(response.status, 200, "TinyFish run status");
+    equal(response.status, 403, "TinyFish zero-cost policy status");
     const body = await response.json();
-    equal(body.ok, true, "TinyFish upstream result");
-    equal(calls, 1, "TinyFish call count");
-  });
-
-  await isolated(async () => {
-    Deno.env.set("TINYFISH_API_KEY", "test-only-tinyfish-key");
-    let calls = 0;
-    globalThis.fetch = async () => { calls++; return Response.json({}); };
-    const response = await tinyfishRunHandler(request("https://local.test/tinyfish", "POST", {
-      consent: false, url: "https://example.com", goal: "no consent",
-    }));
-    equal(response.status, 403, "TinyFish explicit consent status");
-    equal(calls, 0, "TinyFish must not call upstream without consent");
-  });
-
-  await isolated(async () => {
-    Deno.env.set("TINYFISH_API_KEY", "test-only-tinyfish-key");
-    let calls = 0;
-    globalThis.fetch = async () => { calls++; return Response.json({}); };
-    const response = await tinyfishRunHandler(request("https://local.test/tinyfish", "POST", {
-      consent: true, url: "http://example.com", goal: "reject insecure URL",
-    }));
-    equal(response.status, 400, "TinyFish HTTP URL rejection");
-    equal(calls, 0, "TinyFish must not call upstream for HTTP URL");
+    equal(body.error, "tinyfish_disabled_no_topups", "TinyFish zero-cost policy error");
+    equal(calls, 0, "disabled TinyFish runner must never call upstream");
   });
 
   await isolated(async () => {
