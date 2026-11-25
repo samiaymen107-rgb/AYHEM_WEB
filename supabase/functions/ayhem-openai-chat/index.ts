@@ -22,14 +22,15 @@ const instructions = [
 ].join("\n");
 
 async function groqReply(apiKey: string, input: string, signal: AbortSignal) {
+  const model = Deno.env.get("GROQ_MODEL") || "openai/gpt-oss-20b";
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     signal,
     headers: { "Authorization": "Bearer " + apiKey, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: Deno.env.get("GROQ_MODEL") || "openai/gpt-oss-20b",
+      model,
       messages: [
-        { role: "system", content: instructions },
+        { role: "system", content: instructions + "\n" + "هوية الاتصال المؤكدة من الخادم: المزوّد Groq، ومعرّف النموذج المستخدم حرفياً: " + model + ". إذا سُئلت عن المزوّد أو النموذج، اذكر هذه البيانات فقط. لا تدّع استخدام OpenAI API أو GPT-4، ولا تستنتج أن اسم النموذج يعني أنه GPT-4." },
         { role: "user", content: input }
       ],
       max_completion_tokens: 1200,
@@ -52,7 +53,7 @@ async function groqReply(apiKey: string, input: string, signal: AbortSignal) {
   const reply = typeof result?.choices?.[0]?.message?.content === "string"
     ? result.choices[0].message.content.trim() : "";
   if (!reply) throw new Error("وصل رد من Groq لكنه لا يحتوي على نص قابل للعرض.");
-  return reply;
+  return { reply, model };
 }
 
 export async function handler(req: Request) {
@@ -81,8 +82,8 @@ export async function handler(req: Request) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 25000);
   try {
-    const reply = await groqReply(groqKey!, input, controller.signal);
-    return json({ reply, provider });
+    const result = await groqReply(groqKey!, input, controller.signal);
+    return json({ reply: result.reply, provider, model: result.model });
   } catch (error) {
     if (controller.signal.aborted) return json({ error: "انتهت مهلة الاتصال بعد 25 ثانية. أعد المحاولة." }, 504);
     const message = error instanceof Error ? error.message : String(error || "تعذّر إكمال طلب الذكاء الاصطناعي.");
