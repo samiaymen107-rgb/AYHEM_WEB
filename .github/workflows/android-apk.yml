@@ -1,0 +1,66 @@
+name: AYHEM Android APK (free test build)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - android/play-store
+    paths:
+      - "**"
+      - "!README.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ayhem-android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-debug-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4.0.4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install Capacitor dependencies
+        run: npm install
+
+      - name: Prepare web application
+        run: npm run android:prepare
+
+      - name: Generate Android project
+        run: npx cap add android
+
+      - name: Synchronize Android assets
+        run: npx cap sync android
+
+      - name: Build debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Upload installable debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AYHEM-Android-debug-${{ github.sha }}
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
