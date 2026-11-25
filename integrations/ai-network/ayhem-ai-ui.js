@@ -17,6 +17,11 @@ import { createAyhemReasoningPlan, buildAyhemReasoningContext } from "./ayhem-re
 import { buildAyhemVerificationContext, verifyAyhemAnswer } from "./ayhem-verification-core.js";
 export { buildRelevantMemoryContext } from "./ayhem-memory-context.js";
 
+export function cleanAyhemReply(value) {
+  const text = typeof value === "string" ? value : "";
+  return text.replace(/^\\s*(?:مرحبًا|مرحباً|مرحبا)[!！،,.\\s]*(?:كيف يمكنني مساعدتك اليوم؟|كيف أستطيع مساعدتك اليوم؟)[!！،,.\\s]*/u, "").trim();
+}
+
 export function parseAyhemAutomaticCorrection(prompt) {
   if (typeof prompt !== "string") return null;
   const match = prompt.trim().match(/^(?:تصحيح|التصحيح|أقصد|بل الصحيح|لا،? الصحيح)\s*[:：،-]?\s*([\s\S]{3,})$/u);
@@ -359,7 +364,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       reasoningBody.textContent = reasoningPlan.intent_label + "\n" + reasoningPlan.steps.map(step => step.id + ". " + step.title).join("\n") + "\nالمخاطر: " + reasoningPlan.risks.join("؛ ");
       reasoningPanel.hidden = false;
       const verification = verifyAyhemAnswer(prompt, result.output);
-      renderAyhemAssistantMessage(output, result.output, documentRef);
+      const cleanOutput = cleanAyhemReply(result.output) || "اكتب طلبك مباشرة.";\n      renderAyhemAssistantMessage(output, cleanOutput, documentRef);
       scrollConversationToLatest();
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
       const memoryLabel = result.memoryReadError
