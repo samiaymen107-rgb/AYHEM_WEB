@@ -55,6 +55,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 @media(max-height:650px){.app{gap:6px;padding-top:max(5px,env(safe-area-inset-top));padding-bottom:calc(5px + var(--safe-bottom))}.topbar{min-height:44px}.logo{width:32px;height:32px}.home-hero{padding:12px;gap:8px}.orb{width:76px;height:76px;border-radius:25px;font-size:2rem}.tile{min-height:54px}.tile.primary{min-height:48px}.screen-card{padding:12px;gap:7px}.panel textarea{min-height:58px}}
 @media(min-width:700px){body{display:grid;place-items:center}.app{height:min(900px,100dvh);border-inline:1px solid var(--line);background:#091727;box-shadow:0 20px 80px #0008}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* AYHEM conversational interface */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.chat-screen{gap:0!important;position:relative;background:radial-gradient(ellipse at 50% 0,rgba(30,89,133,.2),transparent 52%)}
+.chat-top{height:54px;flex:0 0 54px;display:flex;align-items:center;gap:12px;padding:0 8px;border-bottom:1px solid var(--line);background:rgba(7,17,31,.7)}
+.chat-top>div{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}.chat-top strong{font-size:1rem}.chat-top small{font-size:.68rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-menu{width:38px;height:38px;border:1px solid var(--line);border-radius:12px;background:#ffffff08;color:var(--text)}.chat-mark{width:32px;height:32px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,#f0d58f,#a77c38);color:#142238;font-weight:900}
+.chat-history{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:24px 12px 18px;display:flex;flex-direction:column;gap:18px;scrollbar-width:thin;scrollbar-color:#49617b transparent}
+.welcome-card{text-align:center;margin:auto auto 16px;max-width:330px;color:var(--muted);padding:18px 10px}.welcome-card h1{font-size:1.35rem;color:var(--text);margin:14px 0 7px}.welcome-card p{font-size:.85rem;line-height:1.7;margin:0}.welcome-orb{margin:auto;width:62px;height:62px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(145deg,#f0d58f,#a77c38);color:#142238;font-size:1.7rem;font-weight:900;box-shadow:0 0 35px #d9b66f25}
+.user-message{align-self:flex-start;max-width:88%;padding:12px 15px;border:1px solid rgba(117,166,220,.18);border-radius:18px 18px 5px 18px;background:linear-gradient(135deg,#173754,#10283f);color:#f5f7fb;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;font-size:.92rem}
+.assistant-message{align-self:stretch;max-width:100%;padding:4px 2px 12px;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.9;font-size:.94rem;direction:auto;text-align:start}.assistant-message:empty{display:none}
+.chat-composer{flex:0 0 auto;position:relative;padding:10px 10px 3px;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(7,17,31,.94),#07111f)}
+.chat-composer textarea{display:block;width:100%;min-height:52px;max-height:26dvh;resize:none;padding:14px 54px 14px 15px;border-radius:20px;border:1px solid rgba(129,166,205,.3);background:linear-gradient(145deg,#12283e,#0c1c2e);color:var(--text);outline:none;line-height:1.6;font-size:.95rem;box-shadow:0 8px 28px #0003}
+.chat-composer textarea:focus{border-color:#d9b66f88;box-shadow:0 0 0 3px #d9b66f14,0 8px 28px #0003}.chat-send{position:absolute;right:19px;bottom:37px;width:36px;height:36px;border:0;border-radius:13px;background:linear-gradient(145deg,#f0d58f,#c49a50);color:#142238;font-size:1.35rem;font-weight:900}.chat-send:disabled{opacity:.45}.chat-disclaimer{text-align:center;color:#8395aa;font-size:.63rem;margin:7px 0 0}
+.chat-screen .ai-learning-feedback,.chat-screen .ai-reasoning-plan{flex:0 0 auto;margin:0 10px 8px!important;max-height:25dvh;overflow:auto;background:#102139!important;border-radius:14px!important;font-size:.82rem}.chat-screen .ai-learning-feedback textarea{max-height:90px}.chat-screen .ai-learning-feedback button{min-height:36px}
+@media(max-height:650px){.chat-top{height:44px;flex-basis:44px}.chat-history{padding-top:12px;gap:12px}.welcome-card{padding:8px}.welcome-orb{width:48px;height:48px}.chat-composer{padding-top:7px}.chat-composer textarea{min-height:46px}.chat-send{bottom:34px}}
 </style>
 </head>
 <body>
@@ -74,16 +90,19 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 <p id="view" class="ai-status" role="status" aria-live="polite">النظام جاهز للبدء. اختر إحدى الوحدات.</p>
 </div>
 </section>
-<section class="screen" id="screen-ai"><div class="screen-card"><div class="screen-heading"><h2>محادثة أيهم</h2><button class="back" data-go="home">الرئيسية</button></div><section class="panel ai-panel" aria-labelledby="aiTitle">
-      <h2 id="aiTitle">الاتصال بالذكاء الاصطناعي / AI Gateway</h2>
-      <p id="aiConnectionStatus" class="ai-status" role="status" aria-live="polite">جارٍ التحقق من إعداد الاتصال...</p>
-      <label for="aiPrompt">رسالتك إلى أيهم</label>
-      <textarea id="aiPrompt" placeholder="اكتب سؤالك هنا..." maxlength="8000"></textarea>
-      <div class="actions">
-        <button class="primary" id="aiSendBtn" type="button">إرسال إلى أيهم</button>
-      </div>
-      <div id="aiOutput" class="ai-output" role="status" aria-live="polite">لن يظهر الاتصال كجاهز إلا بعد نجاح فحص البوابة ومزوّد الذكاء الاصطناعي.</div>
-    </section></div></section>
+<section class="screen chat-screen active" id="screen-ai" aria-label="محادثة أيهم">
+  <div class="chat-top"><button class="chat-menu" data-go="home" aria-label="القائمة">☰</button><div><strong>أيهم</strong><small id="aiConnectionStatus" role="status" aria-live="polite">جارٍ تهيئة الاتصال...</small></div><span class="chat-mark">A</span></div>
+  <div id="aiConversation" class="chat-history" aria-live="polite">
+    <div class="welcome-card"><div class="welcome-orb">A</div><h1>كيف أستطيع مساعدتك؟</h1><p>اسأل أيهم، وسأساعدك في التحليل والتخطيط والبحث.</p></div>
+    <div id="aiOutput" class="assistant-message" role="status">لن يظهر الاتصال كجاهز إلا بعد نجاح فحص البوابة ومزوّد الذكاء الاصطناعي.</div>
+  </div>
+  <section class="chat-composer" aria-label="إرسال رسالة">
+    <label class="sr-only" for="aiPrompt">رسالتك إلى أيهم</label>
+    <textarea id="aiPrompt" placeholder="اسأل أيهم..." maxlength="8000" rows="1"></textarea>
+    <button class="chat-send" id="aiSendBtn" type="button" aria-label="إرسال الرسالة">↑</button>
+    <p class="chat-disclaimer">قد يخطئ أيهم. تحقّق من المعلومات المهمة.</p>
+  </section>
+</section>
 <section class="screen" id="screen-memory"><div class="screen-card"><div class="screen-heading"><h2>الذاكرة السحابية</h2><button class="back" data-go="home">الرئيسية</button></div><section class="panel auth-panel" aria-labelledby="memoryTitle">
       <h2 id="memoryTitle">الذاكرة السحابية / Cloud Memory</h2>
       <p id="memoryStatus" class="ai-status" role="status" aria-live="polite">سجّل الدخول لعرض الذاكرة أو إضافة سجل اختبار مستقل والتحقق من حفظه واسترجاعه. لا يُحذف أو يُعدّل أي سجل سابق.</p>
