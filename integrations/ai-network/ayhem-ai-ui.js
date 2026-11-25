@@ -196,7 +196,10 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     status.textContent = authenticated
       ? "جلسة AYHEM موثّقة. مزوّد الذكاء يُحدّد من إعداد الخادم."
       : "يلزم تسجيل الدخول إلى AYHEM لاستخدام مساعد الذكاء الاصطناعي.";
-    if (!sending && initialized) {
+    // Auth refresh events can arrive after a reply. Never replace a chat
+    // message with the initial placeholder once the conversation has started.
+    const conversationStarted = Boolean(conversation?.querySelector?.(".user-message"));
+    if (!sending && initialized && !conversationStarted) {
       output.textContent = authenticated
         ? "اكتب رسالتك ثم اضغط إرسال."
         : "سجّل الدخول من قسم Supabase Auth أولاً، ثم أرسل رسالتك.";
