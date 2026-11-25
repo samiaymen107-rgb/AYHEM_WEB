@@ -330,3 +330,28 @@ Deno.test("AYHEM memory-to-inference pipeline: relevant memory context reaches m
     equal(upstreamCalls, 1, "pipeline upstream call count");
   });
 });
+
+
+Deno.test("AYHEM local learning: explicit corrections persist separately and are retrieved", async () => {
+  const values = new Map<string, string>([["AYHEM_MEMORY", "LEGACY_MEMORY_MUST_REMAIN_UNCHANGED"]]);
+  const storage = {
+    getItem(key: string) { return values.get(key) ?? null; },
+    setItem(key: string, value: string) { values.set(key, value); },
+  };
+  const { createAyhemLocalLearningStore } = await import("../../../integrations/ai-network/ayhem-local-learning.js");
+  const learning = createAyhemLocalLearningStore({
+    storage,
+    now: () => "2026-11-25T00:00:00.000Z",
+    makeId: () => "learning-test-1",
+  });
+  const saved = learning.recordFeedback({
+    prompt: "كيف أزرع الزيتون في جلمة؟",
+    kind: "correction",
+    correction: "يجب مراعاة الجفاف والتربة المحلية وتحليل الماء قبل اختيار الصنف.",
+  });
+  equal(saved.saved, true, "local correction must save");
+  const context = learning.getRelevantContext("أفضل صنف زيتون في جلمة");
+  assert(context.includes("مراعاة الجفاف"), "matching correction must be retrieved");
+  equal(values.get("AYHEM_MEMORY"), "LEGACY_MEMORY_MUST_REMAIN_UNCHANGED", "legacy memory must remain untouched");
+  equal(learning.stats().corrections, 1, "correction count");
+});
