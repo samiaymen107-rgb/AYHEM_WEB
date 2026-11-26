@@ -147,6 +147,27 @@ Deno.test("AYHEM Edge handlers: authenticated runtime paths with mocked upstream
 });
 
 
+Deno.test("AYHEM rate limit: deterministic core replies also consume the authenticated quota", async () => {
+  await isolated(async () => {
+    let quotaCalls = 0;
+    let groqCalls = 0;
+    globalThis.fetch = async (input) => {
+      if (isRateLimitRequest(input)) {
+        quotaCalls++;
+        return allowedQuotaResponse();
+      }
+      groqCalls++;
+      throw new Error("deterministic core reply must not call Groq");
+    };
+    const response = await aiHandler(request("https://local.test/ai", "POST", { message: "من أنت" }));
+    equal(response.status, 200, "deterministic core response status");
+    const body = await response.json();
+    equal(body.provider, "ayhem-core", "deterministic core provider");
+    equal(quotaCalls, 1, "deterministic core request must consume quota");
+    equal(groqCalls, 0, "deterministic core response must not call Groq");
+  });
+});
+
 Deno.test("AYHEM rate limit: quota denial returns 429 and never calls Groq", async () => {
   await isolated(async () => {
     let groqCalls = 0;
