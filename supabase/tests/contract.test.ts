@@ -181,3 +181,18 @@ Deno.test("AYHEM private file library: local image preview stays private and bou
   includes(source, '["image/jpeg", "image/png", "image/webp", "image/gif"]', "Only raster image MIME types should be previewed");
   assert(!source.includes("functions.invoke"), "Image preview must not send images to an AI or server function");
 });
+
+
+Deno.test("AYHEM private file library: Arabic image OCR is local, opt-in, and bounded", async () => {
+  const source = await read("integrations/supabase/ayhem-file-library.js");
+  includes(source, "recognizeImageText(item, row, ocrButton)", "Image OCR must require an explicit user action");
+  includes(source, 'item.file_path?.startsWith(session.user.id + "/")', "OCR must verify the authenticated user's object path");
+  includes(source, 'data.size > 5 * 1024 * 1024', "OCR must enforce the 5 MiB file limit");
+  includes(source, "pixels > 15000000", "OCR must enforce a 15 megapixel limit");
+  includes(source, 'createWorker("ara+eng", 1', "OCR must support Arabic and English");
+  includes(source, "worker.recognize(data)", "OCR must process the downloaded image in the browser");
+  includes(source, "await worker.terminate()", "OCR worker must be terminated after processing");
+  includes(source, "output.textContent = extracted.slice(0, 12000)", "OCR output must be bounded and rendered as text");
+  includes(source, "لم تُرسل الصورة أو النص إلى مزوّد ذكاء اصطناعي", "OCR must disclose that image and text are not sent to AI");
+  assert(!source.includes("functions.invoke"), "OCR must not invoke an AI or server function");
+});
