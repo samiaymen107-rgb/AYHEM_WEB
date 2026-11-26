@@ -1,4 +1,5 @@
 import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-3";
+import { extractDocumentText, DOCUMENT_PREVIEW_LIMIT } from "./ayhem-document-extract.js?v=20261126-doc-preview1";
 
 const BUCKET = "ayhem-private-library";
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
@@ -64,6 +65,44 @@ async function previewTextFile(item, row, button) {
   }
 }
 
+
+function isPdfDocxFile(item) {
+  const mime = String(item.document_type || "").toLowerCase();
+  const name = String(item.title || item.metadata?.original_name || "").toLowerCase();
+  return mime === "application/pdf" || mime === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || /\.(pdf|docx)$/.test(name);
+}
+
+async function previewDocumentFile(item, row, button) {
+  button.disabled = true;
+  button.textContent = "جارٍ استخراج النص محلياً...";
+  try {
+    const session = await getAyhemSession();
+    if (!session?.user?.id) throw new Error("سجّل الدخول أولاً.");
+    if (!item.file_path?.startsWith(session.user.id + "/")) throw new Error("مسار الملف لا يطابق الحساب الحالي.");
+    const { data, error } = await getAyhemSupabaseClient().storage.from(BUCKET).download(item.file_path);
+    if (error) throw error;
+    if (!data) throw new Error("لم يصل محتوى الملف.");
+    const result = await extractDocumentText(new File([data], item.title || "document", { type: item.document_type || data.type }));
+    const output = document.createElement("pre");
+    output.className = "ayhem-file-text-preview";
+    output.dir = "auto";
+    output.textContent = result.text.slice(0, DOCUMENT_PREVIEW_LIMIT) || "لم يُعثر على نص قابل للاستخراج في الملف.";
+    row.append(output);
+    const note = document.createElement("small");
+    note.textContent = result.kind === "PDF"
+      ? "استخراج محلي من PDF — عدد الصفحات: " + result.pages + ". قد لا يظهر النص الموجود داخل الصور الممسوحة."
+      : "استخراج محلي من Word. تحذيرات التنسيق: " + (result.warnings || 0) + ".";
+    row.append(note);
+    button.textContent = "تمت المعاينة محلياً";
+    button.disabled = true;
+    say("تم استخراج النص داخل جهازك. لم يُرسل محتوى الوثيقة إلى مزوّد ذكاء اصطناعي. مكتبات المعالجة تُحمّل عند الطلب من شبكات توزيع خارجية.");
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = "معاينة الوثيقة محلياً";
+    say("تعذرت معاينة الوثيقة: " + (error?.message || "خطأ غير معروف"));
+  }
+}
+
 function renderItems(items) {
   if (!list) return;
   list.replaceChildren();
@@ -89,6 +128,14 @@ function renderItems(items) {
       previewButton.textContent = "معاينة النص محلياً";
       previewButton.addEventListener("click", () => previewTextFile(item, row, previewButton));
       row.append(previewButton);
+    }
+    if (item.file_path && isPdfDocxFile(item)) {
+      const documentButton = document.createElement("button");
+      documentButton.type = "button";
+      documentButton.className = "secondary";
+      documentButton.textContent = "معاينة الوثيقة محلياً";
+      documentButton.addEventListener("click", () => previewDocumentFile(item, row, documentButton));
+      row.append(documentButton);
     }
     const path = item.file_path;
     if (path) {
