@@ -27,6 +27,12 @@ function fileKind(file) {
 function formatSize(bytes) {
   return bytes < 1024 * 1024 ? Math.max(1, Math.round(bytes / 1024)) + " KB" : (bytes / 1024 / 1024).toFixed(1) + " MB";
 }
+function isImageFile(item) {
+  const mime = String(item.document_type || "").toLowerCase();
+  const name = String(item.title || item.metadata?.original_name || "").toLowerCase();
+  return ["image/jpeg", "image/png", "image/webp", "image/gif"].includes(mime) || /\.(jpe?g|png|webp|gif)$/.test(name);
+}
+
 function isPlainTextFile(item) {
   const mime = String(item.document_type || "").toLowerCase();
   const name = String(item.title || item.metadata?.original_name || "").toLowerCase();
@@ -65,6 +71,42 @@ async function previewTextFile(item, row, button) {
   }
 }
 
+
+async function previewImageFile(item, row, button) {
+  button.disabled = true;
+  button.textContent = "جارٍ فتح الصورة محلياً...";
+  let objectUrl = null;
+  try {
+    const session = await getAyhemSession();
+    if (!session?.user?.id) throw new Error("سجّل الدخول أولاً.");
+    if (!item.file_path?.startsWith(session.user.id + "/")) throw new Error("مسار الملف لا يطابق الحساب الحالي.");
+    const { data, error } = await getAyhemSupabaseClient().storage.from(BUCKET).download(item.file_path);
+    if (error) throw error;
+    if (!data) throw new Error("لم يصل محتوى الصورة.");
+    if (data.size <= 0 || data.size > 5 * 1024 * 1024) throw new Error("المعاينة المحلية للصور محدودة بـ5 ميغابايت.");
+    const allowed = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+    const mime = String(item.document_type || data.type || "").toLowerCase();
+    if (!allowed.has(mime) || !allowed.has(String(data.type || mime).toLowerCase())) {
+      throw new Error("نوع الصورة غير مدعوم للمعاينة الآمنة.");
+    }
+    objectUrl = URL.createObjectURL(data);
+    const preview = document.createElement("img");
+    preview.className = "ayhem-file-image-preview";
+    preview.alt = item.title || "صورة من مكتبة AYHEM";
+    preview.loading = "lazy";
+    preview.addEventListener("load", () => URL.revokeObjectURL(objectUrl), { once: true });
+    preview.addEventListener("error", () => URL.revokeObjectURL(objectUrl), { once: true });
+    preview.src = objectUrl;
+    row.append(preview);
+    button.textContent = "تم فتح الصورة محلياً";
+    say("تُعرض الصورة داخل جهازك من التخزين الخاص. لم تُرسل إلى مزوّد ذكاء اصطناعي.");
+  } catch (error) {
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    button.disabled = false;
+    button.textContent = "معاينة الصورة محلياً";
+    say("تعذرت معاينة الصورة: " + (error?.message || "خطأ غير معروف"));
+  }
+}
 
 function isPdfDocxFile(item) {
   const mime = String(item.document_type || "").toLowerCase();
@@ -128,6 +170,14 @@ function renderItems(items) {
       previewButton.textContent = "معاينة النص محلياً";
       previewButton.addEventListener("click", () => previewTextFile(item, row, previewButton));
       row.append(previewButton);
+    }
+    if (item.file_path && isImageFile(item)) {
+      const imageButton = document.createElement("button");
+      imageButton.type = "button";
+      imageButton.className = "secondary";
+      imageButton.textContent = "معاينة الصورة محلياً";
+      imageButton.addEventListener("click", () => previewImageFile(item, row, imageButton));
+      row.append(imageButton);
     }
     if (item.file_path && isPdfDocxFile(item)) {
       const documentButton = document.createElement("button");
