@@ -391,7 +391,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
         : result.memoryRecordsUsed
           ? " استُخدمت " + result.memoryRecordsUsed + " سجلات ذاكرة ذات صلة."
           : " لم يُعثر على سجلات ذاكرة ذات صلة.";
-      status.textContent = "تم استلام الرد.";
+      status.textContent = "تم استلام الرد." + memoryLabel;
       feedbackPanel.hidden = false;
       feedbackStatus.textContent = automaticCorrectionSaved
         ? "تعلّم أيهم التصحيح تلقائياً وحفظه محلياً."
