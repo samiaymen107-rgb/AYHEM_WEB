@@ -35,7 +35,7 @@ export function getAyhemLocalGreeting(prompt) {
   if (/^(?:السلامعليكم|سلامعليكم)$/u.test(normalized)) return "وعليكم السلام ورحمة الله وبركاته، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟";
   if (/^(?:صباحالخير)$/u.test(normalized)) return "صباح النور والسرور، أهلاً وسهلاً بك.";
   if (/^(?:مساءالخير)$/u.test(normalized)) return "مساء النور، أهلاً وسهلاً بك.";
-  if (/^(?:مرحبا|مرحب|اهلا|اهلين|هاي|hello|hi|bonjour|salut)$/u.test(normalized)) return "أهلاً وسهلاً! كيف يمكنني مساعدتك اليوم؟";
+  if (/^(?:مرحبا|مرحب|اهلا|اهلاوسهلا|اهلين|هاي|hello|hi|bonjour|salut)$/u.test(normalized)) return "أهلاً وسهلاً! كيف يمكنني مساعدتك اليوم؟";
   return null;
 }
 
