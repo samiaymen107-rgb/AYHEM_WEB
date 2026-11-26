@@ -238,3 +238,19 @@ Deno.test("AYHEM private knowledge bank: authenticated users can search saved kn
   includes(html, 'id="memorySearchInput"', "The UI must expose a private knowledge search field");
   includes(html, 'id="memorySearchBtn"', "The UI must expose a private knowledge search action");
 });
+
+
+Deno.test("AYHEM scanned PDF OCR: local bounded page rendering and private provenance", async () => {
+  const library = await read("integrations/supabase/ayhem-file-library.js");
+  const capture = await read("integrations/supabase/ayhem-knowledge-capture.js");
+  includes(library, "async function recognizeScannedPdfText", "Scanned PDFs must have an explicit OCR action");
+  includes(library, 'pdfjs.getDocument({ data: new Uint8Array(await data.arrayBuffer()), isEvalSupported: false })', "PDF bytes must be parsed locally with PDF.js and JavaScript evaluation disabled");
+  includes(library, "const pageLimit = Math.min(pdf.numPages, 5)", "Scanned PDF OCR must be capped at five pages per operation");
+  includes(library, "canvas.width * canvas.height > 4000000", "Rendered page pixels must be bounded");
+  includes(library, "worker.recognize(canvas)", "Rendered PDF pages must be processed by local Tesseract OCR");
+  includes(library, 'extractionMethod: "pdf-page-ocr"', "Scanned PDF capture must identify its extraction method");
+  includes(library, "pages: processedPages", "Scanned PDF capture must retain processed page numbers");
+  includes(capture, "source_page_numbers:", "Knowledge records must preserve source page provenance");
+  includes(capture, "original_file_preserved: true", "Scanned PDF OCR must preserve the original file");
+  assert(!library.includes("functions.invoke"), "Scanned PDF OCR must not call an AI/server parser");
+});
