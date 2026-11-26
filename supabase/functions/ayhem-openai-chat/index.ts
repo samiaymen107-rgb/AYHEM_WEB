@@ -235,4 +235,4 @@ export async function handler(req: Request, dependencies: RateLimitDependencies 
   }
 }
 
-if (import.meta.main) Deno.serve(handler);
+if (import.meta.main) Deno.serve((req) => handler(req));
