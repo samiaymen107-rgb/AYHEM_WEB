@@ -118,4 +118,24 @@ BEGIN
 END;
 $$;
 
+
+-- An expired fixed window resets cleanly without waiting in real time.
+UPDATE public.ayhem_rate_limit_windows
+SET window_start = window_start - interval '120 seconds', request_count = 21
+WHERE user_id = '22222222-2222-4222-8222-222222222222';
+
+SET ROLE authenticated;
+DO $
+DECLARE
+  v_result record;
+BEGIN
+  PERFORM set_config('request.jwt.claim.sub', '22222222-2222-4222-8222-222222222222', true);
+  SELECT * INTO v_result FROM public.ayhem_consume_rate_limit();
+  IF v_result.allowed IS DISTINCT FROM true OR v_result.remaining <> 19 THEN
+    RAISE EXCEPTION 'expired window must reset to a fresh allowance';
+  END IF;
+END;
+$;
+RESET ROLE;
+
 SELECT 'AYHEM rate-limit PostgreSQL integration checks passed' AS result;
