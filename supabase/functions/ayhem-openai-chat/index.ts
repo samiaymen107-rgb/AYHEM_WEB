@@ -6,6 +6,7 @@ const cors = {
   "Vary": "Origin",
   "Content-Type": "application/json; charset=utf-8",
   "Cache-Control": "no-store",
+  "Access-Control-Expose-Headers": "Retry-After",
 };
 
 function json(data: Record<string, unknown>, status = 200, extraHeaders: Record<string, string> = {}) {
