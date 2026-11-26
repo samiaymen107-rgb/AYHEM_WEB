@@ -125,7 +125,7 @@ SET window_start = window_start - interval '120 seconds', request_count = 21
 WHERE user_id = '22222222-2222-4222-8222-222222222222';
 
 SET ROLE authenticated;
-DO $
+DO $do$
 DECLARE
   v_result record;
 BEGIN
@@ -135,7 +135,7 @@ BEGIN
     RAISE EXCEPTION 'expired window must reset to a fresh allowance';
   END IF;
 END;
-$;
+$do$;
 RESET ROLE;
 
 SELECT 'AYHEM rate-limit PostgreSQL integration checks passed' AS result;
