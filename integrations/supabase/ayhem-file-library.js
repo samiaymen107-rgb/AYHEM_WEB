@@ -1,4 +1,5 @@
 import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-3";
+import { createAyhemRemoteMemoryStore } from "./ayhem-remote-memory.js?v=20261124-3";
 import { extractDocumentText, DOCUMENT_PREVIEW_LIMIT } from "./ayhem-document-extract.js?v=20261126-doc-preview1";
 
 const BUCKET = "ayhem-private-library";
@@ -13,6 +14,50 @@ const input = document.getElementById("ayhemFileInput");
 const uploadButton = document.getElementById("ayhemFileUpload");
 const listButton = document.getElementById("ayhemFileRefresh");
 const status = document.getElementById("ayhemFileStatus");
+const ocrLanguagesInput = document.getElementById("ayhemOcrLanguages");
+
+function getOcrLanguages() {
+  const raw = String(ocrLanguagesInput?.value || "ara+eng+fra").trim().toLowerCase();
+  const codes = [...new Set(raw.split("+").map(code => code.trim()).filter(Boolean))];
+  if (!codes.length || codes.length > 10 || codes.some(code => !/^[a-z0-9_]{2,12}$/.test(code))) {
+    throw new Error("أدخل رموز لغات Tesseract صحيحة، مثل ara+eng+fra، وبحد أقصى 10 لغات في العملية.");
+  }
+  return codes.join("+");
+}
+
+async function saveExtractedKnowledge(item, textValue, kind, languages, truncated = false) {
+  const extracted = String(textValue || "").trim();
+  if (!extracted) return { saved: false, reason: "empty" };
+  const session = await getAyhemSession();
+  if (!session?.user?.id) throw new Error("سجّل الدخول لحفظ النص في بنك المعلومات.");
+  const client = getAyhemSupabaseClient();
+  const externalId = "file-extract:" + item.id + ":" + kind + ":" + (languages || "source");
+  const { data: existing, error: lookupError } = await client.from("ayhem_memories")
+    .select("id").eq("external_id", externalId).limit(1).maybeSingle();
+  if (lookupError) throw lookupError;
+  if (existing?.id) return { saved: false, reason: "exists", id: existing.id };
+  const { data, error } = await client.from("ayhem_memories").insert({
+    title: "استخراج: " + String(item.title || "ملف دون عنوان").slice(0, 180),
+    content: extracted,
+    evidence_level: "unverified",
+    source: "private-file-" + kind,
+    external_id: externalId,
+    tags: ["extracted", kind, ...(languages ? languages.split("+").map(code => "lang:" + code) : [])],
+    metadata: {
+      capture_version: 1,
+      source_document_id: item.id,
+      source_file_name: item.title || null,
+      source_mime: item.document_type || null,
+      extraction_kind: kind,
+      languages: languages || null,
+      extracted_at: new Date().toISOString(),
+      truncated: Boolean(truncated),
+      original_file_preserved: true
+    }
+  }).select("id").single();
+  if (error) throw error;
+  return { saved: true, id: data?.id || null };
+}
 const list = document.getElementById("ayhemFileList");
 
 function say(message) { if (status) status.textContent = message; }
@@ -51,6 +96,7 @@ async function previewTextFile(item, row, button) {
     if (!data) throw new Error("لم يصل محتوى الملف.");
     if (data.size > 1024 * 1024) throw new Error("المعاينة المحلية متاحة حالياً للملفات النصية حتى 1 ميغابايت.");
     const rawText = await data.text();
+    const saved = await saveExtractedKnowledge(item, rawText.slice(0, 20000), "text", null, rawText.length > 20000);
     const preview = document.createElement("pre");
     preview.className = "ayhem-file-text-preview";
     preview.dir = "auto";
@@ -63,7 +109,7 @@ async function previewTextFile(item, row, button) {
     row.append(preview);
     button.textContent = "تمت المعاينة محلياً";
     button.disabled = true;
-    say("تمت قراءة النص داخل جهازك فقط. لم يُرسل محتوى الملف إلى مزوّد الذكاء الاصطناعي ولم يُحفظ كنص إضافي.");
+    say(saved.saved ? "تمت قراءة النص وحفظه في بنك معلومات حسابك الخاص." : saved.reason === "exists" ? "هذا النص محفوظ مسبقاً في بنك معلوماتك." : "الملف النصي فارغ؛ لم يُنشأ سجل.");
   } catch (error) {
     button.disabled = false;
     button.textContent = "معاينة النص محلياً";
@@ -132,11 +178,12 @@ async function recognizeImageText(item, row, button) {
     bitmap.close();
     if (!pixels || pixels > 15000000) throw new Error("أبعاد الصورة كبيرة للمعالجة الآمنة (الحد 15 ميغابكسل).");
 
-    say("يُحمّل محرك OCR وبيانات العربية والإنجليزية عند الطلب. تبقى الصورة داخل جهازك.");
+    const languages = getOcrLanguages();
+    say("يُحمّل محرك OCR وبيانات اللغات المختارة عند الطلب. تبقى الصورة داخل جهازك.");
     const tesseractModule = await import("https://esm.sh/tesseract.js@6.0.1?bundle");
     const createWorker = tesseractModule.createWorker || tesseractModule.default?.createWorker;
     if (typeof createWorker !== "function") throw new Error("تعذر تحميل محرك OCR.");
-    worker = await createWorker("ara+eng", 1, {
+    worker = await createWorker(languages, 1, {
       workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js",
       corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0",
       langPath: "https://tessdata.projectnaptha.com/4.0.0",
@@ -151,13 +198,12 @@ async function recognizeImageText(item, row, button) {
     output.dir = "auto";
     output.textContent = extracted.slice(0, 12000) || "لم يُعثر على نص واضح في الصورة.";
     row.append(output);
+    const saved = await saveExtractedKnowledge(item, extracted.slice(0, 12000), "ocr", languages, extracted.length > 12000);
     const note = document.createElement("small");
-    note.textContent = extracted.length > 12000
-      ? "عُرض أول 12,000 حرف فقط. لم يُحفظ النص ولم يُعدّل الملف الأصلي."
-      : "استخراج OCR محلي للعربية والإنجليزية. قد تختلف الدقة حسب وضوح الصورة وجودتها.";
+    note.textContent = (extracted.length > 12000 ? "تم حفظ أول 12,000 حرف فقط. " : "") + (saved.saved ? "حُفظ النص في بنك معلومات حسابك." : saved.reason === "exists" ? "النص محفوظ مسبقاً." : "لم يُعثر على نص للحفظ.") + " اللغات: " + languages + ". الملف الأصلي لم يُعدّل."
     row.append(note);
     button.textContent = "اكتمل استخراج النص";
-    say("اكتمل OCR داخل المتصفح. لم تُرسل الصورة أو النص إلى مزوّد ذكاء اصطناعي؛ تم تنزيل محرك OCR وبيانات اللغة من شبكات خارجية.");
+    say("اكتمل OCR وحُفظ النص المستخرج في بنك معلومات حسابك الخاص. تم تحميل محرك OCR وبيانات اللغة من شبكات خارجية؛ لم تُرسل الصورة إلى مزوّد ذكاء اصطناعي.");
   } catch (error) {
     button.disabled = false;
     button.textContent = "استخراج النص العربي";
@@ -186,6 +232,7 @@ async function previewDocumentFile(item, row, button) {
     if (error) throw error;
     if (!data) throw new Error("لم يصل محتوى الملف.");
     const result = await extractDocumentText(new File([data], item.title || "document", { type: item.document_type || data.type }));
+    const saved = await saveExtractedKnowledge(item, result.text.slice(0, DOCUMENT_PREVIEW_LIMIT), "document", null, result.text.length > DOCUMENT_PREVIEW_LIMIT);
     const output = document.createElement("pre");
     output.className = "ayhem-file-text-preview";
     output.dir = "auto";
@@ -198,7 +245,7 @@ async function previewDocumentFile(item, row, button) {
     row.append(note);
     button.textContent = "تمت المعاينة محلياً";
     button.disabled = true;
-    say("تم استخراج النص داخل جهازك. لم يُرسل محتوى الوثيقة إلى مزوّد ذكاء اصطناعي. مكتبات المعالجة تُحمّل عند الطلب من شبكات توزيع خارجية.");
+    say(saved.saved ? "تم استخراج النص وحفظه في بنك معلومات حسابك الخاص." : saved.reason === "exists" ? "النص محفوظ مسبقاً في بنك معلوماتك." : "لم يُعثر على نص قابل للحفظ.");
   } catch (error) {
     button.disabled = false;
     button.textContent = "معاينة الوثيقة محلياً";
