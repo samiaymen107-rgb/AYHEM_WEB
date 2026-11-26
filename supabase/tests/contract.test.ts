@@ -183,15 +183,16 @@ Deno.test("AYHEM private file library: local image preview stays private and bou
 });
 
 
-Deno.test("AYHEM private file library: Arabic image OCR is local, opt-in, and bounded", async () => {
+Deno.test("AYHEM private file library: multilingual OCR and durable knowledge capture are private and bounded", async () => {
   const source = await read("integrations/supabase/ayhem-file-library.js");
+  const html = await read("index.html");
   includes(source, "recognizeImageText(item, row, ocrButton)", "Image OCR must require an explicit user action");
   includes(source, 'item.file_path?.startsWith(session.user.id + "/")', "OCR must verify the authenticated user's object path");
   includes(source, 'data.size > 5 * 1024 * 1024', "OCR must enforce the 5 MiB file limit");
   includes(source, "pixels > 15000000", "OCR must enforce a 15 megapixel limit");
   includes(source, "createWorker(languages, 1", "OCR must use the validated multilingual language selection");
   includes(source, "function getOcrLanguages()", "OCR must expose a validated language selection");
-  includes(source, 'value="ara+eng+fra"', "Arabic, English, and French must be preselected");
+  includes(html, 'value="ara+eng+fra"', "Arabic, English, and French must be preselected");
   includes(source, "saveExtractedKnowledge(item, extracted.slice(0, 12000), \"ocr\", languages", "OCR output must be saved to the private knowledge bank");
   includes(source, "saveExtractedKnowledge(item, result.text.slice(0, DOCUMENT_PREVIEW_LIMIT), \"document\"", "PDF/DOCX text must be saved to the private knowledge bank");
   includes(source, "saveExtractedKnowledge(item, rawText.slice(0, 20000), \"text\"", "TXT/CSV text must be saved to the private knowledge bank");
