@@ -88,6 +88,7 @@ async function createSupabaseAIClient() {
         let memoryContext = "";
         let memoryRecordsUsed = 0;
         let memoryReadError = false;
+        let memoryReadErrorCode = "";
         try {
           const records = await memoryStore.list({ limit: 100 });
           const allowPrivateKnowledge = documentRef.getElementById("ayhemUseKnowledgeInAI")?.checked === true;
@@ -98,9 +99,16 @@ async function createSupabaseAIClient() {
           memoryRecordsUsed = memoryContext
             ? memoryContext.split("[سجل ذاكرة مرجعي]").length - 1
             : 0;
-        } catch {
-          // Keep chat available if memory is temporarily unavailable; report the degraded mode.
+        } catch (memoryError) {
+          // Keep chat available, but preserve only a safe diagnostic identifier.
+          // Never expose raw messages, tokens, user IDs, or memory contents.
           memoryReadError = true;
+          const candidate = typeof memoryError?.code === "string"
+            ? memoryError.code
+            : typeof memoryError?.name === "string" ? memoryError.name : "";
+          memoryReadErrorCode = /^[A-Za-z][A-Za-z0-9_]{0,63}$/.test(candidate)
+            ? candidate
+            : "MEMORY_READ_FAILED";
         }
 
         const { data, error } = await supabase.functions.invoke("ayhem-openai-chat", {
@@ -121,7 +129,7 @@ async function createSupabaseAIClient() {
         }
         const reply = typeof data?.reply === "string" ? data.reply.trim() : "";
         if (!reply) throw new Error(data?.error || "لم يصل رد نصي من AYHEM.");
-        return { output: reply, provider: data.provider || "unknown", model: typeof data.model === "string" ? data.model : "", memoryRecordsUsed, memoryReadError };
+        return { output: reply, provider: data.provider || "unknown", model: typeof data.model === "string" ? data.model : "", memoryRecordsUsed, memoryReadError, memoryReadErrorCode };
       } catch (error) {
         if (controller.signal.aborted) throw new Error("انتهت مهلة الواجهة بعد 30 ثانية. أعد المحاولة.");
         throw error;
@@ -390,8 +398,12 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       renderAyhemAssistantMessage(output, cleanOutput, documentRef);
       scrollConversationToLatest();
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";
+      const safeMemoryErrorCode = typeof result.memoryReadErrorCode === "string"
+        && /^[A-Za-z][A-Za-z0-9_]{0,63}$/.test(result.memoryReadErrorCode)
+        ? result.memoryReadErrorCode
+        : "MEMORY_READ_FAILED";
       const memoryLabel = result.memoryReadError
-        ? " تعذر قراءة الذاكرة؛ أُكملت المحادثة دون سياق ذاكرة."
+        ? " تعذر قراءة الذاكرة؛ أُكملت المحادثة دون سياق ذاكرة. رمز التشخيص: " + safeMemoryErrorCode + "."
         : result.memoryRecordsUsed
           ? " استُخدمت " + result.memoryRecordsUsed + " سجلات ذاكرة ذات صلة."
           : " لم يُعثر على سجلات ذاكرة ذات صلة.";
