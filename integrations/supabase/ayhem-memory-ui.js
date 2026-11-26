@@ -1,4 +1,4 @@
-import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-3";
+import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-2";
 import { createAyhemRemoteMemoryStore } from "./ayhem-remote-memory.js?v=20261124-3";
 
 const button = document.getElementById("memoryLoadBtn");

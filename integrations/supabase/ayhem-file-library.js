@@ -1,4 +1,4 @@
-import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-3";
+import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-2";
 import { extractDocumentText, DOCUMENT_PREVIEW_LIMIT } from "./ayhem-document-extract.js?v=20261126-scanned-pdf1";
 import { captureExtractedKnowledge } from "./ayhem-knowledge-capture.js?v=20261126-scanned-pdf1";
 
