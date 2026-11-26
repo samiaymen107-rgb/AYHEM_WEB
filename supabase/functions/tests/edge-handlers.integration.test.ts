@@ -158,7 +158,7 @@ Deno.test("AYHEM rate limit: deterministic core replies also consume the authent
       groqCalls++;
       throw new Error("deterministic core reply must not call Groq");
     };
-    const response = await aiHandler(request("https://local.test/ai", "POST", { message: "من أنت" }));
+    const response = await aiHandler(request("https://local.test/ai", "POST", { message: "مرحبا" }));
     equal(response.status, 200, "deterministic core response status");
     const body = await response.json();
     equal(body.provider, "ayhem-core", "deterministic core provider");
