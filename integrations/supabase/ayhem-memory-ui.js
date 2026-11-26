@@ -60,7 +60,7 @@ async function searchCloudMemory() {
           "التاريخ: " + String(record.created_at || "غير محدد"),
           "المحتوى: " + String(record.content || "").slice(0, 1200),
           "—".repeat(24)
-        ].join("\\n")).join("\\n")
+        ].join("\n")).join("\n")
       : "لا توجد نتائج مطابقة في سجلات حسابك.";
     showStatus("نتائج البحث: " + matches.length + " سجل. البحث محلي داخل واجهة حسابك ولم يرسل المحتوى إلى مزوّد الذكاء الاصطناعي.");
   } catch (error) {
