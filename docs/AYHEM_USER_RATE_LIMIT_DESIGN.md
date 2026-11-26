@@ -1,6 +1,6 @@
 # AYHEM per-user rate limiting — implementation proposal
 
-Status: proposed implementation in a draft GitHub pull request. The migration is present in the repository but is not applied to Supabase; the Edge Function change is not deployed.
+Status: implementation merged into GitHub main by the repository workflow on 2026-11-26. The migration file is committed but is NOT applied to the production Supabase project; the Edge Function change is NOT deployed.
 
 ## Objective
 Protect Groq usage and the AYHEM service from one authenticated account consuming an unfair share of requests. The first release uses a fixed window of **20 requests per user per 60 seconds**. These are conservative initial defaults, not a pricing or capacity guarantee.
@@ -36,18 +36,21 @@ Protect Groq usage and the AYHEM service from one authenticated account consumin
 - first request is allowed, request 20 allowed, request 21 denied;
 - next fixed window resets the counter;
 - simultaneous requests cannot exceed the configured allowance;
-- invalid limits/window sizes rejected;
+- callers cannot change the server-side limit or window;
 - quota denial never calls Groq and returns 429;
 - RPC failure returns 503 and never calls Groq;
 - deterministic core replies are subject to the same policy;
 - existing no-paid-fallback, memory-isolation, and response behavior tests remain green.
 
 ## Rollout / rollback
-1. Review the SQL and test it in an isolated Supabase project first.
-2. Apply the migration only after explicit owner approval.
-3. Deploy the matching Edge Function change only after migration verification.
-4. Observe 429/503 rates and adjust limits deliberately.
-5. Rollback: disable the Edge Function's RPC check first, then remove the RPC/table only after explicit approval and after confirming no dependent traffic. Never delete user memory or application records.
+1. Confirm the production Edge Function version and current project migration history using read-only checks.
+2. Verify required Edge Function environment variables (`SUPABASE_URL` and a publishable/anon API key) without printing secret values.
+3. Test the exact migration in a disposable Supabase project, including Auth JWT identity, RLS, grants, and concurrent requests. The PostgreSQL CI harness is necessary but is not a substitute for a Supabase Auth integration test.
+4. Review Supabase security and performance advisors in the isolated project.
+5. Obtain explicit owner approval before applying the migration to production.
+6. After migration verification, obtain separate explicit approval before deploying the matching Edge Function.
+7. Monitor 429/503 rates and request latency; reconsider the initial 20/60s limit using observed traffic.
+8. Rollback: disable the Edge Function's RPC check first, then consider removing the RPC/table only after explicit approval and after confirming no dependent traffic. Never delete user memory or application records.
 
 ## Not included
-The development branch contains the Edge Function integration, but no migration execution, production schema change, Edge Function deployment, user data modification, or account creation is performed.
+The `main` branch contains the Edge Function integration and migration source. No migration execution, production schema change, Edge Function deployment, user data modification, or account creation has been performed.
