@@ -70,7 +70,7 @@ test("enables chat after session check and renders returned text safely", async 
   assert.ok(documentRef.elements.aiOutput.textContent.startsWith("<script>not HTML</script>"));
   assert.doesNotMatch(documentRef.elements.aiOutput.textContent, /فحص AYHEM المحلي|عدم ظهور تحذير لا يثبت صحة الإجابة/);
   assert.equal(documentRef.elements.aiPrompt.value, "");
-  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "تم استلام الرد.");
+  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "تم استلام الرد. استُخدمت 2 سجلات ذاكرة ذات صلة.");
 });
 
 test("reports memory degradation without blocking the AI response", async () => {
@@ -84,7 +84,7 @@ test("reports memory degradation without blocking the AI response", async () => 
   });
   documentRef.elements.aiPrompt.value = "اختبار";
   await documentRef.elements.aiSendBtn.handlers.click();
-  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "تم استلام الرد.");
+  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "تم استلام الرد. تعذر قراءة الذاكرة؛ أُكملت المحادثة دون سياق ذاكرة.");
 });
 
 test("retains a working click handler when Supabase initialization fails", async () => {
@@ -127,7 +127,7 @@ test("keeps provider and model metadata out of the user-facing answer", async ()
   documentRef.elements.aiPrompt.value = "ما المزوّد والنموذج؟";
   await documentRef.elements.aiSendBtn.handlers.click();
   assert.equal(documentRef.elements.aiOutput.textContent, "أنا AYHEM AI.");
-  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "تم استلام الرد.");
+  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "تم استلام الرد. لم يُعثر على سجلات ذاكرة ذات صلة.");
 });
 
 

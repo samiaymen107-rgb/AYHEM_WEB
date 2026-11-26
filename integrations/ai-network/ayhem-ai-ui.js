@@ -43,9 +43,9 @@ export function parseAyhemExplicitMemorySave(prompt) {
   // Recognize a clear save request appended after the facts.
   // Save only the factual prefix, not the request itself.
   const naturalRequest = value.match(
-    /^([\s\S]{8,}?)\s*(?:[،,؛;.]\s*)?(?:(?:أريدك|أرجوك|ارجوك|من فضلك)\s*)?(?:أن\s*)?(?:تحفظ|تسجل|تسجّل|تخزن|تخزّن)\s+(?:(?:هذه|هاته|هاتين|تلك)\s*)?(?:المعلومة|المعلومات|المعلومتين|ما\s+ذكرته)?\s*(?:في\s+)?(?:ذاكرتك|الذاكرة(?:\s+السحابية)?)(?:\s|$)/u,
+    /^([\s\S]{8,}?)([،,؛;.])?\s*(?:(?:أريدك|أرجوك|ارجوك|من فضلك)\s*)?(?:أن\s*)?(?:تحفظ|تسجل|تسجّل|تخزن|تخزّن)\s+(?:(?:هذه|هاته|هاتين|تلك)\s*)?(?:المعلومة|المعلومات|المعلومتين|ما\s+ذكرته)?\s*(?:في\s+)?(?:ذاكرتك|الذاكرة(?:\s+السحابية)?)(?:\s|$)/u,
   );
-  if (naturalRequest?.[1]?.trim()) return naturalRequest[1].trim();
+  if (naturalRequest?.[1]?.trim()) return naturalRequest[1].trim() + (naturalRequest[2] || "");
   return null;
 }
 
