@@ -57,6 +57,10 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayhem_contract
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/rate_limit_postgres.integration.sql
+      - name: Verify private file-library Storage policies
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayhem_contract
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/private_file_library_postgres.integration.sql
       - name: Verify concurrent quota increments
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayhem_contract
