@@ -215,3 +215,14 @@ Deno.test("AYHEM AI memory context: private file knowledge is excluded unless th
   includes(html, 'id="ayhemUseKnowledgeInAI" type="checkbox"', "The user must have a visible opt-in control");
   includes(html, "هذا الخيار معطّل افتراضياً", "The default-disabled privacy behavior must be disclosed");
 });
+
+
+Deno.test("AYHEM private knowledge bank: user can search their own saved records", async () => {
+  const source = await read("integrations/supabase/ayhem-memory-ui.js");
+  const html = await read("index.html");
+  includes(source, "async function searchCloudMemory()", "Knowledge bank must expose a search operation");
+  includes(source, "createAyhemRemoteMemoryStore().list({ limit: 500 })", "Search must read only through the authenticated owner-scoped memory adapter");
+  includes(source, "toLocaleLowerCase().includes(query)", "Search must match multilingual text without changing stored records");
+  includes(html, 'id="memorySearchInput"', "Knowledge bank must expose a search input");
+  includes(html, 'id="memorySearchBtn"', "Knowledge bank must expose a search action");
+});
