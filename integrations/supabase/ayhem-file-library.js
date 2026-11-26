@@ -49,7 +49,7 @@ function renderItems(items) {
       const open = document.createElement("button");
       open.type = "button";
       open.className = "secondary";
-      open.textContent = "فتح / تنزيل";
+      open.textContent = "إنشاء رابط فتح آمن";
       open.addEventListener("click", async () => {
         open.disabled = true;
         try {
@@ -57,9 +57,14 @@ function renderItems(items) {
           const { data, error } = await client.storage.from(BUCKET).createSignedUrl(path, 300, { download: item.title || true });
           if (error) throw error;
           if (!data?.signedUrl) throw new Error("تعذر إنشاء رابط آمن للملف.");
-          window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+          const link = document.createElement("a");
+          link.href = data.signedUrl;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = "فتح الملف (الرابط صالح 5 دقائق)";
+          row.replaceChild(link, open);
         } catch (error) {
-          say("تعذر فتح الملف: " + (error?.message || "خطأ غير معروف"));
+          say("تعذر إنشاء رابط الملف: " + (error?.message || "خطأ غير معروف"));
         } finally { open.disabled = false; }
       });
       row.append(open);
@@ -98,11 +103,13 @@ async function uploadSelected() {
     for (const file of files) {
       if (file.size <= 0 || file.size > MAX_FILE_BYTES) throw new Error("حجم الملف غير مقبول (الحد الأقصى 10 ميغابايت): " + file.name);
       if (!fileKind(file)) throw new Error("نوع الملف غير مدعوم: " + file.name);
-      const mime = file.type || ({
+      const extension = (file.name.split(".").pop() || "").toLowerCase();
+      const mime = file.type && file.type !== "application/octet-stream" ? file.type : ({
+        jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif",
         pdf: "application/pdf", doc: "application/msword",
         docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         txt: "text/plain", csv: "text/csv"
-      }[(file.name.split(".").pop() || "").toLowerCase()] || "application/octet-stream");
+      }[extension] || "application/octet-stream");
       if (!ALLOWED_TYPES.has(mime)) throw new Error("تعذر التحقق من نوع الملف: " + file.name);
       const objectPath = session.user.id + "/" + globalThis.crypto.randomUUID() + "-" + safeName(file.name);
       say("جارٍ رفع " + file.name + " (" + (completed + 1) + "/" + files.length + ")...");
