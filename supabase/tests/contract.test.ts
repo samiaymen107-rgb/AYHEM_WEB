@@ -222,6 +222,7 @@ Deno.test("AYHEM private knowledge: all selected Tesseract languages and AI opt-
   const ai = await read("integrations/ai-network/ayhem-ai-ui.js");
   const html = await read("index.html");
   includes(library, "createWorker(languages.join(\"+\"), 1", "OCR must use all user-selected Tesseract languages");
+  includes(library, "codes.length > 10", "OCR must cap the number of language models loaded in one operation");
   includes(html, 'value="ara+fra+eng"', "Arabic, French, and English must be the default language selection");
   includes(ai, 'getElementById("ayhemUseKnowledgeInAI")?.checked === true', "Private extracted knowledge must require explicit user opt-in before AI use");
   includes(ai, 'startsWith("ayhem-private-file-library")', "Private file knowledge must be excluded from AI context by default");
