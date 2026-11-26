@@ -1,6 +1,6 @@
 # AYHEM per-user rate limiting — implementation proposal
 
-Status: draft on a development branch. No database migration has been applied and no Edge Function has been deployed.
+Status: proposed implementation in a draft GitHub pull request. The migration is present in the repository but is not applied to Supabase; the Edge Function change is not deployed.
 
 ## Objective
 Protect Groq usage and the AYHEM service from one authenticated account consuming an unfair share of requests. The first release uses a fixed window of **20 requests per user per 60 seconds**. These are conservative initial defaults, not a pricing or capacity guarantee.
@@ -8,7 +8,7 @@ Protect Groq usage and the AYHEM service from one authenticated account consumin
 ## Architecture
 1. The Edge Function continues to require a bearer token and POST.
 2. After validating the request shape and before deterministic or remote inference, the Edge Function calls the authenticated Supabase RPC using the caller's existing JWT and the public/anon project key.
-3. The RPC derives identity from `auth.uid()`. It accepts no user ID from the browser or request body.
+3. The RPC derives identity from `auth.uid()`. It accepts no user ID or quota configuration from the browser or request body; the 20-request / 60-second policy is fixed inside the database function.
 4. A single row per Auth user is atomically inserted/updated with PostgreSQL `INSERT ... ON CONFLICT DO UPDATE`. Concurrent requests for one account serialize on the primary-key conflict.
 5. The RPC returns `allowed`, `remaining`, and `reset_at`. The Edge Function returns HTTP 429 with a safe Arabic message and `Retry-After` when denied.
 6. Any RPC error fails closed (503); inference is not called if quota accounting is unavailable.
@@ -50,4 +50,4 @@ Protect Groq usage and the AYHEM service from one authenticated account consumin
 5. Rollback: disable the Edge Function's RPC check first, then remove the RPC/table only after explicit approval and after confirming no dependent traffic. Never delete user memory or application records.
 
 ## Not included
-No migration execution, production schema change, Edge Function modification/deployment, user data modification, or account creation is performed by this proposal.
+The development branch contains the Edge Function integration, but no migration execution, production schema change, Edge Function deployment, user data modification, or account creation is performed.

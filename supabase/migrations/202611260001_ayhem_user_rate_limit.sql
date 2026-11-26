@@ -12,10 +12,7 @@ create table if not exists public.ayhem_rate_limit_windows (
 alter table public.ayhem_rate_limit_windows enable row level security;
 revoke all on table public.ayhem_rate_limit_windows from anon, authenticated, public;
 
-create or replace function public.ayhem_consume_rate_limit(
-  p_limit integer default 20,
-  p_window_seconds integer default 60
-)
+create or replace function public.ayhem_consume_rate_limit()
 returns table (
   allowed boolean,
   remaining integer,
@@ -30,19 +27,16 @@ declare
   v_now timestamptz := pg_catalog.clock_timestamp();
   v_window_start timestamptz;
   v_count integer;
+  v_limit constant integer := 20;
+  v_window_seconds constant integer := 60;
 begin
   v_user_id := auth.uid();
   if v_user_id is null then
     raise exception 'authentication_required' using errcode = '28000';
   end if;
 
-  if p_limit is null or p_limit < 1 or p_limit > 120
-     or p_window_seconds is null or p_window_seconds < 10 or p_window_seconds > 3600 then
-    raise exception 'invalid_rate_limit_configuration' using errcode = '22023';
-  end if;
-
   v_window_start := pg_catalog.to_timestamp(
-    pg_catalog.floor(pg_catalog.extract(epoch from v_now) / p_window_seconds) * p_window_seconds
+    pg_catalog.floor(pg_catalog.date_part('epoch', v_now) / v_window_seconds) * v_window_seconds
   );
 
   insert into public.ayhem_rate_limit_windows as current_window
@@ -53,7 +47,7 @@ begin
     set window_start = excluded.window_start,
         request_count = case
           when current_window.window_start = excluded.window_start
-            then least(current_window.request_count + 1, p_limit + 1)
+            then least(current_window.request_count + 1, v_limit + 1)
           else 1
         end,
         updated_at = excluded.updated_at
@@ -62,16 +56,16 @@ begin
 
   return query
     select
-      v_count <= p_limit,
-      greatest(p_limit - v_count, 0),
-      v_window_start + pg_catalog.make_interval(secs => p_window_seconds);
+      v_count <= v_limit,
+      greatest(v_limit - v_count, 0),
+      v_window_start + pg_catalog.make_interval(secs => v_window_seconds);
 end;
 $$;
 
-revoke all on function public.ayhem_consume_rate_limit(integer, integer) from public, anon;
-grant execute on function public.ayhem_consume_rate_limit(integer, integer) to authenticated;
+revoke all on function public.ayhem_consume_rate_limit() from public, anon;
+grant execute on function public.ayhem_consume_rate_limit() to authenticated;
 
 comment on table public.ayhem_rate_limit_windows is
   'AYHEM per-user fixed-window request counters; private to the security-definer RPC.';
-comment on function public.ayhem_consume_rate_limit(integer, integer) is
-  'Atomically consumes one request for auth.uid(); defaults to 20 requests per 60 seconds.';
+comment on function public.ayhem_consume_rate_limit() is
+  'Atomically consumes one request for auth.uid(); server-enforced limit is 20 requests per 60 seconds.';

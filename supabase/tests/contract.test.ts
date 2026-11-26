@@ -87,11 +87,27 @@ Deno.test("AYHEM rate-limit migration: private atomic per-user quota contract", 
   includes(sql, "enable row level security", "Quota table must have RLS enabled");
   includes(sql, "revoke all on table public.ayhem_rate_limit_windows from anon, authenticated, public", "Clients must not access quota rows directly");
   includes(sql, "v_user_id := auth.uid()", "RPC must derive identity from verified JWT context");
-  assert(!/p_user_id|user_id\\s+uuid\\s*,/i.test(sql), "RPC must not accept a caller-selected user ID");
+  includes(sql, "v_limit constant integer := 20", "Request limit must be fixed server-side");
+  includes(sql, "v_window_seconds constant integer := 60", "Window duration must be fixed server-side");
+  assert(!/p_limit|p_window_seconds/i.test(sql), "RPC must not accept caller-controlled quota configuration");
+  assert(!/p_user_id|user_id\s+uuid\s*,/i.test(sql), "RPC must not accept a caller-selected user ID");
   includes(sql, "security definer", "Atomic quota RPC must run with controlled owner privileges");
   includes(sql, "set search_path = ''", "Security-definer RPC must pin an empty search path");
   includes(sql, "on conflict (user_id) do update", "Quota increments must be atomic under concurrency");
-  includes(sql, "least(current_window.request_count + 1, p_limit + 1)", "Denied requests must not grow counters without bound");
-  includes(sql, "grant execute on function public.ayhem_consume_rate_limit(integer, integer) to authenticated", "Only authenticated users may consume quota");
-  includes(sql, "revoke all on function public.ayhem_consume_rate_limit(integer, integer) from public, anon", "Public and anonymous callers must not execute quota RPC");
+  includes(sql, "least(current_window.request_count + 1, v_limit + 1)", "Denied requests must not grow counters without bound");
+  includes(sql, "grant execute on function public.ayhem_consume_rate_limit() to authenticated", "Only authenticated users may consume quota");
+  includes(sql, "revoke all on function public.ayhem_consume_rate_limit() from public, anon", "Public and anonymous callers must not execute quota RPC");
+});
+
+
+Deno.test("AYHEM rate-limit runtime: every valid request is quota-checked before inference", async () => {
+  const source = await read("supabase/functions/ayhem-openai-chat/index.ts");
+  includes(source, "consumeRateLimit(authorization, dependencies)", "AI handler must consume the per-user quota");
+  includes(source, "/rest/v1/rpc/ayhem_consume_rate_limit", "AI handler must call the dedicated quota RPC");
+  includes(source, '"apikey": apiKey', "RPC must use a publishable/anon API key");
+  includes(source, '"Authorization": authorization', "RPC must forward the caller JWT");
+  includes(source, ' }, 429, { "Retry-After": String(quota.retryAfter) })', "Quota denial must return 429 with Retry-After");
+  includes(source, ' }, 503);', "Quota accounting failures must fail closed");
+  assert(!source.includes("p_limit") && !source.includes("p_window_seconds"), "Edge Function must not send caller-configurable quota values");
+  assert(!source.includes("SUPABASE_SERVICE_ROLE_KEY"), "Rate-limit RPC must never use a service-role key");
 });
