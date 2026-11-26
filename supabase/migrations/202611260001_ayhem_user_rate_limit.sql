@@ -36,7 +36,7 @@ begin
   end if;
 
   v_window_start := pg_catalog.to_timestamp(
-    pg_catalog.floor(pg_catalog.extract(epoch from v_now) / v_window_seconds) * v_window_seconds
+    pg_catalog.floor(pg_catalog.date_part('epoch', v_now) / v_window_seconds) * v_window_seconds
   );
 
   insert into public.ayhem_rate_limit_windows as current_window
