@@ -66,7 +66,7 @@ export function parseAyhemExplicitMemorySave(prompt) {
   return null;
 }
 
-async function createSupabaseAIClient() {
+async function createSupabaseAIClient({ documentRef = globalThis.document } = {}) {
   await import("../supabase/public-config.js");
   const { getAyhemSupabaseClient, getAyhemSession } = await import("../supabase/ayhem-supabase-auth.js?v=20261124-2");
   const { createAyhemRemoteMemoryStore } = await import("../supabase/ayhem-remote-memory.js?v=20261124-3");
@@ -492,7 +492,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
   output.textContent = "";
 
   try {
-    client = await withTimeout(clientFactory(), "supabase_client_init", 12000);
+    client = await withTimeout(clientFactory({ documentRef }), "supabase_client_init", 12000);
     if (typeof client.onAuthStateChange === "function") {
       client.onAuthStateChange((_event, session) => renderAuth(Boolean(session?.access_token)));
     }
