@@ -8,7 +8,7 @@ Protect Groq usage and the AYHEM service from one authenticated account consumin
 ## Architecture
 1. The Edge Function continues to require a bearer token and POST.
 2. After validating the request shape and before deterministic or remote inference, the Edge Function calls the authenticated Supabase RPC using the caller's existing JWT and the public/anon project key.
-3. The RPC derives identity from `auth.uid()`. It accepts no user ID from the browser or request body.
+3. The RPC derives identity from `auth.uid()`. It accepts no user ID or quota configuration from the browser or request body; the 20-request / 60-second policy is fixed inside the database function.
 4. A single row per Auth user is atomically inserted/updated with PostgreSQL `INSERT ... ON CONFLICT DO UPDATE`. Concurrent requests for one account serialize on the primary-key conflict.
 5. The RPC returns `allowed`, `remaining`, and `reset_at`. The Edge Function returns HTTP 429 with a safe Arabic message and `Retry-After` when denied.
 6. Any RPC error fails closed (503); inference is not called if quota accounting is unavailable.
