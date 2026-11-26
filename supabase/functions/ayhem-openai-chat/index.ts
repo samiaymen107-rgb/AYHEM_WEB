@@ -149,7 +149,7 @@ async function consumeRateLimit(
           "Content-Type": "application/json",
           "Cache-Control": "no-store",
         },
-        body: JSON.stringify({ p_limit: 20, p_window_seconds: 60 }),
+        body: JSON.stringify({}),
       },
     );
     if (!response.ok) return null;
