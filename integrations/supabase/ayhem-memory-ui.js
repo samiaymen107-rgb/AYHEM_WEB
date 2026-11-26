@@ -6,6 +6,8 @@ const testButton = document.getElementById("memoryRoundTripBtn");
 const isolationButton = document.getElementById("memoryIsolationBtn");
 const status = document.getElementById("memoryStatus");
 const output = document.getElementById("memoryOutput");
+const searchInput = document.getElementById("memorySearchInput");
+const searchButton = document.getElementById("memorySearchBtn");
 
 function showStatus(message) {
   if (status) status.textContent = message;
@@ -35,6 +37,23 @@ async function loadCloudMemory() {
   } finally {
     button.disabled = false;
   }
+}
+
+
+async function searchCloudMemory() {
+  if (!searchButton || !output) return;
+  const query = String(searchInput?.value || "").trim().toLocaleLowerCase();
+  if (query.length < 2) { showStatus("اكتب حرفين على الأقل للبحث."); return; }
+  searchButton.disabled = true;
+  output.textContent = "جارٍ البحث في بنك معلومات حسابك...";
+  try {
+    await requireSession();
+    const records = await createAyhemRemoteMemoryStore().list({ limit: 500 });
+    const matches = records.filter(record => [record.title, record.content, ...(Array.isArray(record.tags) ? record.tags : [])].some(value => String(value || "").toLocaleLowerCase().includes(query)));
+    output.textContent = matches.length ? matches.slice(0, 50).map(record => ["العنوان: " + String(record.title || "دون عنوان"), "المصدر: " + String(record.source || "غير محدد"), "التاريخ: " + String(record.created_at || "غير محدد"), "المحتوى: " + String(record.content || "").slice(0, 1200), "—".repeat(24)].join("\n")).join("\n") : "لا توجد نتائج مطابقة في سجلات حسابك.";
+    showStatus("نتائج البحث: " + matches.length + " سجل. البحث محلي داخل واجهة حسابك ولا يرسل المحتوى إلى مزوّد الذكاء الاصطناعي.");
+  } catch (error) { output.textContent = ""; showStatus("تعذر البحث: " + (error?.message || "خطأ غير معروف")); }
+  finally { searchButton.disabled = false; }
 }
 
 async function testCloudMemoryRoundTrip() {
@@ -134,6 +153,7 @@ async function verifyCloudMemoryIsolation() {
 }
 
 button?.addEventListener("click", loadCloudMemory);
+searchButton?.addEventListener("click", searchCloudMemory);
 testButton?.addEventListener("click", testCloudMemoryRoundTrip);
 isolationButton?.addEventListener("click", verifyCloudMemoryIsolation);
 
@@ -143,6 +163,7 @@ try {
     if (button) button.disabled = !session?.user;
     if (testButton) testButton.disabled = !session?.user;
     if (isolationButton) isolationButton.disabled = !session?.user;
+    if (searchButton) searchButton.disabled = !session?.user;
     if (!session?.user) {
       showStatus("سجّل الدخول لعرض الذاكرة السحابية أو اختبار الحفظ والاسترجاع.");
       if (output) output.textContent = "";

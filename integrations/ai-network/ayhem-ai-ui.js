@@ -90,7 +90,11 @@ async function createSupabaseAIClient() {
         let memoryReadError = false;
         try {
           const records = await memoryStore.list({ limit: 100 });
-          memoryContext = buildRelevantMemoryContext(prompt, records);
+          const allowPrivateKnowledge = documentRef.getElementById("ayhemUseKnowledgeInAI")?.checked === true;
+          const eligibleRecords = allowPrivateKnowledge
+            ? records
+            : records.filter(record => !String(record?.source || "").startsWith("ayhem-private-file-library"));
+          memoryContext = buildRelevantMemoryContext(prompt, eligibleRecords);
           memoryRecordsUsed = memoryContext
             ? memoryContext.split("[سجل ذاكرة مرجعي]").length - 1
             : 0;

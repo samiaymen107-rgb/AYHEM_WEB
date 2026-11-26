@@ -14,6 +14,16 @@ const input = document.getElementById("ayhemFileInput");
 const uploadButton = document.getElementById("ayhemFileUpload");
 const listButton = document.getElementById("ayhemFileRefresh");
 const status = document.getElementById("ayhemFileStatus");
+const ocrLanguagesInput = document.getElementById("ayhemOcrLanguages");
+
+function getOcrLanguages() {
+  const raw = String(ocrLanguagesInput?.value || "ara+fra+eng").trim().toLowerCase();
+  const codes = [...new Set(raw.split("+").map(code => code.trim()).filter(Boolean))];
+  if (!codes.length || codes.length > 10 || codes.some(code => !/^[a-z0-9_]{2,12}$/.test(code))) {
+    throw new Error("أدخل رموز لغات Tesseract صحيحة، مثل ara+fra+eng، وبحد أقصى 10 لغات في العملية.");
+  }
+  return codes;
+}
 const list = document.getElementById("ayhemFileList");
 
 function say(message) { if (status) status.textContent = message; }
@@ -118,7 +128,7 @@ async function previewImageFile(item, row, button) {
 
 async function recognizeImageText(item, row, button) {
   button.disabled = true;
-  button.textContent = "جارٍ تجهيز OCR بالعربية والفرنسية والإنجليزية...";
+  button.textContent = "جارٍ تجهيز محرك OCR...";
   let worker = null;
   try {
     const session = await getAyhemSession();
@@ -139,11 +149,12 @@ async function recognizeImageText(item, row, button) {
     bitmap.close();
     if (!pixels || pixels > 15000000) throw new Error("أبعاد الصورة كبيرة للمعالجة الآمنة (الحد 15 ميغابكسل).");
 
-    say("يُحمّل محرك OCR وبيانات العربية والفرنسية والإنجليزية عند الطلب. تبقى الصورة داخل جهازك.");
+    const languages = getOcrLanguages();
+    say("يُحمّل محرك OCR وبيانات اللغات المختارة عند الطلب. تبقى الصورة داخل جهازك.");
     const tesseractModule = await import("https://esm.sh/tesseract.js@6.0.1?bundle");
     const createWorker = tesseractModule.createWorker || tesseractModule.default?.createWorker;
     if (typeof createWorker !== "function") throw new Error("تعذر تحميل محرك OCR.");
-    worker = await createWorker("ara+fra+eng", 1, {
+    worker = await createWorker(languages.join("+"), 1, {
       workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js",
       corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0",
       langPath: "https://tessdata.projectnaptha.com/4.0.0",
@@ -156,7 +167,7 @@ async function recognizeImageText(item, row, button) {
     let capture = null;
     if (extracted) {
       try {
-        capture = await captureExtractedKnowledge({ text: extracted, title: item.title, sourceFilePath: item.file_path, sourceDocumentId: item.id, contentType: item.document_type || data.type, extractionMethod: "tesseract-ocr", languages: ["ara", "fra", "eng"] });
+        capture = await captureExtractedKnowledge({ text: extracted, title: item.title, sourceFilePath: item.file_path, sourceDocumentId: item.id, contentType: item.document_type || data.type, extractionMethod: "tesseract-ocr", languages });
       } catch (captureError) {
         say("اكتمل OCR، لكن تعذر حفظ النص في بنك المعلومات: " + (captureError?.message || "خطأ"));
       }
@@ -169,13 +180,13 @@ async function recognizeImageText(item, row, button) {
     const note = document.createElement("small");
     note.textContent = extracted.length > 12000
       ? "عُرض أول 12,000 حرف فقط. حُفظ النص المستخرج ضمن الحد المسموح، وبقي الملف الأصلي دون تعديل."
-      : "استخراج OCR محلي للعربية والفرنسية والإنجليزية. قد تختلف الدقة حسب وضوح الصورة وجودتها.";
+      : "استخراج OCR محلي للغات المختارة. قد تختلف الدقة حسب وضوح الصورة وجودتها.";
     row.append(note);
     button.textContent = "اكتمل استخراج النص";
-    say(capture?.saved ? "اكتمل OCR وحُفظ النص العربي والفرنسي والإنجليزي في بنك معلومات حسابك الخاص." : capture?.duplicate ? "اكتمل OCR؛ هذا النص محفوظ مسبقاً في بنك معلومات حسابك." : "اكتمل OCR محلياً؛ تعذر تأكيد حفظ النص في بنك المعلومات.");
+    say(capture?.saved ? "اكتمل OCR وحُفظ النص المستخرج في بنك معلومات حسابك الخاص." : capture?.duplicate ? "اكتمل OCR؛ هذا النص محفوظ مسبقاً في بنك معلومات حسابك." : "اكتمل OCR محلياً؛ تعذر تأكيد حفظ النص في بنك المعلومات.");
   } catch (error) {
     button.disabled = false;
-    button.textContent = "استخراج النص (عربي/فرنسي/إنجليزي)";
+    button.textContent = "استخراج النص";
     say("تعذر استخراج النص: " + (error?.message || "خطأ غير معروف"));
   } finally {
     if (worker) {

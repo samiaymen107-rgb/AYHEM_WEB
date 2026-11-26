@@ -50,7 +50,7 @@ export async function captureExtractedKnowledge({
 
   const safeTitle = String(title || "محتوى مستخرج من ملف").slice(0, 240);
   const languageList = Array.isArray(languages)
-    ? [...new Set(languages.filter(code => ["ara", "fra", "eng"].includes(code)))]
+    ? [...new Set(languages.filter(code => typeof code === "string" && /^[a-z0-9_]{2,12}$/.test(code)))].slice(0, 10)
     : [];
 
   const { data, error } = await client
