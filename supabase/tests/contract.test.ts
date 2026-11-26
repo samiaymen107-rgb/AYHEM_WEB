@@ -201,7 +201,8 @@ Deno.test("AYHEM private file library: Arabic image OCR is local, opt-in, and bo
 Deno.test("AYHEM knowledge capture: multilingual extracted content is private, append-only, and deduplicated", async () => {
   const source = await read("integrations/supabase/ayhem-knowledge-capture.js");
   const library = await read("integrations/supabase/ayhem-file-library.js");
-  includes(library, 'createWorker("ara+fra+eng", 1', "Image OCR must support Arabic, French, and English");
+  includes(library, "createWorker(languages.join(\"+\"), 1", "Image OCR must use user-selected Tesseract language models");
+  includes(library, "function getOcrLanguages()", "OCR must validate the selected language codes");
   includes(source, '.from("ayhem_memories")', "Extracted content must be saved into the existing private knowledge bank");
   includes(source, '.eq("owner_id", userId)', "Deduplication lookup must be scoped to the authenticated owner");
   includes(source, 'sourceFilePath.startsWith(userId + "/")', "Capture must reject files outside the current user's private path");
@@ -210,7 +211,28 @@ Deno.test("AYHEM knowledge capture: multilingual extracted content is private, a
   includes(source, "content_sha256: digest", "Capture metadata must retain a content integrity fingerprint");
   includes(source, "original_file_preserved: true", "Capture must preserve the original file");
   includes(source, "ai_provider_used_for_extraction: false", "Capture must disclose local extraction");
-  includes(source, '["ara", "fra", "eng"]', "Capture must constrain language metadata to supported languages");
-  assert(!/\\.from\\(["']ayhem_memories["']\\)\\s*\\.delete\\(/.test(source), "Knowledge capture must not delete existing memories");
-  assert(!/functions\\.invoke|fetch\\(/.test(source), "Knowledge capture must not transmit extracted text to an external parser or AI gateway");
+  includes(source, "languages.filter(code => typeof code === \"string\" && /^[a-z0-9_]{2,12}$/.test(code))", "Capture must preserve any valid Tesseract language code");
+  assert(!source.includes('.from("ayhem_memories").delete('), "Knowledge capture must not delete existing memories");
+  assert(!source.includes("functions.invoke") && !source.includes("fetch("), "Knowledge capture must not transmit extracted text to an external parser or AI gateway");
+});
+
+
+Deno.test("AYHEM private knowledge: all selected Tesseract languages and AI opt-in are explicit", async () => {
+  const library = await read("integrations/supabase/ayhem-file-library.js");
+  const ai = await read("integrations/ai-network/ayhem-ai-ui.js");
+  const html = await read("index.html");
+  includes(library, "createWorker(languages.join(\"+\"), 1", "OCR must use all user-selected Tesseract languages");
+  includes(html, 'value="ara+fra+eng"', "Arabic, French, and English must be the default language selection");
+  includes(ai, 'getElementById("ayhemUseKnowledgeInAI")?.checked === true', "Private extracted knowledge must require explicit user opt-in before AI use");
+  includes(ai, 'startsWith("ayhem-private-file-library")', "Private file knowledge must be excluded from AI context by default");
+  includes(html, 'id="ayhemUseKnowledgeInAI" type="checkbox"', "A visible consent checkbox must control AI access");
+});
+
+Deno.test("AYHEM private knowledge bank: authenticated users can search saved knowledge", async () => {
+  const ui = await read("integrations/supabase/ayhem-memory-ui.js");
+  const html = await read("index.html");
+  includes(ui, "async function searchCloudMemory()", "The knowledge bank must provide search");
+  includes(ui, "createAyhemRemoteMemoryStore().list({ limit: 500 })", "Search must use the authenticated owner-scoped memory adapter");
+  includes(html, 'id="memorySearchInput"', "The UI must expose a private knowledge search field");
+  includes(html, 'id="memorySearchBtn"', "The UI must expose a private knowledge search action");
 });
