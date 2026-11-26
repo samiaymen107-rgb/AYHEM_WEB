@@ -205,3 +205,13 @@ Deno.test("AYHEM private file library: multilingual OCR and durable knowledge ca
   includes(source, "لم تُرسل الصورة إلى مزوّد ذكاء اصطناعي", "OCR must disclose that the image is not sent to an AI provider");
   assert(!source.includes("functions.invoke"), "OCR must not invoke an AI or server function");
 });
+
+
+Deno.test("AYHEM AI memory context: private file knowledge is excluded unless the user opts in", async () => {
+  const source = await read("integrations/ai-network/ayhem-ai-ui.js");
+  const html = await read("index.html");
+  includes(source, 'getElementById("ayhemUseKnowledgeInAI")?.checked === true', "Private file knowledge must require an explicit checked consent control");
+  includes(source, '!String(record?.source || "").startsWith("private-file-")', "Private file knowledge must be excluded from AI context by default");
+  includes(html, 'id="ayhemUseKnowledgeInAI" type="checkbox"', "The user must have a visible opt-in control");
+  includes(html, "هذا الخيار معطّل افتراضياً", "The default-disabled privacy behavior must be disclosed");
+});
