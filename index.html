@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07111f"><meta name="description" content="AYHEM — تطبيق العقل الرقمي على الهاتف">
 <title>AYHEM | أيهم</title>
-<link rel="stylesheet" href="./ayhem-chatgpt-shell.css?v=20261126-1">
+<link rel="stylesheet" href="./ayhem-chatgpt-shell.css?v=20261127-chat-first1">
 <style>
 :root{color-scheme:dark;--bg:#07111f;--surface:#102139;--surface2:#152b45;--text:#f5f7fb;--muted:#a9b8ca;--gold:#d9b66f;--line:rgba(210,224,240,.14);--safe-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
@@ -155,6 +155,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 .ayhem-file-item{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px;border:1px solid var(--line);border-radius:12px}
 .ayhem-file-item strong{flex:1 1 100%;overflow-wrap:anywhere}
 .ayhem-file-item small{color:var(--muted);font-size:.82rem}
+
+/* Deterministic chat-first boot: keep the conversation as the initial mobile screen. */
+main.app.chat-mode>.topbar,main.app.chat-mode>.bottom-nav{display:none!important}
+main.app.chat-mode>.workspace>#screen-ai{display:flex!important}
+main.app.chat-mode>.workspace>#screen-home{display:none!important}
 </style>
 </head>
 <body>
@@ -268,7 +273,9 @@ document.getElementById("chatHistoryTop")?.addEventListener("click",()=>{setChat
 document.querySelectorAll("[data-chat-go]").forEach(b=>b.addEventListener("click",()=>{setChatDrawer(false);navigate(b.dataset.chatGo);}));
 
 document.getElementById("dashboardBtn").addEventListener("click",()=>location.href="AYHEM_DASHBOARD.html");
-document.getElementById("startBtn").addEventListener("click",async()=>{const b=document.getElementById("startBtn"),v=document.getElementById("view");b.disabled=true;v.textContent="جارٍ فحص وحدات AYHEM...";try{const r=await window.AYHEM_ORCHESTRATOR.start();v.textContent="حالة النظام: "+r.state+" ("+r.ready+"/"+r.total+")";}catch(e){v.textContent="تعذر الفحص: "+(e?.message||e)}finally{b.disabled=false}});
+document.getElementById("startBtn").addEventListener("click",async()=>{const b=document.getElementById("startBtn"),v=document.getElementById("view");b.disabled=true;v.textContent="جارٍ فحص وحدات AYHEM...";try{const r=await window.AYHEM_ORCHESTRATOR.start();v.textContent="حالة النظام: "+r.state+" ("+r.ready+"/"+r.total+")";}catch(e){v.textContent="تعذر الفحص: "+(e?.message||e)}finally{navigate("ai");b.disabled=false}});
+// Re-assert the intended initial screen after all navigation handlers are registered.
+navigate("ai");
 </script>
 <script type="module" src="AYHEM_MASTER_ORCHESTRATOR.js?v=20261125-single-screen"></script>
 <script type="module" src="./integrations/supabase/ayhem-auth-ui.js?v=20261124-groq1"></script>
