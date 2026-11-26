@@ -8,8 +8,8 @@ const cors = {
   "Cache-Control": "no-store",
 };
 
-function json(data: Record<string, unknown>, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: cors });
+function json(data: Record<string, unknown>, status = 200, extraHeaders: Record<string, string> = {}) {
+  return new Response(JSON.stringify(data), { status, headers: { ...cors, ...extraHeaders } });
 }
 
 const instructions = [
@@ -109,7 +109,70 @@ async function groqReply(apiKey: string, input: string, signal: AbortSignal) {
   return { reply, model };
 }
 
-export async function handler(req: Request) {
+type RateLimitDependencies = {
+  fetch?: typeof fetch;
+  env?: (name: string) => string | undefined;
+};
+
+function getPublishableApiKey(readEnv: (name: string) => string | undefined): string | null {
+  const namedKeys = readEnv("SUPABASE_PUBLISHABLE_KEYS");
+  if (namedKeys) {
+    try {
+      const parsed = JSON.parse(namedKeys);
+      const key = parsed && typeof parsed.default === "string" ? parsed.default : null;
+      return key && key.trim() ? key : null;
+    } catch {
+      return null;
+    }
+  }
+  return readEnv("SUPABASE_PUBLISHABLE_KEY") || readEnv("SUPABASE_ANON_KEY") || null;
+}
+
+async function consumeRateLimit(
+  authorization: string,
+  dependencies: RateLimitDependencies = {},
+): Promise<{ allowed: boolean; remaining: number; resetAt: string; retryAfter: number } | null> {
+  const readEnv = dependencies.env ?? ((name: string) => Deno.env.get(name));
+  const supabaseUrl = readEnv("SUPABASE_URL")?.replace(/\\/+$/, "");
+  const apiKey = getPublishableApiKey(readEnv);
+  if (!supabaseUrl || !apiKey) return null;
+
+  try {
+    const response = await (dependencies.fetch ?? fetch)(
+      supabaseUrl + "/rest/v1/rpc/ayhem_consume_rate_limit",
+      {
+        method: "POST",
+        headers: {
+          "apikey": apiKey,
+          "Authorization": authorization,
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+        },
+        body: JSON.stringify({ p_limit: 20, p_window_seconds: 60 }),
+      },
+    );
+    if (!response.ok) return null;
+    const payload = await response.json();
+    const row = Array.isArray(payload) ? payload[0] : payload;
+    if (
+      !row || typeof row.allowed !== "boolean" ||
+      !Number.isInteger(row.remaining) || row.remaining < 0 ||
+      typeof row.reset_at !== "string" || !Number.isFinite(Date.parse(row.reset_at))
+    ) return null;
+
+    const resetAtMs = Date.parse(row.reset_at);
+    return {
+      allowed: row.allowed,
+      remaining: row.remaining,
+      resetAt: new Date(resetAtMs).toISOString(),
+      retryAfter: Math.max(1, Math.ceil((resetAtMs - Date.now()) / 1000)),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function handler(req: Request, dependencies: RateLimitDependencies = {}) {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "طريقة الطلب غير مدعومة." }, 405);
 
@@ -123,6 +186,21 @@ export async function handler(req: Request) {
   const message = typeof body.message === "string" ? body.message.trim() : "";
   const memoryContext = typeof body.memory_context === "string" ? body.memory_context.slice(0, 10000) : "";
   if (!message || message.length > 6000) return json({ error: "اكتب رسالة غير فارغة ولا تتجاوز 6000 حرف." }, 400);
+
+  // The quota is consumed for every valid request, including deterministic core replies.
+  // The RPC receives the caller JWT and a publishable/anon key only; never use a service-role key.
+  const quota = await consumeRateLimit(authorization, dependencies);
+  if (!quota) {
+    return json({ error: "تعذّر التحقق من حد الاستخدام حالياً. أعد المحاولة لاحقاً." }, 503);
+  }
+  if (!quota.allowed) {
+    return json({
+      error: "بلغت حد الطلبات المؤقت. انتظر قليلاً ثم أعد المحاولة.",
+      remaining: 0,
+      reset_at: quota.resetAt,
+      retry_after_seconds: quota.retryAfter,
+    }, 429, { "Retry-After": String(quota.retryAfter) });
+  }
 
   const coreReply = getAyhemCoreReply(message);
   if (coreReply) {
