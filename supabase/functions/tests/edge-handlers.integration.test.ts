@@ -20,11 +20,25 @@ function request(url: string, method: string, body?: unknown) {
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
 }
-const envKeys = ["GROQ_API_KEY", "OPENAI_API_KEY", "AYHEM_AI_PROVIDER", "TINYFISH_API_KEY"];
+const envKeys = ["GROQ_API_KEY", "OPENAI_API_KEY", "AYHEM_AI_PROVIDER", "TINYFISH_API_KEY", "SUPABASE_URL", "SUPABASE_ANON_KEY"];
+function isRateLimitRequest(input: RequestInfo | URL) {
+  return String(input).endsWith("/rest/v1/rpc/ayhem_consume_rate_limit");
+}
+function allowedQuotaResponse() {
+  return Response.json([{
+    allowed: true,
+    remaining: 19,
+    reset_at: new Date(Date.now() + 60_000).toISOString(),
+  }]);
+}
 async function isolated(run: () => Promise<void>) {
   const old = new Map(envKeys.map((key) => [key, Deno.env.get(key)]));
   const originalFetch = globalThis.fetch;
-  try { await run(); }
+  try {
+    Deno.env.set("SUPABASE_URL", "https://test-project.supabase.co");
+    Deno.env.set("SUPABASE_ANON_KEY", "test-publishable-key");
+    await run();
+  }
   finally {
     globalThis.fetch = originalFetch;
     for (const [key, value] of old) {
@@ -41,6 +55,16 @@ Deno.test("AYHEM Edge handlers: authenticated runtime paths with mocked upstream
     Deno.env.delete("AYHEM_AI_PROVIDER");
     let groqCalls = 0;
     globalThis.fetch = async (input, init) => {
+      if (isRateLimitRequest(input)) {
+        equal(init?.method, "POST", "rate-limit RPC method");
+        const headers = new Headers(init?.headers);
+        equal(headers.get("apikey"), "test-publishable-key", "rate-limit RPC uses publishable key");
+        equal(headers.get("authorization"), "Bearer test-user-token", "rate-limit RPC forwards caller JWT");
+        const params = JSON.parse(String(init?.body));
+        equal(params.p_limit, 20, "per-user request limit");
+        equal(params.p_window_seconds, 60, "per-user window duration");
+        return allowedQuotaResponse();
+      }
       groqCalls++;
       equal(String(input), "https://api.groq.com/openai/v1/chat/completions", "AI must call Groq endpoint");
       const payload = JSON.parse(String(init?.body));
@@ -62,7 +86,8 @@ Deno.test("AYHEM Edge handlers: authenticated runtime paths with mocked upstream
     Deno.env.set("GROQ_API_KEY", "test-only-groq-key");
     Deno.env.set("OPENAI_API_KEY", "test-only-openai-key");
     let calls = 0;
-    globalThis.fetch = async () => {
+    globalThis.fetch = async (input) => {
+      if (isRateLimitRequest(input)) return allowedQuotaResponse();
       calls++;
       return Response.json({ error: { code: "rate_limit_exceeded" } }, { status: 429 });
     };
@@ -77,7 +102,10 @@ Deno.test("AYHEM Edge handlers: authenticated runtime paths with mocked upstream
     Deno.env.delete("GROQ_API_KEY");
     Deno.env.delete("OPENAI_API_KEY");
     Deno.env.delete("AYHEM_AI_PROVIDER");
-    globalThis.fetch = async () => { throw new Error("must not call upstream"); };
+    globalThis.fetch = async (input) => {
+      if (isRateLimitRequest(input)) return allowedQuotaResponse();
+      throw new Error("must not call upstream");
+    };
     const response = await aiHandler(request("https://local.test/ai", "POST", { message: "no provider" }));
     equal(response.status, 503, "missing provider status");
   });
@@ -118,6 +146,41 @@ Deno.test("AYHEM Edge handlers: authenticated runtime paths with mocked upstream
   });
 });
 
+
+Deno.test("AYHEM rate limit: quota denial returns 429 and never calls Groq", async () => {
+  await isolated(async () => {
+    let groqCalls = 0;
+    globalThis.fetch = async (input) => {
+      if (isRateLimitRequest(input)) {
+        return Response.json([{
+          allowed: false,
+          remaining: 0,
+          reset_at: new Date(Date.now() + 30_000).toISOString(),
+        }]);
+      }
+      groqCalls++;
+      throw new Error("Groq must not run after quota denial");
+    };
+    const response = await aiHandler(request("https://local.test/ai", "POST", { message: "quota denied" }));
+    equal(response.status, 429, "quota denial status");
+    assert(Number(response.headers.get("Retry-After")) >= 1, "429 must include Retry-After");
+    equal(groqCalls, 0, "quota denial must not call Groq");
+  });
+});
+
+Deno.test("AYHEM rate limit: RPC failure fails closed with 503 and never calls Groq", async () => {
+  await isolated(async () => {
+    let groqCalls = 0;
+    globalThis.fetch = async (input) => {
+      if (isRateLimitRequest(input)) return Response.json({ message: "database unavailable" }, { status: 500 });
+      groqCalls++;
+      throw new Error("Groq must not run when quota accounting fails");
+    };
+    const response = await aiHandler(request("https://local.test/ai", "POST", { message: "quota service unavailable" }));
+    equal(response.status, 503, "quota RPC failure status");
+    equal(groqCalls, 0, "RPC failure must not call Groq");
+  });
+});
 
 Deno.test("Cloud memory adapter: append/list behavior with an injected isolated client", async () => {
   const inserted: Record<string, unknown>[] = [];
@@ -310,6 +373,7 @@ Deno.test("AYHEM memory-to-inference pipeline: relevant memory context reaches m
     Deno.env.delete("AYHEM_AI_PROVIDER");
     let upstreamCalls = 0;
     globalThis.fetch = async (input, init) => {
+      if (isRateLimitRequest(input)) return allowedQuotaResponse();
       upstreamCalls++;
       equal(String(input), "https://api.groq.com/openai/v1/chat/completions", "pipeline provider endpoint");
       const payload = JSON.parse(String(init?.body));
