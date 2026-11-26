@@ -30,7 +30,7 @@ export function getAyhemLocalGreeting(prompt) {
     .normalize("NFKC")
     .replace(/[\u064B-\u065F\u0670\u0640]/gu, "")
     .replace(/[أإآ]/gu, "ا")
-    .replace(/[؟?!！،,؛;:.\\sـ]/gu, "");
+    .replace(/[؟?!！،,؛;:\sـ]/gu, "");
   if (!normalized || normalized.length > 80) return null;
   if (/^(?:السلامعليكم|سلامعليكم)$/u.test(normalized)) return "وعليكم السلام ورحمة الله وبركاته، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟";
   if (/^(?:صباحالخير)$/u.test(normalized)) return "صباح النور والسرور، أهلاً وسهلاً بك.";
