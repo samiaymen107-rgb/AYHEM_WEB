@@ -187,15 +187,20 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
 <section class="screen" id="screen-memory"><div class="screen-card"><div class="screen-heading"><h2>الذاكرة السحابية</h2><button class="back" data-go="home">الرئيسية</button></div><section class="panel auth-panel" aria-labelledby="memoryTitle">
       <h2 id="memoryTitle">الذاكرة السحابية / Cloud Memory</h2>
       <p id="memoryStatus" class="ai-status" role="status" aria-live="polite">سجّل الدخول لعرض الذاكرة أو إضافة سجل اختبار مستقل والتحقق من حفظه واسترجاعه. لا يُحذف أو يُعدّل أي سجل سابق.</p>
+      <label for="ayhemUseKnowledgeInAI"><input id="ayhemUseKnowledgeInAI" type="checkbox" /> أسمح لأيهم بإرسال مقتطفات ذات صلة من بنك معلوماتي الخاص إلى مزوّد الذكاء الاصطناعي عند الإجابة. معطّل افتراضياً ويُلغى عند تحديث الصفحة.</label>
       <div class="actions">
         <button class="secondary" id="memoryLoadBtn" type="button" disabled>عرض الذاكرة السحابية</button>
         <button class="primary" id="memoryRoundTripBtn" type="button" disabled>اختبار الحفظ والاسترجاع (إضافة سجل تجريبي)</button>
         <button class="secondary" id="memoryIsolationBtn" type="button" disabled>فحص الجلسة وعزل الذاكرة (قراءة فقط)</button>
       </div>
+      <div class="actions"><label for="memorySearchInput">البحث في بنك معلوماتك</label><input id="memorySearchInput" type="search" maxlength="200" placeholder="ابحث في النصوص والوثائق المحفوظة..." /><button class="secondary" id="memorySearchBtn" type="button" disabled>بحث في البنك</button></div>
       <pre id="memoryOutput" class="ai-output" aria-live="polite"></pre>
       <section class="file-library" aria-labelledby="ayhemFilesTitle">
         <h3 id="ayhemFilesTitle">مكتبتي الخاصة — الصور والوثائق</h3>
         <p>ارفع صورك وملفات PDF وWord والنصوص إلى مساحة خاصة بحسابك. عند استخراج النص، تُحفظ نسخة قابلة للبحث في بنك معلومات حسابك فقط، مع الاحتفاظ بالملف الأصلي. لا يستطيع المستخدمون الآخرون فتحها.</p>
+      <label for="ayhemOcrLanguages">لغات OCR (رموز Tesseract مفصولة بعلامة +)</label>
+      <input id="ayhemOcrLanguages" type="text" value="ara+fra+eng" maxlength="120" autocomplete="off" spellcheck="false" />
+      <small>أدخل رموز أي لغات متاحة في نماذج Tesseract، مثل ara+fra+eng أو deu+spa+ita. <a href="https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html" target="_blank" rel="noopener noreferrer">قائمة اللغات الرسمية</a>. لا يكتشف المحرك اللغة تلقائياً؛ اخترها هنا.</small>
         <label for="ayhemFileInput">اختيار الصور والوثائق (حتى 10 ميغابايت لكل ملف)</label>
         <input id="ayhemFileInput" type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/csv" />
         <div class="actions">
@@ -262,7 +267,7 @@ document.getElementById("startBtn").addEventListener("click",async()=>{const b=d
 </script>
 <script type="module" src="AYHEM_MASTER_ORCHESTRATOR.js?v=20261125-single-screen"></script>
 <script type="module" src="./integrations/supabase/ayhem-auth-ui.js?v=20261124-groq1"></script>
-<script type="module" src="./integrations/supabase/ayhem-memory-ui.js?v=20261125-rls1"></script>
-<script type="module" src="./integrations/supabase/ayhem-file-library.js?v=20261126-knowledge1"></script>
-<script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=20261125-ayhem-digital-identity1"></script>
+<script type="module" src="./integrations/supabase/ayhem-memory-ui.js?v=20261126-knowledge2"></script>
+<script type="module" src="./integrations/supabase/ayhem-file-library.js?v=20261126-knowledge2"></script>
+<script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=20261126-private-knowledge-consent1"></script>
 </body></html>
