@@ -73,18 +73,34 @@ test("enables chat after session check and renders returned text safely", async 
   assert.equal(documentRef.elements.aiConnectionStatus.textContent, "تم استلام الرد. استُخدمت 2 سجلات ذاكرة ذات صلة.");
 });
 
-test("reports memory degradation without blocking the AI response", async () => {
+test("reports a safe memory diagnostic code without blocking the AI response", async () => {
   const documentRef = fakeDocument();
   await mountAyhemAIUI({
     documentRef,
     clientFactory: () => ({
       health: async () => ({ ready: true }),
-      ask: async () => ({ output: "رد", provider: "groq", memoryReadError: true }),
+      ask: async () => ({ output: "رد", provider: "groq", memoryReadError: true, memoryReadErrorCode: "PGRST301" }),
     }),
   });
   documentRef.elements.aiPrompt.value = "اختبار";
   await documentRef.elements.aiSendBtn.handlers.click();
-  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "تم استلام الرد. تعذر قراءة الذاكرة؛ أُكملت المحادثة دون سياق ذاكرة.");
+  assert.equal(documentRef.elements.aiOutput.textContent, "رد");
+  assert.equal(documentRef.elements.aiConnectionStatus.textContent, "تم استلام الرد. تعذر قراءة الذاكرة؛ أُكملت المحادثة دون سياق ذاكرة. رمز التشخيص: PGRST301.");
+});
+
+test("never renders an unsafe memory diagnostic value", async () => {
+  const documentRef = fakeDocument();
+  await mountAyhemAIUI({
+    documentRef,
+    clientFactory: () => ({
+      health: async () => ({ ready: true }),
+      ask: async () => ({ output: "رد", memoryReadError: true, memoryReadErrorCode: "PGRST301\\nBearer secret-token" }),
+    }),
+  });
+  documentRef.elements.aiPrompt.value = "اختبار";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  assert.match(documentRef.elements.aiConnectionStatus.textContent, /رمز التشخيص: MEMORY_READ_FAILED\./);
+  assert.doesNotMatch(documentRef.elements.aiConnectionStatus.textContent, /secret-token|Bearer/);
 });
 
 test("retains a working click handler when Supabase initialization fails", async () => {
