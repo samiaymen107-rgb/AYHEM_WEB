@@ -156,7 +156,7 @@ async function previewImageFile(item, row, button) {
 
 async function recognizeImageText(item, row, button) {
   button.disabled = true;
-  button.textContent = "جارٍ تجهيز OCR العربي...";
+  button.textContent = "جارٍ تجهيز محرك OCR...";
   let worker = null;
   try {
     const session = await getAyhemSession();
@@ -205,7 +205,7 @@ async function recognizeImageText(item, row, button) {
     say("اكتمل OCR وحُفظ النص المستخرج في بنك معلومات حسابك الخاص. تم تحميل محرك OCR وبيانات اللغة من شبكات خارجية؛ لم تُرسل الصورة إلى مزوّد ذكاء اصطناعي.");
   } catch (error) {
     button.disabled = false;
-    button.textContent = "استخراج النص العربي";
+    button.textContent = "استخراج النص";
     say("تعذر استخراج النص: " + (error?.message || "خطأ غير معروف"));
   } finally {
     if (worker) {
@@ -288,7 +288,7 @@ function renderItems(items) {
       const ocrButton = document.createElement("button");
       ocrButton.type = "button";
       ocrButton.className = "secondary";
-      ocrButton.textContent = "استخراج النص العربي";
+      ocrButton.textContent = "استخراج النص";
       ocrButton.addEventListener("click", () => recognizeImageText(item, row, ocrButton));
       row.append(ocrButton);
     }
