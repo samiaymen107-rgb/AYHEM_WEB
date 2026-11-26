@@ -19,7 +19,24 @@ export { buildRelevantMemoryContext } from "./ayhem-memory-context.js";
 
 export function cleanAyhemReply(value) {
   const text = typeof value === "string" ? value : "";
-  return text.replace(/^\s*(?:مرحبًا|مرحباً|مرحبا)[!！،,.\s]*(?:كيف يمكنني مساعدتك اليوم؟|كيف أستطيع مساعدتك اليوم؟)[!！،,.\s]*/u, "").trim();
+  const cleaned = text.replace(/^\s*(?:مرحبًا|مرحباً|مرحبا)[!！،,.\s]*(?:كيف يمكنني مساعدتك اليوم؟|كيف أستطيع مساعدتك اليوم؟)[!！،,.\s]*/u, "").trim();
+  // A greeting-only answer is valid content; never replace it with the composer placeholder.
+  return cleaned || text.trim();
+}
+
+export function getAyhemLocalGreeting(prompt) {
+  if (typeof prompt !== "string") return null;
+  const normalized = prompt.toLocaleLowerCase("ar")
+    .normalize("NFKC")
+    .replace(/[\u064B-\u065F\u0670\u0640]/gu, "")
+    .replace(/[أإآ]/gu, "ا")
+    .replace(/[؟?!！،,؛;:\sـ]/gu, "");
+  if (!normalized || normalized.length > 80) return null;
+  if (/^(?:السلامعليكم|سلامعليكم)$/u.test(normalized)) return "وعليكم السلام ورحمة الله وبركاته، أهلاً وسهلاً بك. كيف يمكنني مساعدتك؟";
+  if (/^(?:صباحالخير)$/u.test(normalized)) return "صباح النور والسرور، أهلاً وسهلاً بك.";
+  if (/^(?:مساءالخير)$/u.test(normalized)) return "مساء النور، أهلاً وسهلاً بك.";
+  if (/^(?:مرحبا|مرحب|اهلا|اهلاوسهلا|اهلين|هاي|hello|hi|bonjour|salut)$/u.test(normalized)) return "أهلاً وسهلاً! كيف يمكنني مساعدتك اليوم؟";
+  return null;
 }
 
 export function parseAyhemAutomaticCorrection(prompt) {
@@ -362,6 +379,16 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
     status.textContent = "جارٍ إرسال الطلب إلى بوابة AYHEM الآمنة...";
     output.textContent = "جارٍ استرجاع الذاكرة ذات الصلة ثم الاتصال بمزوّد الذكاء.";
     try {
+      const localGreeting = getAyhemLocalGreeting(prompt);
+      if (localGreeting) {
+        renderAyhemAssistantMessage(output, localGreeting, documentRef);
+        scrollConversationToLatest();
+        status.textContent = "تم الرد على التحية محلياً دون الاتصال بمزوّد الذكاء.";
+        feedbackPanel.hidden = true;
+        reasoningPanel.hidden = true;
+        input.value = "";
+        return;
+      }
       const automaticCorrection = parseAyhemAutomaticCorrection(prompt);
       let automaticCorrectionSaved = false;
       if (automaticCorrection && lastAssistantPrompt) {
@@ -394,7 +421,7 @@ export async function mountAyhemAIUI({ documentRef = globalThis.document, client
       reasoningBody.textContent = reasoningPlan.intent_label + "\n" + reasoningPlan.steps.map(step => step.id + ". " + step.title).join("\n") + "\nالمخاطر: " + reasoningPlan.risks.join("؛ ");
       reasoningPanel.hidden = false;
       const verification = verifyAyhemAnswer(prompt, result.output);
-      const cleanOutput = cleanAyhemReply(result.output) || "اكتب طلبك مباشرة.";
+      const cleanOutput = cleanAyhemReply(result.output) || "تعذّر عرض ردّ المساعد. أعد المحاولة.";
       renderAyhemAssistantMessage(output, cleanOutput, documentRef);
       scrollConversationToLatest();
       const providerLabel = result.provider === "groq" ? "Groq" : result.provider === "openai" ? "OpenAI" : "المزوّد";

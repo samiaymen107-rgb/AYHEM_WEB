@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave, parseAyhemAutomaticCorrection, cleanAyhemReply } from "./ayhem-ai-ui.js";
+import { buildRelevantMemoryContext, mountAyhemAIUI, parseAyhemExplicitMemorySave, parseAyhemAutomaticCorrection, cleanAyhemReply, getAyhemLocalGreeting } from "./ayhem-ai-ui.js";
 
 function fakeDocument() {
   const elements = Object.fromEntries(
@@ -221,4 +221,35 @@ test("automatically learns a clearly marked correction locally", async () => {
     if (originalStorage === undefined) delete globalThis.localStorage;
     else globalThis.localStorage = originalStorage;
   }
+});
+
+test("preserves greeting-only model replies instead of converting them to the composer placeholder", () => {
+  const greeting = "مرحباً! كيف يمكنني مساعدتك اليوم؟";
+  assert.equal(cleanAyhemReply(greeting), greeting);
+  assert.equal(cleanAyhemReply(greeting + " أستطيع مساعدتك في ذلك."), "أستطيع مساعدتك في ذلك.");
+});
+
+test("recognizes common Arabic and French greetings locally", () => {
+  assert.match(getAyhemLocalGreeting("مرحبا"), /أهلاً وسهلاً/);
+  assert.match(getAyhemLocalGreeting("أهلا وسهلا"), /أهلاً وسهلاً/);
+  assert.match(getAyhemLocalGreeting("السلام عليكم"), /وعليكم السلام/);
+  assert.match(getAyhemLocalGreeting("bonjour"), /أهلاً وسهلاً/);
+  assert.equal(getAyhemLocalGreeting("salutv"), null);
+});
+
+test("answers greetings without calling the AI provider or consuming provider quota", async () => {
+  const documentRef = fakeDocument();
+  let asked = false;
+  await mountAyhemAIUI({
+    documentRef,
+    clientFactory: () => ({
+      health: async () => ({ ready: true }),
+      ask: async () => { asked = true; return { output: "unexpected" }; },
+    }),
+  });
+  documentRef.elements.aiPrompt.value = "مرحبا";
+  await documentRef.elements.aiSendBtn.handlers.click();
+  assert.equal(asked, false);
+  assert.match(documentRef.elements.aiOutput.textContent, /أهلاً وسهلاً/);
+  assert.match(documentRef.elements.aiConnectionStatus.textContent, /محلياً/);
 });
