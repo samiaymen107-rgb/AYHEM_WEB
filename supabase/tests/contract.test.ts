@@ -123,7 +123,7 @@ Deno.test("AYHEM private file library: plain text preview stays local and bounde
   includes(source, 'item.file_path.startsWith(session.user.id + "/")', "Text preview must verify the current user's object path");
   includes(source, "data.size > 1024 * 1024", "Local preview must enforce a 1 MiB processing limit");
   includes(source, "rawText.slice(0, 20000)", "Local preview must cap displayed text");
-  includes(source, "preview.textContent = rawText", "Extracted text must be rendered as text, not HTML");
+  includes(source, "preview.textContent = rawText.slice(0, 20000)", "Extracted text must be rendered as text, not HTML");
   includes(source, "لم يُرسل محتوى الملف إلى مزوّد الذكاء الاصطناعي", "Local preview must disclose that file content is not sent to an AI provider");
   assert(!source.includes("functions.invoke"), "Local text preview must not call an AI or external function");
   assert(!source.includes("fetch("), "Local text preview must not make a separate network request outside the authenticated storage client");
