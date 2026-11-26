@@ -1,6 +1,6 @@
 # AYHEM per-user rate limiting — implementation proposal
 
-Status: draft on a development branch. No database migration has been applied and no Edge Function has been deployed.
+Status: proposed implementation in a draft GitHub pull request. The migration is present in the repository but is not applied to Supabase; the Edge Function change is not deployed.
 
 ## Objective
 Protect Groq usage and the AYHEM service from one authenticated account consuming an unfair share of requests. The first release uses a fixed window of **20 requests per user per 60 seconds**. These are conservative initial defaults, not a pricing or capacity guarantee.
@@ -50,4 +50,4 @@ Protect Groq usage and the AYHEM service from one authenticated account consumin
 5. Rollback: disable the Edge Function's RPC check first, then remove the RPC/table only after explicit approval and after confirming no dependent traffic. Never delete user memory or application records.
 
 ## Not included
-No migration execution, production schema change, Edge Function modification/deployment, user data modification, or account creation is performed by this proposal.
+The development branch contains the Edge Function integration, but no migration execution, production schema change, Edge Function deployment, user data modification, or account creation is performed.
