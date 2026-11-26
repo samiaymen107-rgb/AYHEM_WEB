@@ -1,8 +1,8 @@
 // Local-only document text extraction. Document bytes are never uploaded to a parser service.
 const MAX_PDF_PAGES = 25;
 const MAX_TEXT_CHARS = 20000;
-const PDFJS_VERSION = "4.10.38";
-const MAMMOTH_VERSION = "1.9.0";
+const PDFJS_VERSION = "6.5.438";
+const MAMMOTH_VERSION = "1.9.1";
 
 export async function extractDocumentText(file) {
   const name = String(file?.name || "").toLowerCase();
@@ -32,7 +32,8 @@ export async function extractDocumentText(file) {
     return { text: pages.join("\n"), kind: "PDF", pages: Math.min(pdf.numPages, MAX_PDF_PAGES) };
   }
   if (name.endsWith(".docx") || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-    const mammoth = await import(`https://esm.sh/mammoth@${MAMMOTH_VERSION}?bundle`);
+    const mammothModule = await import(`https://esm.sh/mammoth@${MAMMOTH_VERSION}?bundle`);
+    const mammoth = mammothModule.default || mammothModule;
     const result = await mammoth.extractRawText({ arrayBuffer: buffer });
     return { text: result.value || "", kind: "Word", warnings: (result.messages || []).length };
   }
