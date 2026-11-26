@@ -99,7 +99,7 @@ test("never renders an unsafe memory diagnostic value", async () => {
   });
   documentRef.elements.aiPrompt.value = "اختبار";
   await documentRef.elements.aiSendBtn.handlers.click();
-  assert.match(documentRef.elements.aiConnectionStatus.textContent, /رمز التشخيص: MEMORY_READ_FAILED\\./);
+  assert.match(documentRef.elements.aiConnectionStatus.textContent, /رمز التشخيص: MEMORY_READ_FAILED\./);
   assert.doesNotMatch(documentRef.elements.aiConnectionStatus.textContent, /secret-token|Bearer/);
 });
 
