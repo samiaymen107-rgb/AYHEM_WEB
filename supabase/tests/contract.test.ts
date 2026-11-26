@@ -151,3 +151,21 @@ Deno.test("AYHEM private file library: per-user private bucket and additive uplo
   includes(html, 'id="ayhemFileUpload"', "Memory screen must expose the upload action");
   includes(html, 'src="./integrations/supabase/ayhem-file-library.js', "Memory screen must load the file library module");
 });
+
+Deno.test("AYHEM private file library: PDF and DOCX extraction is bounded and client-side", async () => {
+  const parser = await read("integrations/supabase/ayhem-document-extract.js");
+  const library = await read("integrations/supabase/ayhem-file-library.js");
+  includes(library, "isPdfDocxFile(item)", "Only PDF and DOCX files should expose document preview");
+  includes(library, "previewDocumentFile(item, row, documentButton)", "Document preview must use the local parser");
+  includes(library, 'item.file_path?.startsWith(session.user.id + "/")', "Document preview must verify the authenticated user storage path");
+  includes(parser, "file.arrayBuffer()", "Document bytes must be read in the browser");
+  includes(parser, "file.size > 5 * 1024 * 1024", "Local document extraction must enforce a 5 MiB limit");
+  includes(parser, "MAX_PDF_PAGES = 25", "PDF extraction must be capped at 25 pages");
+  includes(parser, "MAX_TEXT_CHARS = 20000", "Extracted text must be bounded");
+  includes(parser, "isEvalSupported: false", "PDF parsing must disable PDF JavaScript evaluation");
+  includes(parser, "mammoth.extractRawText({ arrayBuffer: buffer })", "DOCX extraction must return raw text");
+  includes(parser, "PDFJS_VERSION = \"6.5.438\"", "PDF.js dependency version must be pinned");
+  includes(parser, "MAMMOTH_VERSION = \"1.9.1\"", "Mammoth dependency version must be pinned");
+  assert(!parser.includes("fetch("), "Parser must not send document bytes using fetch");
+  assert(!parser.includes("functions.invoke"), "Parser must not invoke an AI or server parser");
+});
