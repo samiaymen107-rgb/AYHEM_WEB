@@ -1,5 +1,4 @@
 import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-3";
-import { createAyhemRemoteMemoryStore } from "./ayhem-remote-memory.js?v=20261124-3";
 import { extractDocumentText, DOCUMENT_PREVIEW_LIMIT } from "./ayhem-document-extract.js?v=20261126-doc-preview1";
 
 const BUCKET = "ayhem-private-library";
