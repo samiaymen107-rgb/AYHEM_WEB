@@ -138,6 +138,8 @@ async function consumeRateLimit(
   const apiKey = getPublishableApiKey(readEnv);
   if (!supabaseUrl || !apiKey) return null;
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
   try {
     const response = await (dependencies.fetch ?? fetch)(
       supabaseUrl + "/rest/v1/rpc/ayhem_consume_rate_limit",
@@ -150,6 +152,7 @@ async function consumeRateLimit(
           "Cache-Control": "no-store",
         },
         body: JSON.stringify({}),
+        signal: controller.signal,
       },
     );
     if (!response.ok) return null;
@@ -170,6 +173,8 @@ async function consumeRateLimit(
     };
   } catch {
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
