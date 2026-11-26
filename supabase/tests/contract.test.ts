@@ -189,10 +189,28 @@ Deno.test("AYHEM private file library: Arabic image OCR is local, opt-in, and bo
   includes(source, 'item.file_path?.startsWith(session.user.id + "/")', "OCR must verify the authenticated user's object path");
   includes(source, 'data.size > 5 * 1024 * 1024', "OCR must enforce the 5 MiB file limit");
   includes(source, "pixels > 15000000", "OCR must enforce a 15 megapixel limit");
-  includes(source, 'createWorker("ara+eng", 1', "OCR must support Arabic and English");
+  includes(source, 'createWorker("ara+fra+eng", 1', "OCR must support Arabic and English");
   includes(source, "worker.recognize(data)", "OCR must process the downloaded image in the browser");
   includes(source, "await worker.terminate()", "OCR worker must be terminated after processing");
   includes(source, "output.textContent = extracted.slice(0, 12000)", "OCR output must be bounded and rendered as text");
-  includes(source, "لم تُرسل الصورة أو النص إلى مزوّد ذكاء اصطناعي", "OCR must disclose that image and text are not sent to AI");
+  includes(source, "captureExtractedKnowledge({ text: extracted", "OCR output must be persisted in the private knowledge bank");
   assert(!source.includes("functions.invoke"), "OCR must not invoke an AI or server function");
+});
+
+
+Deno.test("AYHEM knowledge capture: multilingual extracted content is private, append-only, and deduplicated", async () => {
+  const source = await read("integrations/supabase/ayhem-knowledge-capture.js");
+  const library = await read("integrations/supabase/ayhem-file-library.js");
+  includes(library, 'createWorker("ara+fra+eng", 1', "Image OCR must support Arabic, French, and English");
+  includes(source, '.from("ayhem_memories")', "Extracted content must be saved into the existing private knowledge bank");
+  includes(source, '.eq("owner_id", userId)', "Deduplication lookup must be scoped to the authenticated owner");
+  includes(source, 'sourceFilePath.startsWith(userId + "/")', "Capture must reject files outside the current user's private path");
+  includes(source, 'external_id: externalId', "Capture must use a stable source/content identity to avoid duplicates");
+  includes(source, 'evidence_level: "unverified"', "Machine-extracted content must not be represented as verified fact");
+  includes(source, "content_sha256: digest", "Capture metadata must retain a content integrity fingerprint");
+  includes(source, "original_file_preserved: true", "Capture must preserve the original file");
+  includes(source, "ai_provider_used_for_extraction: false", "Capture must disclose local extraction");
+  includes(source, '["ara", "fra", "eng"]', "Capture must constrain language metadata to supported languages");
+  assert(!/\\.from\\(["']ayhem_memories["']\\)\\s*\\.delete\\(/.test(source), "Knowledge capture must not delete existing memories");
+  assert(!/functions\\.invoke|fetch\\(/.test(source), "Knowledge capture must not transmit extracted text to an external parser or AI gateway");
 });

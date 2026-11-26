@@ -1,5 +1,6 @@
 import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-3";
 import { extractDocumentText, DOCUMENT_PREVIEW_LIMIT } from "./ayhem-document-extract.js?v=20261126-doc-preview1";
+import { captureExtractedKnowledge } from "./ayhem-knowledge-capture.js?v=20261126-knowledge1";
 
 const BUCKET = "ayhem-private-library";
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
@@ -51,6 +52,12 @@ async function previewTextFile(item, row, button) {
     if (!data) throw new Error("لم يصل محتوى الملف.");
     if (data.size > 1024 * 1024) throw new Error("المعاينة المحلية متاحة حالياً للملفات النصية حتى 1 ميغابايت.");
     const rawText = await data.text();
+    let capture = null;
+    try {
+      capture = await captureExtractedKnowledge({ text: rawText, title: item.title, sourceFilePath: item.file_path, sourceDocumentId: item.id, contentType: item.document_type || data.type, extractionMethod: "plain-text" });
+    } catch (captureError) {
+      say("تمت قراءة الملف، لكن تعذر حفظ النص في بنك المعلومات: " + (captureError?.message || "خطأ"));
+    }
     const preview = document.createElement("pre");
     preview.className = "ayhem-file-text-preview";
     preview.dir = "auto";
@@ -63,7 +70,7 @@ async function previewTextFile(item, row, button) {
     row.append(preview);
     button.textContent = "تمت المعاينة محلياً";
     button.disabled = true;
-    say("تمت قراءة النص داخل جهازك فقط. لم يُرسل محتوى الملف إلى مزوّد الذكاء الاصطناعي ولم يُحفظ كنص إضافي.");
+    say(capture?.saved ? "تمت قراءة النص وحفظ نسخة منه في بنك معلومات حسابك الخاص. لم يُرسل محتوى الملف إلى مزوّد ذكاء اصطناعي." : capture?.duplicate ? "هذا المحتوى محفوظ مسبقاً في بنك معلومات حسابك." : "تمت قراءة النص محلياً؛ لم يكتمل حفظه في بنك المعلومات.");
   } catch (error) {
     button.disabled = false;
     button.textContent = "معاينة النص محلياً";
@@ -111,7 +118,7 @@ async function previewImageFile(item, row, button) {
 
 async function recognizeImageText(item, row, button) {
   button.disabled = true;
-  button.textContent = "جارٍ تجهيز OCR العربي...";
+  button.textContent = "جارٍ تجهيز OCR بالعربية والفرنسية والإنجليزية...";
   let worker = null;
   try {
     const session = await getAyhemSession();
@@ -132,11 +139,11 @@ async function recognizeImageText(item, row, button) {
     bitmap.close();
     if (!pixels || pixels > 15000000) throw new Error("أبعاد الصورة كبيرة للمعالجة الآمنة (الحد 15 ميغابكسل).");
 
-    say("يُحمّل محرك OCR وبيانات العربية والإنجليزية عند الطلب. تبقى الصورة داخل جهازك.");
+    say("يُحمّل محرك OCR وبيانات العربية والفرنسية والإنجليزية عند الطلب. تبقى الصورة داخل جهازك.");
     const tesseractModule = await import("https://esm.sh/tesseract.js@6.0.1?bundle");
     const createWorker = tesseractModule.createWorker || tesseractModule.default?.createWorker;
     if (typeof createWorker !== "function") throw new Error("تعذر تحميل محرك OCR.");
-    worker = await createWorker("ara+eng", 1, {
+    worker = await createWorker("ara+fra+eng", 1, {
       workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js",
       corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0",
       langPath: "https://tessdata.projectnaptha.com/4.0.0",
@@ -146,6 +153,14 @@ async function recognizeImageText(item, row, button) {
     });
     const result = await worker.recognize(data);
     const extracted = String(result?.data?.text || "").trim();
+    let capture = null;
+    if (extracted) {
+      try {
+        capture = await captureExtractedKnowledge({ text: extracted, title: item.title, sourceFilePath: item.file_path, sourceDocumentId: item.id, contentType: item.document_type || data.type, extractionMethod: "tesseract-ocr", languages: ["ara", "fra", "eng"] });
+      } catch (captureError) {
+        say("اكتمل OCR، لكن تعذر حفظ النص في بنك المعلومات: " + (captureError?.message || "خطأ"));
+      }
+    }
     const output = document.createElement("pre");
     output.className = "ayhem-file-text-preview";
     output.dir = "auto";
@@ -153,14 +168,14 @@ async function recognizeImageText(item, row, button) {
     row.append(output);
     const note = document.createElement("small");
     note.textContent = extracted.length > 12000
-      ? "عُرض أول 12,000 حرف فقط. لم يُحفظ النص ولم يُعدّل الملف الأصلي."
-      : "استخراج OCR محلي للعربية والإنجليزية. قد تختلف الدقة حسب وضوح الصورة وجودتها.";
+      ? "عُرض أول 12,000 حرف فقط. حُفظ النص المستخرج ضمن الحد المسموح، وبقي الملف الأصلي دون تعديل."
+      : "استخراج OCR محلي للعربية والفرنسية والإنجليزية. قد تختلف الدقة حسب وضوح الصورة وجودتها.";
     row.append(note);
     button.textContent = "اكتمل استخراج النص";
-    say("اكتمل OCR داخل المتصفح. لم تُرسل الصورة أو النص إلى مزوّد ذكاء اصطناعي؛ تم تنزيل محرك OCR وبيانات اللغة من شبكات خارجية.");
+    say(capture?.saved ? "اكتمل OCR وحُفظ النص العربي والفرنسي والإنجليزي في بنك معلومات حسابك الخاص." : capture?.duplicate ? "اكتمل OCR؛ هذا النص محفوظ مسبقاً في بنك معلومات حسابك." : "اكتمل OCR محلياً؛ تعذر تأكيد حفظ النص في بنك المعلومات.");
   } catch (error) {
     button.disabled = false;
-    button.textContent = "استخراج النص العربي";
+    button.textContent = "استخراج النص (عربي/فرنسي/إنجليزي)";
     say("تعذر استخراج النص: " + (error?.message || "خطأ غير معروف"));
   } finally {
     if (worker) {
@@ -186,6 +201,14 @@ async function previewDocumentFile(item, row, button) {
     if (error) throw error;
     if (!data) throw new Error("لم يصل محتوى الملف.");
     const result = await extractDocumentText(new File([data], item.title || "document", { type: item.document_type || data.type }));
+    let capture = null;
+    if (result.text?.trim()) {
+      try {
+        capture = await captureExtractedKnowledge({ text: result.text, title: item.title, sourceFilePath: item.file_path, sourceDocumentId: item.id, contentType: item.document_type || data.type, extractionMethod: result.kind.toLowerCase() });
+      } catch (captureError) {
+        say("تم استخراج الوثيقة، لكن تعذر حفظ النص في بنك المعلومات: " + (captureError?.message || "خطأ"));
+      }
+    }
     const output = document.createElement("pre");
     output.className = "ayhem-file-text-preview";
     output.dir = "auto";
@@ -198,7 +221,7 @@ async function previewDocumentFile(item, row, button) {
     row.append(note);
     button.textContent = "تمت المعاينة محلياً";
     button.disabled = true;
-    say("تم استخراج النص داخل جهازك. لم يُرسل محتوى الوثيقة إلى مزوّد ذكاء اصطناعي. مكتبات المعالجة تُحمّل عند الطلب من شبكات توزيع خارجية.");
+    say(capture?.saved ? "تم استخراج نص الوثيقة وحفظه في بنك معلومات حسابك الخاص." : capture?.duplicate ? "نص الوثيقة محفوظ مسبقاً في بنك معلومات حسابك." : "تم استخراج النص محلياً؛ تعذر تأكيد حفظه في بنك المعلومات.");
   } catch (error) {
     button.disabled = false;
     button.textContent = "معاينة الوثيقة محلياً";
