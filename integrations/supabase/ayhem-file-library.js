@@ -108,6 +108,67 @@ async function previewImageFile(item, row, button) {
   }
 }
 
+
+async function recognizeImageText(item, row, button) {
+  button.disabled = true;
+  button.textContent = "جارٍ تجهيز OCR العربي...";
+  let worker = null;
+  try {
+    const session = await getAyhemSession();
+    if (!session?.user?.id) throw new Error("سجّل الدخول أولاً.");
+    if (!item.file_path?.startsWith(session.user.id + "/")) throw new Error("مسار الملف لا يطابق الحساب الحالي.");
+    const { data, error } = await getAyhemSupabaseClient().storage.from(BUCKET).download(item.file_path);
+    if (error) throw error;
+    if (!data) throw new Error("لم يصل محتوى الصورة.");
+    if (data.size <= 0 || data.size > 5 * 1024 * 1024) throw new Error("استخراج النص محدود بصور حتى 5 ميغابايت.");
+    const allowed = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+    const mime = String(item.document_type || data.type || "").toLowerCase();
+    if (!allowed.has(mime) || !allowed.has(String(data.type || mime).toLowerCase())) {
+      throw new Error("نوع الصورة غير مدعوم لاستخراج النص.");
+    }
+    if (typeof createImageBitmap !== "function") throw new Error("هذا المتصفح لا يدعم فحص أبعاد الصورة بأمان.");
+    const bitmap = await createImageBitmap(data);
+    const pixels = bitmap.width * bitmap.height;
+    bitmap.close();
+    if (!pixels || pixels > 15000000) throw new Error("أبعاد الصورة كبيرة للمعالجة الآمنة (الحد 15 ميغابكسل).");
+
+    say("يُحمّل محرك OCR وبيانات العربية والإنجليزية عند الطلب. تبقى الصورة داخل جهازك.");
+    const tesseractModule = await import("https://esm.sh/tesseract.js@6.0.1?bundle");
+    const createWorker = tesseractModule.createWorker || tesseractModule.default?.createWorker;
+    if (typeof createWorker !== "function") throw new Error("تعذر تحميل محرك OCR.");
+    worker = await createWorker("ara+eng", 1, {
+      workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js",
+      corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0",
+      langPath: "https://tessdata.projectnaptha.com/4.0.0",
+      logger: message => {
+        if (message?.status) say("استخراج النص محلياً: " + message.status + (Number.isFinite(message.progress) ? " (" + Math.round(message.progress * 100) + "%)" : ""));
+      }
+    });
+    const result = await worker.recognize(data);
+    const extracted = String(result?.data?.text || "").trim();
+    const output = document.createElement("pre");
+    output.className = "ayhem-file-text-preview";
+    output.dir = "auto";
+    output.textContent = extracted.slice(0, 12000) || "لم يُعثر على نص واضح في الصورة.";
+    row.append(output);
+    const note = document.createElement("small");
+    note.textContent = extracted.length > 12000
+      ? "عُرض أول 12,000 حرف فقط. لم يُحفظ النص ولم يُعدّل الملف الأصلي."
+      : "استخراج OCR محلي للعربية والإنجليزية. قد تختلف الدقة حسب وضوح الصورة وجودتها.";
+    row.append(note);
+    button.textContent = "اكتمل استخراج النص";
+    say("اكتمل OCR داخل المتصفح. لم تُرسل الصورة أو النص إلى مزوّد ذكاء اصطناعي؛ تم تنزيل محرك OCR وبيانات اللغة من شبكات خارجية.");
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = "استخراج النص العربي";
+    say("تعذر استخراج النص: " + (error?.message || "خطأ غير معروف"));
+  } finally {
+    if (worker) {
+      try { await worker.terminate(); } catch {}
+    }
+  }
+}
+
 function isPdfDocxFile(item) {
   const mime = String(item.document_type || "").toLowerCase();
   const name = String(item.title || item.metadata?.original_name || "").toLowerCase();
@@ -178,6 +239,12 @@ function renderItems(items) {
       imageButton.textContent = "معاينة الصورة محلياً";
       imageButton.addEventListener("click", () => previewImageFile(item, row, imageButton));
       row.append(imageButton);
+      const ocrButton = document.createElement("button");
+      ocrButton.type = "button";
+      ocrButton.className = "secondary";
+      ocrButton.textContent = "استخراج النص العربي";
+      ocrButton.addEventListener("click", () => recognizeImageText(item, row, ocrButton));
+      row.append(ocrButton);
     }
     if (item.file_path && isPdfDocxFile(item)) {
       const documentButton = document.createElement("button");
