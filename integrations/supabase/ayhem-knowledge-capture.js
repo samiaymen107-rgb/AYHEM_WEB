@@ -15,6 +15,7 @@ export async function captureExtractedKnowledge({
   contentType = null,
   extractionMethod = "text-extraction",
   languages = [],
+  pages = [],
 } = {}) {
   const content = String(text || "").trim().slice(0, MAX_CAPTURE_CHARS);
   if (!content) return { saved: false, empty: true };
@@ -72,6 +73,7 @@ export async function captureExtractedKnowledge({
         source_title: safeTitle,
         content_type: contentType,
         languages_processed: languageList,
+        source_page_numbers: Array.isArray(pages) ? [...new Set(pages.filter(page => Number.isInteger(page) && page > 0))].slice(0, 5) : [],
         content_sha256: digest,
         original_file_preserved: true,
         ai_provider_used_for_extraction: false,
