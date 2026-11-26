@@ -116,6 +116,19 @@ Deno.test("AYHEM rate-limit runtime: every valid request is quota-checked before
 });
 
 
+Deno.test("AYHEM private file library: plain text preview stays local and bounded", async () => {
+  const source = await read("integrations/supabase/ayhem-file-library.js");
+  includes(source, "isPlainTextFile(item)", "Only plain text and CSV files should expose the local text preview");
+  includes(source, ".storage.from(BUCKET).download(item.file_path)", "Text preview must download through the authenticated private bucket");
+  includes(source, 'item.file_path.startsWith(session.user.id + "/")', "Text preview must verify the current user's object path");
+  includes(source, "data.size > 1024 * 1024", "Local preview must enforce a 1 MiB processing limit");
+  includes(source, "rawText.slice(0, 20000)", "Local preview must cap displayed text");
+  includes(source, "preview.textContent = rawText", "Extracted text must be rendered as text, not HTML");
+  includes(source, "لم يُرسل محتوى الملف إلى مزوّد الذكاء الاصطناعي", "Local preview must disclose that file content is not sent to an AI provider");
+  assert(!source.includes("functions.invoke"), "Local text preview must not call an AI or external function");
+  assert(!source.includes("fetch("), "Local text preview must not make a separate network request outside the authenticated storage client");
+});
+
 Deno.test("AYHEM private file library: per-user private bucket and additive upload flow", async () => {
   const sql = await read("supabase/migrations/202611260002_ayhem_private_file_library.sql");
   const moduleSource = await read("integrations/supabase/ayhem-file-library.js");
