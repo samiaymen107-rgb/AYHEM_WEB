@@ -131,7 +131,7 @@ test("keeps provider and model metadata out of the user-facing answer", async ()
 });
 
 
-test("recognizes only explicit cloud-memory save commands", () => {
+test("recognizes explicit cloud-memory save commands and natural save requests", () => {
   assert.equal(
     parseAyhemExplicitMemorySave("احفظ هذه المعلومة في الذاكرة السحابية: اسم مشروعي هو AYHEM"),
     "اسم مشروعي هو AYHEM",
@@ -139,6 +139,10 @@ test("recognizes only explicit cloud-memory save commands", () => {
   assert.equal(
     parseAyhemExplicitMemorySave("احفظ في الذاكرة السحابية: أفضل العمل خطوة بخطوة"),
     "أفضل العمل خطوة بخطوة",
+  );
+  assert.equal(
+    parseAyhemExplicitMemorySave("اسمي أيمن سامي، وأنا مؤسس مشروع AYHEM. أعمل على مبادرة فلاحية للتصرف المستدام في الأراضي شبه الجافة بمنطقة جلمة في تونس. أريدك أن تحفظ هاتين المعلومتين في ذاكرتك إذا كانت خاصية الذاكرة متاحة لديك."),
+    "اسمي أيمن سامي، وأنا مؤسس مشروع AYHEM. أعمل على مبادرة فلاحية للتصرف المستدام في الأراضي شبه الجافة بمنطقة جلمة في تونس.",
   );
   assert.equal(parseAyhemExplicitMemorySave("هل تستطيع حفظ هذه المعلومة؟"), null);
 });
