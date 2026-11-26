@@ -29,7 +29,7 @@ function formatSize(bytes) {
 function isPlainTextFile(item) {
   const mime = String(item.document_type || "").toLowerCase();
   const name = String(item.title || item.metadata?.original_name || "").toLowerCase();
-  return mime === "text/plain" || mime === "text/csv" || /\\.(txt|csv)$/.test(name);
+  return mime === "text/plain" || mime === "text/csv" || /\.(txt|csv)$/.test(name);
 }
 
 async function previewTextFile(item, row, button) {
