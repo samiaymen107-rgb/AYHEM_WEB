@@ -61,8 +61,7 @@ Deno.test("AYHEM Edge handlers: authenticated runtime paths with mocked upstream
         equal(headers.get("apikey"), "test-publishable-key", "rate-limit RPC uses publishable key");
         equal(headers.get("authorization"), "Bearer test-user-token", "rate-limit RPC forwards caller JWT");
         const params = JSON.parse(String(init?.body));
-        equal(params.p_limit, 20, "per-user request limit");
-        equal(params.p_window_seconds, 60, "per-user window duration");
+        equal(Object.keys(params).length, 0, "quota policy must not be caller-configurable");
         return allowedQuotaResponse();
       }
       groqCalls++;
