@@ -50,7 +50,7 @@ jobs:
         with:
           deno-version: v2.x
       - name: Run Supabase security contract tests
-        run: deno test --allow-env --allow-read=supabase/functions,supabase/migrations,integrations/supabase,integrations/ai-network supabase/tests/contract.test.ts supabase/functions/tests/edge-handlers.integration.test.ts
+        run: deno test --allow-env --allow-read=index.html,supabase/functions,supabase/migrations,integrations/supabase,integrations/ai-network supabase/tests/contract.test.ts supabase/functions/tests/edge-handlers.integration.test.ts
       - name: Install PostgreSQL client
         run: sudo apt-get update && sudo apt-get install --yes postgresql-client
       - name: Run isolated PostgreSQL quota integration tests
