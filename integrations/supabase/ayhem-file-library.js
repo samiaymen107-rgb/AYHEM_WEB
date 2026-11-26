@@ -26,6 +26,44 @@ function fileKind(file) {
 function formatSize(bytes) {
   return bytes < 1024 * 1024 ? Math.max(1, Math.round(bytes / 1024)) + " KB" : (bytes / 1024 / 1024).toFixed(1) + " MB";
 }
+function isPlainTextFile(item) {
+  const mime = String(item.document_type || "").toLowerCase();
+  const name = String(item.title || item.metadata?.original_name || "").toLowerCase();
+  return mime === "text/plain" || mime === "text/csv" || /\.(txt|csv)$/.test(name);
+}
+
+async function previewTextFile(item, row, button) {
+  button.disabled = true;
+  button.textContent = "جارٍ جلب النص...";
+  try {
+    const session = await getAyhemSession();
+    if (!session?.user?.id) throw new Error("سجّل الدخول أولاً.");
+    if (!item.file_path.startsWith(session.user.id + "/")) throw new Error("مسار الملف لا يطابق الحساب الحالي.");
+    const { data, error } = await getAyhemSupabaseClient().storage.from(BUCKET).download(item.file_path);
+    if (error) throw error;
+    if (!data) throw new Error("لم يصل محتوى الملف.");
+    if (data.size > 1024 * 1024) throw new Error("المعاينة المحلية متاحة حالياً للملفات النصية حتى 1 ميغابايت.");
+    const rawText = await data.text();
+    const preview = document.createElement("pre");
+    preview.className = "ayhem-file-text-preview";
+    preview.dir = "auto";
+    preview.textContent = rawText.slice(0, 20000) || "الملف النصي فارغ.";
+    if (rawText.length > 20000) {
+      const note = document.createElement("small");
+      note.textContent = "تم عرض أول 20,000 حرف فقط. لم يُعدّل الملف الأصلي.";
+      preview.append(note);
+    }
+    row.append(preview);
+    button.textContent = "تمت المعاينة محلياً";
+    button.disabled = true;
+    say("تمت قراءة النص داخل جهازك فقط. لم يُرسل محتوى الملف إلى مزوّد الذكاء الاصطناعي ولم يُحفظ كنص إضافي.");
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = "معاينة النص محلياً";
+    say("تعذرت المعاينة: " + (error?.message || "خطأ غير معروف"));
+  }
+}
+
 function renderItems(items) {
   if (!list) return;
   list.replaceChildren();
@@ -44,6 +82,14 @@ function renderItems(items) {
     const size = Number(item.metadata?.size_bytes || 0);
     meta.textContent = [item.document_type || "ملف", size ? formatSize(size) : "", new Date(item.created_at).toLocaleString()].filter(Boolean).join(" · ");
     row.append(title, meta);
+    if (item.file_path && isPlainTextFile(item)) {
+      const previewButton = document.createElement("button");
+      previewButton.type = "button";
+      previewButton.className = "secondary";
+      previewButton.textContent = "معاينة النص محلياً";
+      previewButton.addEventListener("click", () => previewTextFile(item, row, previewButton));
+      row.append(previewButton);
+    }
     const path = item.file_path;
     if (path) {
       const open = document.createElement("button");
