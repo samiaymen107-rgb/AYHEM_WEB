@@ -1,5 +1,5 @@
--- AYHEM per-user request limiter (DRAFT).
--- This file is intentionally NOT applied to any Supabase project.
+-- AYHEM per-user request limiter.
+-- Migration source is committed to GitHub main; it is intentionally NOT applied to the production Supabase project.
 -- Identity is derived only from auth.uid(); callers cannot choose another user's bucket.
 
 create table if not exists public.ayhem_rate_limit_windows (

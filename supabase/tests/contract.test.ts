@@ -95,6 +95,9 @@ Deno.test("AYHEM rate-limit migration: private atomic per-user quota contract", 
   includes(sql, "set search_path = ''", "Security-definer RPC must pin an empty search path");
   includes(sql, "on conflict (user_id) do update", "Quota increments must be atomic under concurrency");
   includes(sql, "least(current_window.request_count + 1, v_limit + 1)", "Denied requests must not grow counters without bound");
+  includes(sql, "pg_catalog.clock_timestamp()", "Quota window must use a wall-clock timestamp rather than transaction start time");
+  includes(sql, "pg_catalog.date_part('epoch', v_now)", "Fixed-window calculation must be explicit and schema-qualified");
+  assert(!/execute\s+on\s+function[^;]+\s+to\s+public/i.test(sql), "Quota RPC must not grant execution to PUBLIC");
   includes(sql, "grant execute on function public.ayhem_consume_rate_limit() to authenticated", "Only authenticated users may consume quota");
   includes(sql, "revoke all on function public.ayhem_consume_rate_limit() from public, anon", "Public and anonymous callers must not execute quota RPC");
 });
