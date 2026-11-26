@@ -60,13 +60,13 @@ body{background:radial-gradient(ellipse at 50% -20%,#27313d 0,#151a21 42%,#10131
  .app.chat-mode{position:fixed;inset:0;width:100%;height:100dvh;max-width:none;margin:0;padding:0;display:grid;grid-template-columns:270px minmax(0,1fr);grid-template-rows:56px minmax(0,1fr) auto;gap:0;border:0;background:#101318;box-shadow:none}
  .app.chat-mode>.topbar,.app.chat-mode>.bottom-nav{display:none!important}
  .app.chat-mode>.workspace{display:contents}
- .app.chat-mode #screen-ai{display:flex!important;position:static;grid-column:2;grid-row:1/4;width:100%;height:100%;min-height:0;border:0;border-radius:0}
- .app.chat-mode .chat-top{grid-row:1;flex:0 0 56px;min-height:56px}
+ .app.chat-mode #screen-ai{display:contents!important}
+ .app.chat-mode .chat-top{grid-column:2;grid-row:1;flex:0 0 56px;min-height:56px}
  .app.chat-mode .chat-menu{display:none}
  .app.chat-mode .chat-drawer{position:relative;inset:auto;grid-column:1;grid-row:1/4;width:auto;height:100%;min-height:0;transform:none!important;transition:none;z-index:1;padding:20px 14px;background:#171c23;border-inline-end:1px solid var(--line);box-shadow:none}
  .app.chat-mode .chat-drawer-backdrop{display:none!important}
- .app.chat-mode .chat-history{grid-row:2;min-height:0;padding:28px clamp(24px,7vw,100px) 30px}
- .app.chat-mode .chat-composer{grid-row:3;padding:12px clamp(24px,7vw,100px) 18px}
+ .app.chat-mode .chat-history{grid-column:2;grid-row:2;min-height:0;padding:28px clamp(24px,7vw,100px) 30px}
+ .app.chat-mode .chat-composer{grid-column:2;grid-row:3;padding:12px clamp(24px,7vw,100px) 18px}
  .app.chat-mode .chat-composer textarea{max-width:900px;margin-inline:auto;min-height:60px}
  .app.chat-mode .chat-disclaimer{max-width:900px;margin:7px auto 0}
  .app.chat-mode .chat-send{right:auto;inset-inline-end:calc(clamp(24px,7vw,100px) + 12px);bottom:calc(52px + env(safe-area-inset-bottom,0px))}
