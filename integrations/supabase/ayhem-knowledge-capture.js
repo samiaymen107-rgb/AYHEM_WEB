@@ -1,4 +1,4 @@
-import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-3";
+import { getAyhemSupabaseClient, getAyhemSession } from "./ayhem-supabase-auth.js?v=20261124-2";
 
 const MAX_CAPTURE_CHARS = 20000;
 
