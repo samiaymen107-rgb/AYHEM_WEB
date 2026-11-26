@@ -195,6 +195,110 @@ async function recognizeImageText(item, row, button) {
   }
 }
 
+
+async function recognizeScannedPdfText(item, row, button) {
+  button.disabled = true;
+  button.textContent = "جارٍ تجهيز OCR للصفحات الممسوحة...";
+  let worker = null;
+  let pdf = null;
+  const canvases = [];
+  try {
+    const session = await getAyhemSession();
+    if (!session?.user?.id) throw new Error("سجّل الدخول أولاً.");
+    if (!item.file_path?.startsWith(session.user.id + "/")) throw new Error("مسار الملف لا يطابق الحساب الحالي.");
+    const { data, error } = await getAyhemSupabaseClient().storage.from(BUCKET).download(item.file_path);
+    if (error) throw error;
+    if (!data || data.size <= 0 || data.size > 5 * 1024 * 1024) throw new Error("استخراج PDF الممسوح محدود بملفات حتى 5 ميغابايت.");
+    const mime = String(item.document_type || data.type || "").toLowerCase();
+    if (mime !== "application/pdf" || String(data.type || mime).toLowerCase() !== "application/pdf") throw new Error("هذه العملية مخصصة لملفات PDF فقط.");
+
+    const languages = getOcrLanguages();
+    say("يُحمّل PDF.js ومحرك OCR وبيانات اللغات المختارة عند الطلب. تبقى صفحات الوثيقة داخل جهازك.");
+    const pdfjs = await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@6.5.438/build/pdf.min.mjs");
+    pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.5.438/build/pdf.worker.min.mjs";
+    pdf = await pdfjs.getDocument({ data: new Uint8Array(await data.arrayBuffer()), isEvalSupported: false }).promise;
+    if (!pdf.numPages) throw new Error("ملف PDF لا يحتوي صفحات قابلة للقراءة.");
+    const pageLimit = Math.min(pdf.numPages, 5);
+
+    const tesseractModule = await import("https://esm.sh/tesseract.js@6.0.1?bundle");
+    const createWorker = tesseractModule.createWorker || tesseractModule.default?.createWorker;
+    if (typeof createWorker !== "function") throw new Error("تعذر تحميل محرك OCR.");
+    worker = await createWorker(languages.join("+"), 1, {
+      workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/worker.min.js",
+      corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@6.0.0",
+      langPath: "https://tessdata.projectnaptha.com/4.0.0",
+      logger: message => {
+        if (message?.status) say("OCR للـPDF: " + message.status + (Number.isFinite(message.progress) ? " (" + Math.round(message.progress * 100) + "%)" : ""));
+      }
+    });
+
+    const pageTexts = [];
+    const processedPages = [];
+    for (let pageNo = 1; pageNo <= pageLimit; pageNo++) {
+      say("جارٍ استخراج الصفحة " + pageNo + " من " + pageLimit + " محلياً...");
+      const page = await pdf.getPage(pageNo);
+      const baseViewport = page.getViewport({ scale: 1 });
+      const scale = Math.min(1.5, Math.sqrt(4000000 / Math.max(1, baseViewport.width * baseViewport.height)));
+      const viewport = page.getViewport({ scale: Math.max(0.5, scale) });
+      const canvas = document.createElement("canvas");
+      canvases.push(canvas);
+      canvas.width = Math.ceil(viewport.width);
+      canvas.height = Math.ceil(viewport.height);
+      if (canvas.width * canvas.height > 4000000) throw new Error("تجاوزت أبعاد صفحة PDF حد المعالجة الآمنة.");
+      const context = canvas.getContext("2d", { alpha: false });
+      if (!context) throw new Error("تعذر تجهيز مساحة عرض صفحة PDF.");
+      await page.render({ canvasContext: context, viewport }).promise;
+      const result = await worker.recognize(canvas);
+      const text = String(result?.data?.text || "").trim();
+      if (text) pageTexts.push("[صفحة " + pageNo + "]\n" + text);
+      processedPages.push(pageNo);
+      canvas.width = 0;
+      canvas.height = 0;
+      page.cleanup();
+    }
+
+    const extracted = pageTexts.join("\n\n").slice(0, 20000);
+    let capture = null;
+    if (extracted) {
+      try {
+        capture = await captureExtractedKnowledge({
+          text: extracted, title: item.title, sourceFilePath: item.file_path,
+          sourceDocumentId: item.id, contentType: mime,
+          extractionMethod: "pdf-page-ocr", languages, pages: processedPages
+        });
+      } catch (captureError) {
+        say("اكتمل OCR، لكن تعذر حفظ النص في بنك المعلومات: " + (captureError?.message || "خطأ"));
+      }
+    }
+    const output = document.createElement("pre");
+    output.className = "ayhem-file-text-preview";
+    output.dir = "auto";
+    output.textContent = extracted || "لم يُعثر على نص واضح في الصفحات المعالجة.";
+    row.append(output);
+    const note = document.createElement("small");
+    note.textContent = "OCR محلي للصفحات " + (processedPages.join("، ") || "—") + " من أصل " + pdf.numPages +
+      (pdf.numPages > pageLimit ? ". عولجت أول 5 صفحات فقط في هذه العملية." : ".") +
+      " قد تختلف الدقة حسب جودة المسح واللغات المختارة.";
+    row.append(note);
+    button.textContent = "اكتمل OCR للـPDF";
+    say(capture?.saved ? "اكتمل OCR وحُفظ النص مع أرقام الصفحات في بنك معلومات حسابك الخاص." : capture?.duplicate ? "هذا النص محفوظ مسبقاً في بنك معلومات حسابك." : "اكتمل OCR محلياً؛ تعذر تأكيد حفظ النص في بنك المعلومات.");
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = "استخراج نص PDF الممسوح";
+    say("تعذر OCR للـPDF: " + (error?.message || "خطأ غير معروف"));
+  } finally {
+    for (const canvas of canvases) { canvas.width = 0; canvas.height = 0; }
+    if (worker) { try { await worker.terminate(); } catch {} }
+    if (pdf) { try { await pdf.destroy(); } catch {} }
+  }
+}
+
+function isPdfFile(item) {
+  const mime = String(item.document_type || "").toLowerCase();
+  const name = String(item.title || item.metadata?.original_name || "").toLowerCase();
+  return mime === "application/pdf" || name.endsWith(".pdf");
+}
+
 function isPdfDocxFile(item) {
   const mime = String(item.document_type || "").toLowerCase();
   const name = String(item.title || item.metadata?.original_name || "").toLowerCase();
@@ -287,6 +391,14 @@ function renderItems(items) {
       documentButton.textContent = "معاينة الوثيقة محلياً";
       documentButton.addEventListener("click", () => previewDocumentFile(item, row, documentButton));
       row.append(documentButton);
+      if (isPdfFile(item)) {
+        const ocrPdfButton = document.createElement("button");
+        ocrPdfButton.type = "button";
+        ocrPdfButton.className = "secondary";
+        ocrPdfButton.textContent = "استخراج نص PDF الممسوح";
+        ocrPdfButton.addEventListener("click", () => recognizeScannedPdfText(item, row, ocrPdfButton));
+        row.append(ocrPdfButton);
+      }
     }
     const path = item.file_path;
     if (path) {
