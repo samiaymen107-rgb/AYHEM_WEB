@@ -79,3 +79,19 @@ Deno.test("TinyFish UI: zero-cost mode blocks all paid activity locally", async 
   assert(!source.includes("functions.invoke"), "TinyFish UI must not call any Edge Function");
   assert(!source.includes("agent.tinyfish.ai"), "TinyFish UI must not contact TinyFish directly");
 });
+
+
+Deno.test("AYHEM rate-limit migration: private atomic per-user quota contract", async () => {
+  const sql = await read("supabase/migrations/202611260001_ayhem_user_rate_limit.sql");
+  includes(sql, "user_id uuid primary key references auth.users(id) on delete cascade", "Quota row must be keyed to an Auth user");
+  includes(sql, "enable row level security", "Quota table must have RLS enabled");
+  includes(sql, "revoke all on table public.ayhem_rate_limit_windows from anon, authenticated, public", "Clients must not access quota rows directly");
+  includes(sql, "v_user_id := auth.uid()", "RPC must derive identity from verified JWT context");
+  assert(!/p_user_id|user_id\\s+uuid\\s*,/i.test(sql), "RPC must not accept a caller-selected user ID");
+  includes(sql, "security definer", "Atomic quota RPC must run with controlled owner privileges");
+  includes(sql, "set search_path = ''", "Security-definer RPC must pin an empty search path");
+  includes(sql, "on conflict (user_id) do update", "Quota increments must be atomic under concurrency");
+  includes(sql, "least(current_window.request_count + 1, p_limit + 1)", "Denied requests must not grow counters without bound");
+  includes(sql, "grant execute on function public.ayhem_consume_rate_limit(integer, integer) to authenticated", "Only authenticated users may consume quota");
+  includes(sql, "revoke all on function public.ayhem_consume_rate_limit(integer, integer) from public, anon", "Public and anonymous callers must not execute quota RPC");
+});
