@@ -57,3 +57,34 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayhem_contract
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/rate_limit_postgres.integration.sql
+      - name: Verify concurrent quota increments
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayhem_contract
+        run: |
+          set -euo pipefail
+          user_id="33333333-3333-4333-8333-333333333333"
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "INSERT INTO auth.users (id) VALUES ('$user_id');"
+          while [ "$(date -u +%S)" -gt 50 ]; do sleep 1; done
+          results="$(mktemp)"
+          trap 'rm -f "$results"' EXIT
+          pids=()
+          for i in $(seq 1 25); do
+            (
+              psql "$DATABASE_URL" -X -qAt -v ON_ERROR_STOP=1 -c "SET ROLE authenticated; SELECT set_config('request.jwt.claim.sub', '$user_id', false); SELECT allowed FROM public.ayhem_consume_rate_limit();" | tail -n 1
+            ) >> "$results" &
+            pids+=("$!")
+          done
+          for pid in "${pids[@]}"; do wait "$pid"; done
+          allowed="$(grep -cx 't' "$results" || true)"
+          denied="$(grep -cx 'f' "$results" || true)"
+          if [ "$allowed" -ne 20 ] || [ "$denied" -ne 5 ]; then
+            cat "$results"
+            echo "Expected exactly 20 allowed and 5 denied concurrent requests; got $allowed allowed and $denied denied."
+            exit 1
+          fi
+          counter="$(psql "$DATABASE_URL" -X -qAt -c "SELECT request_count FROM public.ayhem_rate_limit_windows WHERE user_id = '$user_id';")"
+          if [ "$counter" -ne 21 ]; then
+            echo "Expected saturated counter 21 after concurrent requests; got $counter."
+            exit 1
+          fi
+          echo "Concurrent quota test passed: 20 allowed, 5 denied, counter saturated at 21."
