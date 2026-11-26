@@ -169,3 +169,15 @@ Deno.test("AYHEM private file library: PDF and DOCX extraction is bounded and cl
   assert(!parser.includes("fetch("), "Parser must not send document bytes using fetch");
   assert(!parser.includes("functions.invoke"), "Parser must not invoke an AI or server parser");
 });
+
+Deno.test("AYHEM private file library: local image preview stays private and bounded", async () => {
+  const source = await read("integrations/supabase/ayhem-file-library.js");
+  includes(source, "isImageFile(item)", "Only supported image files should expose image preview");
+  includes(source, "previewImageFile(item, row, imageButton)", "Image preview must use the local image renderer");
+  includes(source, 'item.file_path?.startsWith(session.user.id + "/")', "Image preview must verify the current user's storage path");
+  includes(source, "data.size > 5 * 1024 * 1024", "Image preview must enforce a 5 MiB limit");
+  includes(source, "URL.createObjectURL(data)", "Image preview must use a local object URL");
+  includes(source, "URL.revokeObjectURL(objectUrl)", "Image preview must release local object URLs");
+  includes(source, '["image/jpeg", "image/png", "image/webp", "image/gif"]', "Only raster image MIME types should be previewed");
+  assert(!source.includes("functions.invoke"), "Image preview must not send images to an AI or server function");
+});
