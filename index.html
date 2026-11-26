@@ -195,7 +195,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
       <pre id="memoryOutput" class="ai-output" aria-live="polite"></pre>
       <section class="file-library" aria-labelledby="ayhemFilesTitle">
         <h3 id="ayhemFilesTitle">مكتبتي الخاصة — الصور والوثائق</h3>
-        <p>ارفع صورك وملفات PDF وWord والنصوص إلى مساحة خاصة بحسابك. لا يستطيع المستخدمون الآخرون فتحها.</p>
+        <p>ارفع صورك وملفات PDF وWord والنصوص إلى مساحة خاصة بحسابك. عند استخراج النص، تُحفظ نسخة قابلة للبحث في بنك معلومات حسابك فقط، مع الاحتفاظ بالملف الأصلي. لا يستطيع المستخدمون الآخرون فتحها.</p>
         <label for="ayhemFileInput">اختيار الصور والوثائق (حتى 10 ميغابايت لكل ملف)</label>
         <input id="ayhemFileInput" type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/csv" />
         <div class="actions">
@@ -263,6 +263,6 @@ document.getElementById("startBtn").addEventListener("click",async()=>{const b=d
 <script type="module" src="AYHEM_MASTER_ORCHESTRATOR.js?v=20261125-single-screen"></script>
 <script type="module" src="./integrations/supabase/ayhem-auth-ui.js?v=20261124-groq1"></script>
 <script type="module" src="./integrations/supabase/ayhem-memory-ui.js?v=20261125-rls1"></script>
-<script type="module" src="./integrations/supabase/ayhem-file-library.js?v=20261126-files1"></script>
+<script type="module" src="./integrations/supabase/ayhem-file-library.js?v=20261126-knowledge1"></script>
 <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=20261125-ayhem-digital-identity1"></script>
 </body></html>
