@@ -29,6 +29,19 @@ concurrency:
 jobs:
   contract-tests:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ayhem_contract
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ayhem_contract"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,3 +51,9 @@ jobs:
           deno-version: v2.x
       - name: Run Supabase security contract tests
         run: deno test --allow-env --allow-read=supabase/functions,supabase/migrations,integrations/supabase,integrations/ai-network supabase/tests/contract.test.ts supabase/functions/tests/edge-handlers.integration.test.ts
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install --yes postgresql-client
+      - name: Run isolated PostgreSQL quota integration tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ayhem_contract
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/tests/rate_limit_postgres.integration.sql
