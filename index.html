@@ -145,6 +145,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
   .app.chat-mode .chat-history{padding-inline:max(8vw,40px)}
 }
 
+
+.file-library{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);display:grid;gap:12px}
+.file-library h3{margin:0;font-size:1.05rem}
+.file-library>p{margin:0;line-height:1.7;color:var(--muted)}
+.file-library input[type=file]{width:100%;max-width:100%;padding:12px;border:1px dashed var(--line);border-radius:12px;background:rgba(255,255,255,.04);color:inherit}
+.ayhem-file-list{display:grid;gap:10px}
+.ayhem-file-item{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px;border:1px solid var(--line);border-radius:12px}
+.ayhem-file-item strong{flex:1 1 100%;overflow-wrap:anywhere}
+.ayhem-file-item small{color:var(--muted);font-size:.82rem}
 </style>
 </head>
 <body>
@@ -184,6 +193,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{
         <button class="secondary" id="memoryIsolationBtn" type="button" disabled>فحص الجلسة وعزل الذاكرة (قراءة فقط)</button>
       </div>
       <pre id="memoryOutput" class="ai-output" aria-live="polite"></pre>
+      <section class="file-library" aria-labelledby="ayhemFilesTitle">
+        <h3 id="ayhemFilesTitle">مكتبتي الخاصة — الصور والوثائق</h3>
+        <p>ارفع صورك وملفات PDF وWord والنصوص إلى مساحة خاصة بحسابك. لا يستطيع المستخدمون الآخرون فتحها.</p>
+        <label for="ayhemFileInput">اختيار الصور والوثائق (حتى 10 ميغابايت لكل ملف)</label>
+        <input id="ayhemFileInput" type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/csv" />
+        <div class="actions">
+          <button class="primary" id="ayhemFileUpload" type="button" disabled>رفع إلى الذاكرة</button>
+          <button class="secondary" id="ayhemFileRefresh" type="button" disabled>تحديث المكتبة</button>
+        </div>
+        <p id="ayhemFileStatus" class="ai-status" role="status" aria-live="polite">سجّل الدخول لإدارة مكتبتك الخاصة.</p>
+        <div id="ayhemFileList" class="ayhem-file-list" aria-live="polite"></div>
+      </section>
     </section></div></section>
 <section class="screen" id="screen-account"><div class="screen-card"><div class="screen-heading"><h2>حساب AYHEM</h2><button class="back" data-go="home">الرئيسية</button></div><section class="panel auth-panel" aria-labelledby="authTitle">
       <h2 id="authTitle">تسجيل الدخول إلى AYHEM / Supabase Auth</h2>
@@ -242,5 +263,6 @@ document.getElementById("startBtn").addEventListener("click",async()=>{const b=d
 <script type="module" src="AYHEM_MASTER_ORCHESTRATOR.js?v=20261125-single-screen"></script>
 <script type="module" src="./integrations/supabase/ayhem-auth-ui.js?v=20261124-groq1"></script>
 <script type="module" src="./integrations/supabase/ayhem-memory-ui.js?v=20261125-rls1"></script>
+<script type="module" src="./integrations/supabase/ayhem-file-library.js?v=20261126-files1"></script>
 <script type="module" src="./integrations/ai-network/ayhem-ai-ui.js?v=20261125-ayhem-digital-identity1"></script>
 </body></html>

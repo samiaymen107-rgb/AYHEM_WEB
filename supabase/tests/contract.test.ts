@@ -114,3 +114,27 @@ Deno.test("AYHEM rate-limit runtime: every valid request is quota-checked before
   assert(!source.includes("p_limit") && !source.includes("p_window_seconds"), "Edge Function must not send caller-configurable quota values");
   assert(!source.includes("SUPABASE_SERVICE_ROLE_KEY"), "Rate-limit RPC must never use a service-role key");
 });
+
+
+Deno.test("AYHEM private file library: per-user private bucket and additive upload flow", async () => {
+  const sql = await read("supabase/migrations/202611260002_ayhem_private_file_library.sql");
+  const moduleSource = await read("integrations/supabase/ayhem-file-library.js");
+  const html = await read("index.html");
+  includes(sql, "'ayhem-private-library'", "File library must use its dedicated bucket");
+  includes(sql, "false", "File library bucket must be private");
+  includes(sql, "10485760", "File library must cap each file at 10 MiB");
+  includes(sql, "storage.foldername(name))[1] = (select auth.uid()::text)", "Storage policies must isolate each user's folder");
+  includes(sql, "for select to authenticated", "Only authenticated owners may read their objects");
+  includes(sql, "for insert to authenticated", "Only authenticated owners may upload objects");
+  assert(!/for\s+(?:delete|update)/i.test(sql), "Initial file library must not add delete or overwrite permissions");
+  includes(moduleSource, 'from("ayhem_documents")', "File library must register metadata in the existing document table");
+  includes(moduleSource, '.storage.from(BUCKET).upload(', "File library must upload into the private bucket");
+  includes(moduleSource, "createSignedUrl(", "File access must use short-lived signed URLs");
+  includes(moduleSource, "MAX_FILE_BYTES = 10 * 1024 * 1024", "Client must enforce the 10 MiB per-file limit");
+  includes(moduleSource, "getAyhemSession()", "File upload must require an authenticated session");
+  assert(!/\.from\(["']ayhem_documents["']\)\s*\.delete\(/.test(moduleSource), "File library must not delete existing document metadata");
+  assert(!/\.storage\.from\(BUCKET\)\.remove\(/.test(moduleSource), "File library must not remove stored files");
+  includes(html, 'id="ayhemFileInput"', "Memory screen must expose the file picker");
+  includes(html, 'id="ayhemFileUpload"', "Memory screen must expose the upload action");
+  includes(html, 'src="./integrations/supabase/ayhem-file-library.js', "Memory screen must load the file library module");
+});
