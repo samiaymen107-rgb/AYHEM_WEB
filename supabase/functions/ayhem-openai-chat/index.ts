@@ -134,7 +134,7 @@ async function consumeRateLimit(
   dependencies: RateLimitDependencies = {},
 ): Promise<{ allowed: boolean; remaining: number; resetAt: string; retryAfter: number } | null> {
   const readEnv = dependencies.env ?? ((name: string) => Deno.env.get(name));
-  const supabaseUrl = readEnv("SUPABASE_URL")?.replace(/\\/+$/, "");
+  const supabaseUrl = readEnv("SUPABASE_URL")?.replace(/\/+$/, "");
   const apiKey = getPublishableApiKey(readEnv);
   if (!supabaseUrl || !apiKey) return null;
 
