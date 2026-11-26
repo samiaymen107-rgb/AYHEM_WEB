@@ -57,7 +57,7 @@ begin
           else 1
         end,
         updated_at = excluded.updated_at
-  returning public.ayhem_rate_limit_windows.request_count
+  returning current_window.request_count
   into v_count;
 
   return query
