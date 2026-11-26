@@ -116,7 +116,7 @@ Deno.test("AYHEM rate-limit runtime: every valid request is quota-checked before
 });
 
 
-Deno.test("AYHEM private file library: plain text preview stays local and bounded", async () => {
+Deno.test("AYHEM private file library: plain text preview and knowledge capture are local and bounded", async () => {
   const source = await read("integrations/supabase/ayhem-file-library.js");
   includes(source, "isPlainTextFile(item)", "Only plain text and CSV files should expose the local text preview");
   includes(source, ".storage.from(BUCKET).download(item.file_path)", "Text preview must download through the authenticated private bucket");
@@ -124,7 +124,8 @@ Deno.test("AYHEM private file library: plain text preview stays local and bounde
   includes(source, "data.size > 1024 * 1024", "Local preview must enforce a 1 MiB processing limit");
   includes(source, "rawText.slice(0, 20000)", "Local preview must cap displayed text");
   includes(source, "preview.textContent = rawText.slice(0, 20000)", "Extracted text must be rendered as text, not HTML");
-  includes(source, "لم يُرسل محتوى الملف إلى مزوّد الذكاء الاصطناعي", "Local preview must disclose that file content is not sent to an AI provider");
+  includes(source, "captureExtractedKnowledge({ text: rawText", "Text preview must save extracted text to the private knowledge bank");
+  includes(source, "تمت قراءة النص وحفظ نسخة منه في بنك معلومات حسابك الخاص", "Text preview must report successful private knowledge capture");
   assert(!source.includes("functions.invoke"), "Local text preview must not call an AI or external function");
   assert(!source.includes("fetch("), "Local text preview must not make a separate network request outside the authenticated storage client");
 });
@@ -189,7 +190,7 @@ Deno.test("AYHEM private file library: Arabic image OCR is local, opt-in, and bo
   includes(source, 'item.file_path?.startsWith(session.user.id + "/")', "OCR must verify the authenticated user's object path");
   includes(source, 'data.size > 5 * 1024 * 1024', "OCR must enforce the 5 MiB file limit");
   includes(source, "pixels > 15000000", "OCR must enforce a 15 megapixel limit");
-  includes(source, 'createWorker("ara+fra+eng", 1', "OCR must support Arabic and English");
+  includes(source, 'createWorker(languages.join("+"), 1', "OCR must use the selected multilingual language models");
   includes(source, "worker.recognize(data)", "OCR must process the downloaded image in the browser");
   includes(source, "await worker.terminate()", "OCR worker must be terminated after processing");
   includes(source, "output.textContent = extracted.slice(0, 12000)", "OCR output must be bounded and rendered as text");
