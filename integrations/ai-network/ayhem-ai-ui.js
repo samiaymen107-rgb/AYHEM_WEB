@@ -31,14 +31,21 @@ export function parseAyhemAutomaticCorrection(prompt) {
 export function parseAyhemExplicitMemorySave(prompt) {
   if (typeof prompt !== "string") return null;
   const value = prompt.trim();
-  const patterns = [
-    /^(?:احفظ|سجّل)\s+(?:هذه المعلومة|المعلومة)\s+في\s+الذاكرة\s+السحابية\s*[:：]\s*([\s\S]+)$/u,
-    /^(?:احفظ|سجّل)\s+في\s+الذاكرة\s+السحابية\s*[:：]\s*([\s\S]+)$/u,
+  const commandPatterns = [
+    /^(?:احفظ|سجّل|سجل)\s+(?:هذه المعلومة|المعلومة)\s+في\s+الذاكرة\s+السحابية\s*[:：]\s*([\s\S]+)$/u,
+    /^(?:احفظ|سجّل|سجل)\s+في\s+الذاكرة\s+السحابية\s*[:：]\s*([\s\S]+)$/u,
   ];
-  for (const pattern of patterns) {
+  for (const pattern of commandPatterns) {
     const match = value.match(pattern);
     if (match?.[1]?.trim()) return match[1].trim();
   }
+
+  // Recognize a clear save request appended after the facts.
+  // Save only the factual prefix, not the request itself.
+  const naturalRequest = value.match(
+    /^([\s\S]{8,}?)\s*(?:[،,؛;.]\s*)?(?:(?:أريدك|أرجوك|ارجوك|من فضلك)\s*)?(?:أن\s*)?(?:تحفظ|تسجل|تسجّل|تخزن|تخزّن)\s+(?:(?:هذه|هاته|هاتين|تلك)\s*)?(?:المعلومة|المعلومات|المعلومتين|ما\s+ذكرته)?\s*(?:في\s+)?(?:ذاكرتك|الذاكرة(?:\s+السحابية)?)(?:\s|$)/u,
+  );
+  if (naturalRequest?.[1]?.trim()) return naturalRequest[1].trim();
   return null;
 }
 
