@@ -95,3 +95,15 @@ Deno.test("AYHEM rate-limit migration: private atomic per-user quota contract", 
   includes(sql, "grant execute on function public.ayhem_consume_rate_limit(integer, integer) to authenticated", "Only authenticated users may consume quota");
   includes(sql, "revoke all on function public.ayhem_consume_rate_limit(integer, integer) from public, anon", "Public and anonymous callers must not execute quota RPC");
 });
+
+
+Deno.test("AYHEM rate-limit runtime: every valid request is quota-checked before inference", async () => {
+  const source = await read("supabase/functions/ayhem-openai-chat/index.ts");
+  includes(source, "consumeRateLimit(authorization, dependencies)", "AI handler must consume the per-user quota");
+  includes(source, "/rest/v1/rpc/ayhem_consume_rate_limit", "AI handler must call the dedicated quota RPC");
+  includes(source, '"apikey": apiKey', "RPC must use a publishable/anon API key");
+  includes(source, '"Authorization": authorization', "RPC must forward the caller JWT");
+  includes(source, ' }, 429, { "Retry-After": String(quota.retryAfter) })', "Quota denial must return 429 with Retry-After");
+  includes(source, ' }, 503);', "Quota accounting failures must fail closed");
+  assert(!source.includes("SUPABASE_SERVICE_ROLE_KEY"), "Rate-limit RPC must never use a service-role key");
+});
