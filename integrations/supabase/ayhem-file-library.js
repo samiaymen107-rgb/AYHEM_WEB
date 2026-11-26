@@ -118,7 +118,7 @@ async function previewImageFile(item, row, button) {
 
 async function recognizeImageText(item, row, button) {
   button.disabled = true;
-  button.textContent = "جارٍ تجهيز OCR العربي...";
+  button.textContent = "جارٍ تجهيز OCR بالعربية والفرنسية والإنجليزية...";
   let worker = null;
   try {
     const session = await getAyhemSession();
@@ -139,7 +139,7 @@ async function recognizeImageText(item, row, button) {
     bitmap.close();
     if (!pixels || pixels > 15000000) throw new Error("أبعاد الصورة كبيرة للمعالجة الآمنة (الحد 15 ميغابكسل).");
 
-    say("يُحمّل محرك OCR وبيانات العربية والإنجليزية عند الطلب. تبقى الصورة داخل جهازك.");
+    say("يُحمّل محرك OCR وبيانات العربية والفرنسية والإنجليزية عند الطلب. تبقى الصورة داخل جهازك.");
     const tesseractModule = await import("https://esm.sh/tesseract.js@6.0.1?bundle");
     const createWorker = tesseractModule.createWorker || tesseractModule.default?.createWorker;
     if (typeof createWorker !== "function") throw new Error("تعذر تحميل محرك OCR.");
@@ -168,14 +168,14 @@ async function recognizeImageText(item, row, button) {
     row.append(output);
     const note = document.createElement("small");
     note.textContent = extracted.length > 12000
-      ? "عُرض أول 12,000 حرف فقط. لم يُحفظ النص ولم يُعدّل الملف الأصلي."
-      : "استخراج OCR محلي للعربية والإنجليزية. قد تختلف الدقة حسب وضوح الصورة وجودتها.";
+      ? "عُرض أول 12,000 حرف فقط. حُفظ النص المستخرج ضمن الحد المسموح، وبقي الملف الأصلي دون تعديل."
+      : "استخراج OCR محلي للعربية والفرنسية والإنجليزية. قد تختلف الدقة حسب وضوح الصورة وجودتها.";
     row.append(note);
     button.textContent = "اكتمل استخراج النص";
     say(capture?.saved ? "اكتمل OCR وحُفظ النص العربي والفرنسي والإنجليزي في بنك معلومات حسابك الخاص." : capture?.duplicate ? "اكتمل OCR؛ هذا النص محفوظ مسبقاً في بنك معلومات حسابك." : "اكتمل OCR محلياً؛ تعذر تأكيد حفظ النص في بنك المعلومات.");
   } catch (error) {
     button.disabled = false;
-    button.textContent = "استخراج النص العربي";
+    button.textContent = "استخراج النص (عربي/فرنسي/إنجليزي)";
     say("تعذر استخراج النص: " + (error?.message || "خطأ غير معروف"));
   } finally {
     if (worker) {
