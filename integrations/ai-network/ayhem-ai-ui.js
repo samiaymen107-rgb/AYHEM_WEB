@@ -108,7 +108,13 @@ async function createSupabaseAIClient() {
           if (context && typeof context.json === "function") {
             try {
               const payload = await context.clone().json();
-              if (typeof payload?.error === "string") throw new Error(payload.error);
+              if (typeof payload?.error === "string") {
+                const retryAfter = Number(payload.retry_after_seconds);
+                const retryHint = Number.isInteger(retryAfter) && retryAfter > 0 && retryAfter <= 3600
+                  ? " يمكنك إعادة المحاولة بعد نحو " + retryAfter + " ثانية."
+                  : "";
+                throw new Error(payload.error + retryHint);
+              }
             } catch (parseError) {
               if (parseError instanceof Error && parseError.message !== "Unexpected end of JSON input") throw parseError;
             }
