@@ -63,6 +63,51 @@ form?.addEventListener("submit", async event => {
   }
 });
 
+const registerButton = document.createElement("button");
+registerButton.type = "button";
+registerButton.className = "secondary";
+registerButton.id = "authRegister";
+registerButton.textContent = "إنشاء حساب جديد";
+if (form && !byId("authRegister")) {
+  const submitButton = byId("authSubmit");
+  if (submitButton?.parentNode) submitButton.parentNode.append(registerButton);
+}
+
+registerButton.addEventListener("click", async () => {
+  const email = byId("authEmail")?.value?.trim() || "";
+  const password = byId("authPassword")?.value || "";
+  if (!email || !password) {
+    showStatus("أدخل البريد الإلكتروني وكلمة المرور أولاً لإنشاء الحساب.");
+    return;
+  }
+  if (password.length < 8) {
+    showStatus("كلمة المرور يجب ألا تقل عن 8 أحرف.");
+    return;
+  }
+  registerButton.disabled = true;
+  showStatus("جارٍ إنشاء حساب AYHEM...");
+  try {
+    const client = getAyhemSupabaseClient();
+    const emailRedirectTo = window.location.origin + window.location.pathname;
+    const { data, error } = await client.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo },
+    });
+    if (error) throw error;
+    if (data?.session) {
+      showStatus("تم إنشاء الحساب وتسجيل الدخول بنجاح.");
+      if (byId("authPassword")) byId("authPassword").value = "";
+    } else {
+      showStatus("إذا أمكن إنشاء الحساب، فستصلك رسالة لتأكيد البريد الإلكتروني. افتح الرابط ثم عد إلى AYHEM لتسجيل الدخول.");
+    }
+  } catch (error) {
+    showStatus("تعذر إنشاء الحساب: " + (error?.message || "تحقق من البيانات وحاول مجدداً."));
+  } finally {
+    registerButton.disabled = false;
+  }
+});
+
 forgotButton?.addEventListener("click", async () => {
   const email = byId("authEmail")?.value?.trim() || "";
   if (!email) {
