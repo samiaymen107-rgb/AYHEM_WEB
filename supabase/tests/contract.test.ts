@@ -103,6 +103,14 @@ Deno.test("AYHEM rate-limit migration: private atomic per-user quota contract", 
 });
 
 
+
+Deno.test("AYHEM rate-limit UI: explains the server retry delay", async () => {
+  const source = await read("integrations/ai-network/ayhem-ai-ui.js");
+  includes(source, "payload.retry_after_seconds", "UI must read the server-provided retry delay");
+  includes(source, "يمكنك إعادة المحاولة بعد نحو ", "UI must explain when the user can retry after quota denial");
+  includes(source, "retryAfter <= 3600", "UI must bound displayed retry delays");
+});
+
 Deno.test("AYHEM rate-limit runtime: every valid request is quota-checked before inference", async () => {
   const source = await read("supabase/functions/ayhem-openai-chat/index.ts");
   includes(source, "consumeRateLimit(authorization, dependencies)", "AI handler must consume the per-user quota");
