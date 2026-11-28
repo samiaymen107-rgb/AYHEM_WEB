@@ -1,5 +1,10 @@
 name: AYHEM Native Android
 on:
+  push:
+    branches: [fix/android-cloud-chat-session]
+    paths:
+      - 'native-android/**'
+      - '.github/workflows/ayhem-native-android.yml'
   pull_request:
     branches: [main]
     paths:
