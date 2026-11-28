@@ -94,19 +94,21 @@ private object SecureTokenStore {
             .putString("token", android.util.Base64.encodeToString(encrypted, android.util.Base64.NO_WRAP)).apply()
     }
 
-    fun read(context: Context): CloudSession? = try {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val ivText = prefs.getString("iv", null) ?: return null
-        val tokenText = prefs.getString("token", null) ?: return null
-        val iv = android.util.Base64.decode(ivText, android.util.Base64.NO_WRAP)
-        val data = android.util.Base64.decode(tokenText, android.util.Base64.NO_WRAP)
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.DECRYPT_MODE, key(context), GCMParameterSpec(128, iv))
-        val payload = String(cipher.doFinal(data), StandardCharsets.UTF_8)
-        val json = JSONObject(payload)
-        if (!json.has("refresh_token")) return null
-        CloudSession(json.getString("access_token"), json.getString("refresh_token"), json.optLong("expires_at", 0L))
-    } catch (_: Exception) { null }
+    fun read(context: Context): CloudSession? {
+        return try {
+            val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            val ivText = prefs.getString("iv", null) ?: return null
+            val tokenText = prefs.getString("token", null) ?: return null
+            val iv = android.util.Base64.decode(ivText, android.util.Base64.NO_WRAP)
+            val data = android.util.Base64.decode(tokenText, android.util.Base64.NO_WRAP)
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.DECRYPT_MODE, key(context), GCMParameterSpec(128, iv))
+            val payload = String(cipher.doFinal(data), StandardCharsets.UTF_8)
+            val json = JSONObject(payload)
+            if (!json.has("refresh_token")) return null
+            CloudSession(json.getString("access_token"), json.getString("refresh_token"), json.optLong("expires_at", 0L))
+        } catch (_: Exception) { null }
+    }
 
     fun clear(context: Context) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().clear().apply()
